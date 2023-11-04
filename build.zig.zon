@@ -1,0 +1,9 @@
+.{
+    .name = "vapoursynth",
+    .version = "4.0.0",
+    .paths = .{
+        "LICENSE",
+        "build.zig",
+        "src",
+    },
+}
