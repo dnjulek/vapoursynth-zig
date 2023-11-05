@@ -8,4 +8,8 @@ pub fn build(b: *std.Build) void {
     _ = b.addModule("vapoursynth", .{
         .source_file = .{ .path = "src/vapoursynth.zig" },
     });
+
+    _ = b.addModule("vsconstants", .{
+        .source_file = .{ .path = "src/vsconstants.zig" },
+    });
 }
