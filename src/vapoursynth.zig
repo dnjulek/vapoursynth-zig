@@ -1,12 +1,12 @@
-// https://github.com/vapoursynth/vapoursynth/blob/master/include/VapourSynth4.h
+//! https://github.com/vapoursynth/vapoursynth/blob/master/include/VapourSynth4.h
 
-pub inline fn make_version(major: c_int, minor: c_int) c_int {
+pub inline fn makeVersion(major: c_int, minor: c_int) c_int {
     return (major << @as(c_int, 16)) | minor;
 }
 
 pub const VAPOURSYNTH_API_MAJOR: c_int = 4;
 pub const VAPOURSYNTH_API_MINOR: c_int = 0;
-pub const VAPOURSYNTH_API_VERSION: c_int = make_version(VAPOURSYNTH_API_MAJOR, VAPOURSYNTH_API_MINOR);
+pub const VAPOURSYNTH_API_VERSION: c_int = makeVersion(VAPOURSYNTH_API_MAJOR, VAPOURSYNTH_API_MINOR);
 pub const AUDIO_FRAME_SAMPLES: c_int = 3072;
 
 pub const Frame = opaque {};
@@ -31,64 +31,64 @@ pub const SampleType = enum(c_int) {
     Float = 1,
 };
 
-pub inline fn make_video_id(colorFamily: ColorFamily, sampleType: SampleType, bitsPerSample: c_int, subSamplingW: c_int, subSamplingH: c_int) PresetVideoFormat {
-    return ((colorFamily << 28) | (sampleType << 24) | (bitsPerSample << 16) | (subSamplingW << 8) | (subSamplingH << 0));
+pub inline fn makeVideoID(color_family: ColorFamily, sample_type: SampleType, bits_per_sample: c_int, sub_sampling_w: c_int, sub_sampling_h: c_int) PresetVideoFormat {
+    return ((color_family << 28) | (sample_type << 24) | (bits_per_sample << 16) | (sub_sampling_w << 8) | (sub_sampling_h << 0));
 }
 
 pub const PresetVideoFormat = enum(c_int) {
     None = 0,
 
-    Gray8 = make_video_id(ColorFamily.Gray, SampleType.Integer, 8, 0, 0),
-    Gray9 = make_video_id(ColorFamily.Gray, SampleType.Integer, 9, 0, 0),
-    Gray10 = make_video_id(ColorFamily.Gray, SampleType.Integer, 10, 0, 0),
-    Gray12 = make_video_id(ColorFamily.Gray, SampleType.Integer, 12, 0, 0),
-    Gray14 = make_video_id(ColorFamily.Gray, SampleType.Integer, 14, 0, 0),
-    Gray16 = make_video_id(ColorFamily.Gray, SampleType.Integer, 16, 0, 0),
-    Gray32 = make_video_id(ColorFamily.Gray, SampleType.Integer, 32, 0, 0),
+    Gray8 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 8, 0, 0),
+    Gray9 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 9, 0, 0),
+    Gray10 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 10, 0, 0),
+    Gray12 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 12, 0, 0),
+    Gray14 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 14, 0, 0),
+    Gray16 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 16, 0, 0),
+    Gray32 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 32, 0, 0),
 
-    GrayH = make_video_id(ColorFamily.Gray, SampleType.Float, 16, 0, 0),
-    GrayS = make_video_id(ColorFamily.Gray, SampleType.Float, 32, 0, 0),
+    GrayH = makeVideoID(ColorFamily.Gray, SampleType.Float, 16, 0, 0),
+    GrayS = makeVideoID(ColorFamily.Gray, SampleType.Float, 32, 0, 0),
 
-    YUV410P8 = make_video_id(ColorFamily.YUV, SampleType.Integer, 8, 2, 2),
-    YUV411P8 = make_video_id(ColorFamily.YUV, SampleType.Integer, 8, 2, 0),
-    YUV440P8 = make_video_id(ColorFamily.YUV, SampleType.Integer, 8, 0, 1),
+    YUV410P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 2, 2),
+    YUV411P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 2, 0),
+    YUV440P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 0, 1),
 
-    YUV420P8 = make_video_id(ColorFamily.YUV, SampleType.Integer, 8, 1, 1),
-    YUV422P8 = make_video_id(ColorFamily.YUV, SampleType.Integer, 8, 1, 0),
-    YUV444P8 = make_video_id(ColorFamily.YUV, SampleType.Integer, 8, 0, 0),
+    YUV420P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 1, 1),
+    YUV422P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 1, 0),
+    YUV444P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 0, 0),
 
-    YUV420P9 = make_video_id(ColorFamily.YUV, SampleType.Integer, 9, 1, 1),
-    YUV422P9 = make_video_id(ColorFamily.YUV, SampleType.Integer, 9, 1, 0),
-    YUV444P9 = make_video_id(ColorFamily.YUV, SampleType.Integer, 9, 0, 0),
+    YUV420P9 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 9, 1, 1),
+    YUV422P9 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 9, 1, 0),
+    YUV444P9 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 9, 0, 0),
 
-    YUV420P10 = make_video_id(ColorFamily.YUV, SampleType.Integer, 10, 1, 1),
-    YUV422P10 = make_video_id(ColorFamily.YUV, SampleType.Integer, 10, 1, 0),
-    YUV444P10 = make_video_id(ColorFamily.YUV, SampleType.Integer, 10, 0, 0),
+    YUV420P10 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 10, 1, 1),
+    YUV422P10 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 10, 1, 0),
+    YUV444P10 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 10, 0, 0),
 
-    YUV420P12 = make_video_id(ColorFamily.YUV, SampleType.Integer, 12, 1, 1),
-    YUV422P12 = make_video_id(ColorFamily.YUV, SampleType.Integer, 12, 1, 0),
-    YUV444P12 = make_video_id(ColorFamily.YUV, SampleType.Integer, 12, 0, 0),
+    YUV420P12 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 12, 1, 1),
+    YUV422P12 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 12, 1, 0),
+    YUV444P12 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 12, 0, 0),
 
-    YUV420P14 = make_video_id(ColorFamily.YUV, SampleType.Integer, 14, 1, 1),
-    YUV422P14 = make_video_id(ColorFamily.YUV, SampleType.Integer, 14, 1, 0),
-    YUV444P14 = make_video_id(ColorFamily.YUV, SampleType.Integer, 14, 0, 0),
+    YUV420P14 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 14, 1, 1),
+    YUV422P14 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 14, 1, 0),
+    YUV444P14 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 14, 0, 0),
 
-    YUV420P16 = make_video_id(ColorFamily.YUV, SampleType.Integer, 16, 1, 1),
-    YUV422P16 = make_video_id(ColorFamily.YUV, SampleType.Integer, 16, 1, 0),
-    YUV444P16 = make_video_id(ColorFamily.YUV, SampleType.Integer, 16, 0, 0),
+    YUV420P16 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 16, 1, 1),
+    YUV422P16 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 16, 1, 0),
+    YUV444P16 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 16, 0, 0),
 
-    YUV444PH = make_video_id(ColorFamily.YUV, SampleType.Float, 16, 0, 0),
-    YUV444PS = make_video_id(ColorFamily.YUV, SampleType.Float, 32, 0, 0),
+    YUV444PH = makeVideoID(ColorFamily.YUV, SampleType.Float, 16, 0, 0),
+    YUV444PS = makeVideoID(ColorFamily.YUV, SampleType.Float, 32, 0, 0),
 
-    RGB24 = make_video_id(ColorFamily.RGB, SampleType.Integer, 8, 0, 0),
-    RGB27 = make_video_id(ColorFamily.RGB, SampleType.Integer, 9, 0, 0),
-    RGB30 = make_video_id(ColorFamily.RGB, SampleType.Integer, 10, 0, 0),
-    RGB36 = make_video_id(ColorFamily.RGB, SampleType.Integer, 12, 0, 0),
-    RGB42 = make_video_id(ColorFamily.RGB, SampleType.Integer, 14, 0, 0),
-    RGB48 = make_video_id(ColorFamily.RGB, SampleType.Integer, 16, 0, 0),
+    RGB24 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 8, 0, 0),
+    RGB27 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 9, 0, 0),
+    RGB30 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 10, 0, 0),
+    RGB36 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 12, 0, 0),
+    RGB42 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 14, 0, 0),
+    RGB48 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 16, 0, 0),
 
-    RGBH = make_video_id(ColorFamily.RGB, SampleType.Float, 16, 0, 0),
-    RGBS = make_video_id(ColorFamily.RGB, SampleType.Float, 32, 0, 0),
+    RGBH = makeVideoID(ColorFamily.RGB, SampleType.Float, 16, 0, 0),
+    RGBS = makeVideoID(ColorFamily.RGB, SampleType.Float, 32, 0, 0),
 };
 
 pub const FilterMode = enum(c_int) {
@@ -288,24 +288,33 @@ pub const CacheMode = enum(c_int) {
 };
 
 // Core entry point
-pub const GetVapourSynthAPI = ?*const fn (c_int) callconv(.C) [*c]const API;
+pub const GetVapourSynthAPI = ?*const fn (c_int) callconv(.C) *const API;
 
 // Plugin, function and filter related
-pub const PublicFunction = ?*const fn (?*const Map, ?*Map, ?*anyopaque, ?*Core, [*c]const API) callconv(.C) void;
-pub const InitPlugin = ?*const fn (?*Plugin, [*c]const PLUGINAPI) callconv(.C) void;
+pub const PublicFunction = ?*const fn (?*const Map, ?*Map, ?*anyopaque, ?*Core, *const API) callconv(.C) void;
+pub const InitPlugin = ?*const fn (?*Plugin, *const PLUGINAPI) callconv(.C) void;
 pub const FreeFunctionData = ?*const fn (?*anyopaque) callconv(.C) void;
-pub const FilterGetFrame = ?*const fn (c_int, ActivationReason, ?*anyopaque, [*c]?*anyopaque, ?*FrameContext, ?*Core, [*c]const API) callconv(.C) ?*const Frame;
-pub const FilterFree = ?*const fn (?*anyopaque, ?*Core, [*c]const API) callconv(.C) void;
+pub const FilterGetFrame = ?*const fn (c_int, ActivationReason, ?*anyopaque, *?*anyopaque, ?*FrameContext, ?*Core, *const API) callconv(.C) ?*const Frame;
+pub const FilterFree = ?*const fn (?*anyopaque, ?*Core, *const API) callconv(.C) void;
 
 // Other
-pub const FrameDoneCallback = ?*const fn (?*anyopaque, ?*const Frame, c_int, ?*Node, [*c]const u8) callconv(.C) void;
-pub const LogHandler = ?*const fn (c_int, [*c]const u8, ?*anyopaque) callconv(.C) void;
+pub const FrameDoneCallback = ?*const fn (?*anyopaque, ?*const Frame, c_int, ?*Node, [*]const u8) callconv(.C) void;
+pub const LogHandler = ?*const fn (MessageType, [*]const u8, ?*anyopaque) callconv(.C) void;
 pub const LogHandlerFree = ?*const fn (?*anyopaque) callconv(.C) void;
 
 pub const PLUGINAPI = extern struct {
+    /// returns VAPOURSYNTH_API_VERSION of the library
     getAPIVersion: ?*const fn () callconv(.C) c_int,
-    configPlugin: ?*const fn ([*c]const u8, [*c]const u8, [*c]const u8, c_int, c_int, c_int, ?*Plugin) callconv(.C) c_int,
-    registerFunction: ?*const fn ([*c]const u8, [*c]const u8, [*c]const u8, PublicFunction, ?*anyopaque, ?*Plugin) callconv(.C) c_int,
+
+    /// use the VS_MAKE_VERSION macro for pluginVersion
+    ///
+    /// (identifier, pluginNamespace, name, pluginVersion, apiVersion, flags, plugin)
+    configPlugin: ?*const fn ([*]const u8, [*]const u8, [*]const u8, c_int, c_int, c_int, ?*Plugin) callconv(.C) c_int,
+
+    /// non-zero return value on success
+    ///
+    /// (name, args, returnType, argsFunc, functionData, plugin)
+    registerFunction: ?*const fn ([*]const u8, [*]const u8, [*]const u8, PublicFunction, ?*anyopaque, ?*Plugin) callconv(.C) c_int,
 };
 
 pub const FilterDependency = extern struct {
@@ -314,112 +323,299 @@ pub const FilterDependency = extern struct {
 };
 
 pub const API = extern struct {
-    createVideoFilter: ?*const fn (?*Map, [*c]const u8, [*c]const VideoInfo, FilterGetFrame, FilterFree, FilterMode, [*c]const FilterDependency, c_int, ?*anyopaque, ?*Core) callconv(.C) void,
-    createVideoFilter2: ?*const fn ([*c]const u8, [*c]const VideoInfo, FilterGetFrame, FilterFree, FilterMode, [*c]const FilterDependency, c_int, ?*anyopaque, ?*Core) callconv(.C) ?*Node,
-    createAudioFilter: ?*const fn (?*Map, [*c]const u8, [*c]const AudioInfo, FilterGetFrame, FilterFree, FilterMode, [*c]const FilterDependency, c_int, ?*anyopaque, ?*Core) callconv(.C) void,
-    createAudioFilter2: ?*const fn ([*c]const u8, [*c]const AudioInfo, FilterGetFrame, FilterFree, FilterMode, [*c]const FilterDependency, c_int, ?*anyopaque, ?*Core) callconv(.C) ?*Node,
+    /// output nodes are appended to the clip key in the out map
+    ///
+    /// (out, name, vi, getFrame, free, filterMode, dependencies, numDeps, instanceData, core)
+    createVideoFilter: ?*const fn (?*Map, [*]const u8, *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, [*]const FilterDependency, c_int, ?*anyopaque, ?*Core) callconv(.C) void,
+
+    /// same as createVideoFilter but returns a pointer to the VSNode directly or NULL on failure
+    ///
+    /// (name, vi, getFrame, free, filterMode, dependencies, numDeps, instanceData, core)
+    createVideoFilter2: ?*const fn ([*]const u8, *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, [*]const FilterDependency, c_int, ?*anyopaque, ?*Core) callconv(.C) ?*Node,
+
+    /// output nodes are appended to the clip key in the out map
+    ///
+    /// (out, name, ai, getFrame, free, filterMode, dependencies, numDeps, instanceData, core)
+    createAudioFilter: ?*const fn (?*Map, [*]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, [*]const FilterDependency, c_int, ?*anyopaque, ?*Core) callconv(.C) void,
+
+    /// same as createAudioFilter but returns a pointer to the VSNode directly or NULL on failure
+    ///
+    /// (name, ai, getFrame, free, filterMode, dependencies, numDeps, instanceData, core)
+    createAudioFilter2: ?*const fn ([*]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, [*]const FilterDependency, c_int, ?*anyopaque, ?*Core) callconv(.C) ?*Node,
+
+    /// Use right after create*Filter*, sets the correct cache mode for using the cacheFrame API and returns the recommended upper number of additional frames to cache per request
     setLinearFilter: ?*const fn (?*Node) callconv(.C) c_int,
-    setCacheMode: ?*const fn (?*Node, c_int) callconv(.C) void,
+
+    /// VSCacheMode, changing the cache mode also resets all options to their default
+    setCacheMode: ?*const fn (?*Node, CacheMode) callconv(.C) void,
+
+    /// passing -1 means no change
+    ///
+    /// (node, fixedSize, maxSize, maxHistorySize)
     setCacheOptions: ?*const fn (?*Node, c_int, c_int, c_int) callconv(.C) void,
+
     freeNode: ?*const fn (?*Node) callconv(.C) void,
     addNodeRef: ?*const fn (?*Node) callconv(.C) ?*Node,
-    getNodeType: ?*const fn (?*Node) callconv(.C) c_int,
-    getVideoInfo: ?*const fn (?*Node) callconv(.C) [*c]const VideoInfo,
-    getAudioInfo: ?*const fn (?*Node) callconv(.C) [*c]const AudioInfo,
-    newVideoFrame: ?*const fn ([*c]const VideoFormat, c_int, c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
-    newVideoFrame2: ?*const fn ([*c]const VideoFormat, c_int, c_int, [*c]?*const Frame, [*c]const c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
-    newAudioFrame: ?*const fn ([*c]const AudioFormat, c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
-    newAudioFrame2: ?*const fn ([*c]const AudioFormat, c_int, [*c]?*const Frame, [*c]const c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+    getNodeType: ?*const fn (?*Node) callconv(.C) MediaType,
+    getVideoInfo: ?*const fn (?*Node) callconv(.C) *const VideoInfo,
+    getAudioInfo: ?*const fn (?*Node) callconv(.C) *const AudioInfo,
+
+    /// (format, width, height, propSrc, core)
+    newVideoFrame: ?*const fn (*const VideoFormat, c_int, c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+
+    /// same as newVideoFrame but allows the specified planes to be effectively copied from the source frames
+    ///
+    /// (format, width, height, planeSrc, planes, propSrc, core)
+    newVideoFrame2: ?*const fn (*const VideoFormat, c_int, c_int, *?*const Frame, *const c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+
+    /// (format, numSamples, propSrc, core)
+    newAudioFrame: ?*const fn (*const AudioFormat, c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+
+    /// same as newAudioFrame but allows the specified channels to be effectively copied from the source frames
+    ///
+    /// (format, numSamples, channelSrc, channels, propSrc, core)
+    newAudioFrame2: ?*const fn (*const AudioFormat, c_int, *?*const Frame, *const c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+
     freeFrame: ?*const fn (?*const Frame) callconv(.C) void,
     addFrameRef: ?*const fn (?*const Frame) callconv(.C) ?*const Frame,
     copyFrame: ?*const fn (?*const Frame, ?*Core) callconv(.C) ?*Frame,
     getFramePropertiesRO: ?*const fn (?*const Frame) callconv(.C) ?*const Map,
     getFramePropertiesRW: ?*const fn (?*Frame) callconv(.C) ?*Map,
+
+    /// (f, plane)
     getStride: ?*const fn (?*const Frame, c_int) callconv(.C) c_longlong,
-    getReadPtr: ?*const fn (?*const Frame, c_int) callconv(.C) [*c]const u8,
-    getWritePtr: ?*const fn (?*Frame, c_int) callconv(.C) [*c]u8,
-    getVideoFrameFormat: ?*const fn (?*const Frame) callconv(.C) [*c]const VideoFormat,
-    getAudioFrameFormat: ?*const fn (?*const Frame) callconv(.C) [*c]const AudioFormat,
-    getFrameType: ?*const fn (?*const Frame) callconv(.C) c_int,
+
+    /// (f, plane)
+    getReadPtr: ?*const fn (?*const Frame, c_int) callconv(.C) [*]const u8,
+
+    ///calling this function invalidates previously gotten read pointers to the same frame
+    ///
+    /// (f, plane)
+    getWritePtr: ?*const fn (?*Frame, c_int) callconv(.C) [*]u8,
+    getVideoFrameFormat: ?*const fn (?*const Frame) callconv(.C) *const VideoFormat,
+    getAudioFrameFormat: ?*const fn (?*const Frame) callconv(.C) *const AudioFormat,
+    getFrameType: ?*const fn (?*const Frame) callconv(.C) MediaType,
+
+    /// (f, plane)
     getFrameWidth: ?*const fn (?*const Frame, c_int) callconv(.C) c_int,
+
+    /// (f, plane)
     getFrameHeight: ?*const fn (?*const Frame, c_int) callconv(.C) c_int,
+
+    /// returns the number of samples for audio frames
     getFrameLength: ?*const fn (?*const Frame) callconv(.C) c_int,
-    getVideoFormatName: ?*const fn ([*c]const VideoFormat, [*c]u8) callconv(.C) c_int,
-    getAudioFormatName: ?*const fn ([*c]const AudioFormat, [*c]u8) callconv(.C) c_int,
-    queryVideoFormat: ?*const fn ([*c]VideoFormat, c_int, c_int, c_int, c_int, c_int, ?*Core) callconv(.C) c_int,
-    queryAudioFormat: ?*const fn ([*c]AudioFormat, c_int, c_int, u64, ?*Core) callconv(.C) c_int,
-    queryVideoFormatID: ?*const fn (c_int, c_int, c_int, c_int, c_int, ?*Core) callconv(.C) u32,
-    getVideoFormatByID: ?*const fn ([*c]VideoFormat, u32, ?*Core) callconv(.C) c_int,
-    getFrame: ?*const fn (c_int, ?*Node, [*c]u8, c_int) callconv(.C) ?*const Frame,
+
+    /// up to 32 characters including terminating null may be written to the buffer, non-zero return value on success
+    getVideoFormatName: ?*const fn (*const VideoFormat, [*]u8) callconv(.C) c_int,
+
+    /// up to 32 characters including terminating null may be written to the buffer, non-zero return value on success
+    getAudioFormatName: ?*const fn (*const AudioFormat, [*]u8) callconv(.C) c_int,
+
+    /// non-zero return value on success
+    ///
+    /// (format, colorFamily, sampleType, bitsPerSample, subSamplingW, subSamplingH, core)
+    queryVideoFormat: ?*const fn (*VideoFormat, ColorFamily, SampleType, c_int, c_int, c_int, ?*Core) callconv(.C) c_int,
+
+    /// non-zero return value on success
+    ///
+    /// (format, sampleType, bitsPerSample, channelLayout, core)
+    queryAudioFormat: ?*const fn (*AudioFormat, SampleType, c_int, u64, ?*Core) callconv(.C) c_int,
+
+    /// returns 0 on failure
+    ///
+    /// (colorFamily, sampleType, bitsPerSample, subSamplingW, subSamplingH, core)
+    queryVideoFormatID: ?*const fn (ColorFamily, SampleType, c_int, c_int, c_int, ?*Core) callconv(.C) u32,
+
+    /// non-zero return value on success
+    ///
+    /// (format, id, core)
+    getVideoFormatByID: ?*const fn (*VideoFormat, u32, ?*Core) callconv(.C) c_int,
+
+    /// only for external applications using the core as a library or for requesting frames in a filter constructor, do not use inside a filter's getframe function
+    ///
+    /// (n, node, errorMsg, bufSize)
+    getFrame: ?*const fn (c_int, ?*Node, [*]u8, c_int) callconv(.C) ?*const Frame,
+
+    /// only for external applications using the core as a library or for requesting frames in a filter constructor, do not use inside a filter's getframe function
     getFrameAsync: ?*const fn (c_int, ?*Node, FrameDoneCallback, ?*anyopaque) callconv(.C) void,
+
+    /// only use inside a filter's getframe function
     getFrameFilter: ?*const fn (c_int, ?*Node, ?*FrameContext) callconv(.C) ?*const Frame,
+
+    /// only use inside a filter's getframe function
     requestFrameFilter: ?*const fn (c_int, ?*Node, ?*FrameContext) callconv(.C) void,
+
+    /// only use inside a filter's getframe function
     releaseFrameEarly: ?*const fn (?*Node, c_int, ?*FrameContext) callconv(.C) void,
+
+    /// used to store intermediate frames in cache, useful for filters where random access is slow, must call setLinearFilter on the node before using or the result is undefined
     cacheFrame: ?*const fn (?*const Frame, c_int, ?*FrameContext) callconv(.C) void,
-    setFilterError: ?*const fn ([*c]const u8, ?*FrameContext) callconv(.C) void,
+
+    /// used to signal errors in the filter getframe function
+    setFilterError: ?*const fn ([*]const u8, ?*FrameContext) callconv(.C) void,
+
+    // External functions
     createFunction: ?*const fn (PublicFunction, ?*anyopaque, FreeFunctionData, ?*Core) callconv(.C) ?*Function,
     freeFunction: ?*const fn (?*Function) callconv(.C) void,
     addFunctionRef: ?*const fn (?*Function) callconv(.C) ?*Function,
     callFunction: ?*const fn (?*Function, ?*const Map, ?*Map) callconv(.C) void,
+
+    // Map and property access functions
     createMap: ?*const fn () callconv(.C) ?*Map,
     freeMap: ?*const fn (?*Map) callconv(.C) void,
     clearMap: ?*const fn (?*Map) callconv(.C) void,
+
+    /// copies all values in src to dst, if a key already exists in dst it's replaced
     copyMap: ?*const fn (?*const Map, ?*Map) callconv(.C) void,
-    mapSetError: ?*const fn (?*Map, [*c]const u8) callconv(.C) void,
-    mapGetError: ?*const fn (?*const Map) callconv(.C) [*c]const u8,
+
+    /// used to signal errors outside filter getframe function
+    mapSetError: ?*const fn (?*Map, [*]const u8) callconv(.C) void,
+
+    /// used to query errors, returns 0 if no error
+    mapGetError: ?*const fn (?*const Map) callconv(.C) [*]const u8,
+
     mapNumKeys: ?*const fn (?*const Map) callconv(.C) c_int,
-    mapGetKey: ?*const fn (?*const Map, c_int) callconv(.C) [*c]const u8,
-    mapDeleteKey: ?*const fn (?*Map, [*c]const u8) callconv(.C) c_int,
-    mapNumElements: ?*const fn (?*const Map, [*c]const u8) callconv(.C) c_int,
-    mapGetType: ?*const fn (?*const Map, [*c]const u8) callconv(.C) c_int,
-    mapSetEmpty: ?*const fn (?*Map, [*c]const u8, c_int) callconv(.C) c_int,
-    mapGetInt: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) i64,
-    mapGetIntSaturated: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) c_int,
-    mapGetIntArray: ?*const fn (?*const Map, [*c]const u8, [*c]c_int) callconv(.C) [*c]const i64,
-    mapSetInt: ?*const fn (?*Map, [*c]const u8, i64, c_int) callconv(.C) c_int,
-    mapSetIntArray: ?*const fn (?*Map, [*c]const u8, [*c]const i64, c_int) callconv(.C) c_int,
-    mapGetFloat: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) f64,
-    mapGetFloatSaturated: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) f32,
-    mapGetFloatArray: ?*const fn (?*const Map, [*c]const u8, [*c]c_int) callconv(.C) [*c]const f64,
-    mapSetFloat: ?*const fn (?*Map, [*c]const u8, f64, c_int) callconv(.C) c_int,
-    mapSetFloatArray: ?*const fn (?*Map, [*c]const u8, [*c]const f64, c_int) callconv(.C) c_int,
-    mapGetData: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) [*c]const u8,
-    mapGetDataSize: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) c_int,
-    mapGetDataTypeHint: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) c_int,
-    mapSetData: ?*const fn (?*Map, [*c]const u8, [*c]const u8, c_int, c_int, c_int) callconv(.C) c_int,
-    mapGetNode: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) ?*Node,
-    mapSetNode: ?*const fn (?*Map, [*c]const u8, ?*Node, c_int) callconv(.C) c_int,
-    mapConsumeNode: ?*const fn (?*Map, [*c]const u8, ?*Node, c_int) callconv(.C) c_int,
-    mapGetFrame: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) ?*const Frame,
-    mapSetFrame: ?*const fn (?*Map, [*c]const u8, ?*const Frame, c_int) callconv(.C) c_int,
-    mapConsumeFrame: ?*const fn (?*Map, [*c]const u8, ?*const Frame, c_int) callconv(.C) c_int,
-    mapGetFunction: ?*const fn (?*const Map, [*c]const u8, c_int, [*c]c_int) callconv(.C) ?*Function,
-    mapSetFunction: ?*const fn (?*Map, [*c]const u8, ?*Function, c_int) callconv(.C) c_int,
-    mapConsumeFunction: ?*const fn (?*Map, [*c]const u8, ?*Function, c_int) callconv(.C) c_int,
-    registerFunction: ?*const fn ([*c]const u8, [*c]const u8, [*c]const u8, PublicFunction, ?*anyopaque, ?*Plugin) callconv(.C) c_int,
-    getPluginByID: ?*const fn ([*c]const u8, ?*Core) callconv(.C) ?*Plugin,
-    getPluginByNamespace: ?*const fn ([*c]const u8, ?*Core) callconv(.C) ?*Plugin,
+
+    /// (map, index)
+    mapGetKey: ?*const fn (?*const Map, c_int) callconv(.C) [*]const u8,
+    mapDeleteKey: ?*const fn (?*Map, [*]const u8) callconv(.C) c_int,
+
+    /// returns -1 if a key doesn't exist
+    mapNumElements: ?*const fn (?*const Map, [*]const u8) callconv(.C) c_int,
+    mapGetType: ?*const fn (?*const Map, [*]const u8) callconv(.C) PropertyType,
+
+    /// (map, key, type)
+    mapSetEmpty: ?*const fn (?*Map, [*]const u8, c_int) callconv(.C) c_int,
+
+    /// (map, key, index, error)
+    mapGetInt: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) i64,
+
+    /// (map, key, index, error)
+    mapGetIntSaturated: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) c_int,
+
+    /// (map, key, error)
+    mapGetIntArray: ?*const fn (?*const Map, [*]const u8, *c_int) callconv(.C) [*]const i64,
+
+    /// (map, key, i, append)
+    mapSetInt: ?*const fn (?*Map, [*]const u8, i64, MapAppendMode) callconv(.C) c_int,
+
+    /// (map, key, i, size)
+    mapSetIntArray: ?*const fn (?*Map, [*]const u8, [*]const i64, c_int) callconv(.C) c_int,
+
+    /// (map, key, index, error)
+    mapGetFloat: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) f64,
+
+    /// (map, key, index, error)
+    mapGetFloatSaturated: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) f32,
+
+    /// (map, key, error)
+    mapGetFloatArray: ?*const fn (?*const Map, [*]const u8, *c_int) callconv(.C) [*]const f64,
+
+    /// (map, key, i, append)
+    mapSetFloat: ?*const fn (?*Map, [*]const u8, f64, MapAppendMode) callconv(.C) c_int,
+
+    /// (map, key, i, size)
+    mapSetFloatArray: ?*const fn (?*Map, [*]const u8, [*]const f64, c_int) callconv(.C) c_int,
+
+    /// (map, key, index, error)
+    mapGetData: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) [*]const u8,
+
+    /// (map, key, index, error)
+    mapGetDataSize: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) c_int,
+
+    /// (map, key, index, error)
+    mapGetDataTypeHint: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) DataTypeHint,
+
+    /// (map, key, data, size, type, append)
+    mapSetData: ?*const fn (?*Map, [*]const u8, [*]const u8, c_int, DataTypeHint, MapAppendMode) callconv(.C) c_int,
+
+    /// (map, key, index, error)
+    mapGetNode: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) ?*Node,
+
+    /// returns 0 on success
+    /// (map, key, node, append)
+    mapSetNode: ?*const fn (?*Map, [*]const u8, ?*Node, MapAppendMode) callconv(.C) c_int,
+
+    /// always consumes the reference, even on error
+    ///
+    /// (map, key, node, append)
+    mapConsumeNode: ?*const fn (?*Map, [*]const u8, ?*Node, MapAppendMode) callconv(.C) c_int,
+
+    /// (map, key, index, error)
+    mapGetFrame: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) ?*const Frame,
+
+    /// returns 0 on success
+    ///
+    /// (map, key, f, append)
+    mapSetFrame: ?*const fn (?*Map, [*]const u8, ?*const Frame, MapAppendMode) callconv(.C) c_int,
+
+    /// always consumes the reference, even on error
+    ///
+    /// (map, key, f, append)
+    mapConsumeFrame: ?*const fn (?*Map, [*]const u8, ?*const Frame, MapAppendMode) callconv(.C) c_int,
+
+    /// (map, key, index, error)
+    mapGetFunction: ?*const fn (?*const Map, [*]const u8, c_int, *c_int) callconv(.C) ?*Function,
+
+    /// returns 0 on success
+    ///
+    /// (map, key, func, append)
+    mapSetFunction: ?*const fn (?*Map, [*]const u8, ?*Function, MapAppendMode) callconv(.C) c_int,
+
+    /// always consumes the reference, even on error
+    ///
+    /// (map, key, func, append)
+    mapConsumeFunction: ?*const fn (?*Map, [*]const u8, ?*Function, MapAppendMode) callconv(.C) c_int,
+
+    /// non-zero return value on success
+    ///
+    /// (name, args, returnType, argsFunc, functionData, plugin)
+    registerFunction: ?*const fn ([*]const u8, [*]const u8, [*]const u8, PublicFunction, ?*anyopaque, ?*Plugin) callconv(.C) c_int,
+    getPluginByID: ?*const fn ([*]const u8, ?*Core) callconv(.C) ?*Plugin,
+    getPluginByNamespace: ?*const fn ([*]const u8, ?*Core) callconv(.C) ?*Plugin,
+
+    /// pass NULL to get the first plugin
     getNextPlugin: ?*const fn (?*Plugin, ?*Core) callconv(.C) ?*Plugin,
-    getPluginName: ?*const fn (?*Plugin) callconv(.C) [*c]const u8,
-    getPluginID: ?*const fn (?*Plugin) callconv(.C) [*c]const u8,
-    getPluginNamespace: ?*const fn (?*Plugin) callconv(.C) [*c]const u8,
+    getPluginName: ?*const fn (?*Plugin) callconv(.C) [*]const u8,
+    getPluginID: ?*const fn (?*Plugin) callconv(.C) [*]const u8,
+    getPluginNamespace: ?*const fn (?*Plugin) callconv(.C) [*]const u8,
+
+    /// pass NULL to get the first plugin function
     getNextPluginFunction: ?*const fn (?*PluginFunction, ?*Plugin) callconv(.C) ?*PluginFunction,
-    getPluginFunctionByName: ?*const fn ([*c]const u8, ?*Plugin) callconv(.C) ?*PluginFunction,
-    getPluginFunctionName: ?*const fn (?*PluginFunction) callconv(.C) [*c]const u8,
-    getPluginFunctionArguments: ?*const fn (?*PluginFunction) callconv(.C) [*c]const u8,
-    getPluginFunctionReturnType: ?*const fn (?*PluginFunction) callconv(.C) [*c]const u8,
-    getPluginPath: ?*const fn (?*const Plugin) callconv(.C) [*c]const u8,
+    getPluginFunctionByName: ?*const fn ([*]const u8, ?*Plugin) callconv(.C) ?*PluginFunction,
+    getPluginFunctionName: ?*const fn (?*PluginFunction) callconv(.C) [*]const u8,
+
+    /// returns an argument format string
+    getPluginFunctionArguments: ?*const fn (?*PluginFunction) callconv(.C) [*]const u8,
+
+    /// returns an argument format string
+    getPluginFunctionReturnType: ?*const fn (?*PluginFunction) callconv(.C) [*]const u8,
+
+    /// the full path to the loaded library file containing the plugin entry point
+    getPluginPath: ?*const fn (?*const Plugin) callconv(.C) [*]const u8,
     getPluginVersion: ?*const fn (?*const Plugin) callconv(.C) c_int,
-    invoke: ?*const fn (?*Plugin, [*c]const u8, ?*const Map) callconv(.C) ?*Map,
-    createCore: ?*const fn (c_int) callconv(.C) ?*Core,
+
+    /// user must free the returned VSMap
+    invoke: ?*const fn (?*Plugin, [*]const u8, ?*const Map) callconv(.C) ?*Map,
+    createCore: ?*const fn (CoreCreationFlags) callconv(.C) ?*Core,
+
+    /// only call this function after all node, frame and function references belonging to the core have been freed
     freeCore: ?*const fn (?*Core) callconv(.C) void,
+
+    /// the total cache size (in bytes) at which vapoursynth more aggressively tries to reclaim memory, it is not a hard limit
     setMaxCacheSize: ?*const fn (i64, ?*Core) callconv(.C) i64,
+
+    /// setting threads to 0 means automatic detection
     setThreadCount: ?*const fn (c_int, ?*Core) callconv(.C) c_int,
-    getCoreInfo: ?*const fn (?*Core, [*c]CoreInfo) callconv(.C) void,
+    getCoreInfo: ?*const fn (?*Core, *CoreInfo) callconv(.C) void,
     getAPIVersion: ?*const fn () callconv(.C) c_int,
-    logMessage: ?*const fn (c_int, [*c]const u8, ?*Core) callconv(.C) void,
+    logMessage: ?*const fn (MessageType, [*]const u8, ?*Core) callconv(.C) void,
+
+    /// free and userData can be NULL, returns a handle that can be passed to removeLogHandler
     addLogHandler: ?*const fn (LogHandler, LogHandlerFree, ?*anyopaque, ?*Core) callconv(.C) ?*LogHandle,
+
+    /// returns non-zero if successfully removed
     removeLogHandler: ?*const fn (?*LogHandle, ?*Core) callconv(.C) c_int,
 };
 
-pub extern fn getVapourSynthAPI(version: c_int) [*c]const API;
+pub extern fn getVapourSynthAPI(version: c_int) *const API;
