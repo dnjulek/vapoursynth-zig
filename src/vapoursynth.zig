@@ -132,31 +132,31 @@ pub const VideoFormat = extern struct {
 };
 
 pub const AudioChannels = enum(c_int) {
-    acFrontLeft = 0,
-    acFrontRight = 1,
-    acFrontCenter = 2,
-    acLowFrequency = 3,
-    acBackLeft = 4,
-    acBackRight = 5,
-    acFrontLeftOFCenter = 6,
-    acFrontRightOFCenter = 7,
-    acBackCenter = 8,
-    acSideLeft = 9,
-    acSideRight = 10,
-    acTopCenter = 11,
-    acTopFrontLeft = 12,
-    acTopFrontCenter = 13,
-    acTopFrontRight = 14,
-    acTopBackLeft = 15,
-    acTopBackCenter = 16,
-    acTopBackRight = 17,
-    acStereoLeft = 29,
-    acStereoRight = 30,
-    acWideLeft = 31,
-    acWideRight = 32,
-    acSurroundDirectLeft = 33,
-    acSurroundDirectRight = 34,
-    acLowFrequency2 = 35,
+    FrontLeft = 0,
+    FrontRight = 1,
+    FrontCenter = 2,
+    LowFrequency = 3,
+    BackLeft = 4,
+    BackRight = 5,
+    FrontLeftOFCenter = 6,
+    FrontRightOFCenter = 7,
+    BackCenter = 8,
+    SideLeft = 9,
+    SideRight = 10,
+    TopCenter = 11,
+    TopFrontLeft = 12,
+    TopFrontCenter = 13,
+    TopFrontRight = 14,
+    TopBackLeft = 15,
+    TopBackCenter = 16,
+    TopBackRight = 17,
+    StereoLeft = 29,
+    StereoRight = 30,
+    WideLeft = 31,
+    WideRight = 32,
+    SurroundDirectLeft = 33,
+    SurroundDirectRight = 34,
+    LowFrequency2 = 35,
 };
 
 pub const AudioFormat = extern struct {
@@ -186,24 +186,24 @@ pub const PropertyType = enum(c_int) {
 };
 
 pub const MapPropertyError = enum(c_int) {
-    peSuccess = 0,
+    Success = 0,
 
     /// no key exists
-    peUnset = 1,
+    Unset = 1,
 
     /// key exists but not of a compatible type
-    peType = 2,
+    Type = 2,
 
     /// index out of bounds
-    peIndex = 4,
+    Index = 4,
 
     /// map has error state set
-    peError = 3,
+    Error = 3,
 };
 
 pub const MapAppendMode = enum(c_int) {
-    maReplace = 0,
-    maAppend = 1,
+    Replace = 0,
+    Append = 1,
 };
 
 pub const CoreInfo = extern struct {
