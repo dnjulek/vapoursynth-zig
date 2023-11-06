@@ -12,4 +12,8 @@ pub fn build(b: *std.Build) void {
     _ = b.addModule("vsconstants", .{
         .source_file = .{ .path = "src/vsconstants.zig" },
     });
+
+    _ = b.addModule("vshelper", .{
+        .source_file = .{ .path = "src/vshelper.zig" },
+    });
 }
