@@ -3,7 +3,7 @@
     .version = "4.0.0",
     .paths = .{
         "LICENSE",
-        "READ.md",
+        "README.md",
         "build.zig",
         "src",
         "example",
