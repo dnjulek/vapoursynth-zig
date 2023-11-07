@@ -1,0 +1,12 @@
+.{
+    .name = "invert_example",
+    .version = "1.0.0",
+    .paths = .{""},
+    .dependencies = .{
+        .vapoursynth = .{
+            .url = "https://github.com/dnjulek/vapoursynth-zig/archive/refs/heads/main.tar.gz",
+            .hash = "12207164fa3c81d179aecfc9e5007d22782d72de4aef303b99c1968d064890032227",
+            // Delete the .hash line if you want the most up-to-date hash/files.
+        },
+    },
+}

@@ -3,7 +3,9 @@
     .version = "4.0.0",
     .paths = .{
         "LICENSE",
+        "READ.md",
         "build.zig",
         "src",
+        "example",
     },
 }
