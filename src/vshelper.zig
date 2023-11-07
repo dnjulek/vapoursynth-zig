@@ -1,6 +1,6 @@
 //! https://github.com/vapoursynth/vapoursynth/blob/master/include/VSHelper4.h
 
-const vs = @import("vapoursynth.zig");
+const vs = @import("vapoursynth4.zig");
 const cf = vs.ColorFamily;
 
 pub const STD_PLUGIN_ID = "com.vapoursynth.std";
