@@ -6,14 +6,6 @@ pub fn build(b: *std.Build) void {
 
     // Expose this as a module that others can import
     _ = b.addModule("vapoursynth", .{
-        .source_file = .{ .path = "src/vapoursynth.zig" },
-    });
-
-    _ = b.addModule("vsconstants", .{
-        .source_file = .{ .path = "src/vsconstants.zig" },
-    });
-
-    _ = b.addModule("vshelper", .{
-        .source_file = .{ .path = "src/vshelper.zig" },
+        .source_file = .{ .path = "src/module.zig" },
     });
 }
