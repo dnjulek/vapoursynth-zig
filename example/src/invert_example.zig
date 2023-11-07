@@ -3,6 +3,7 @@
 const std = @import("std");
 const vapoursynth = @import("vapoursynth");
 
+const math = std.math;
 const vs = vapoursynth.vapoursynth4;
 const vsh = vapoursynth.vshelper;
 
@@ -85,7 +86,8 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
     }
 
     var enabled: i32 = undefined;
-    enabled = @intCast(vsapi.?.mapGetInt.?(in, "enabled", 0, &err));
+    // math.lossyCast = mapGetIntSaturated or vsh_int64ToIntS (same for float)
+    enabled = math.lossyCast(i32, vsapi.?.mapGetInt.?(in, "enabled", 0, &err));
     if (err != 0) {
         enabled = 1;
     }
