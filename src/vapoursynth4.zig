@@ -511,10 +511,10 @@ pub const API = extern struct {
     /// (map, key, error)
     mapGetFloatArray: ?*const fn (?*const Map, [*]const u8, *c_int) callconv(.C) [*]const f64,
 
-    /// (map, key, i, append)
+    /// (map, key, d, append)
     mapSetFloat: ?*const fn (?*Map, [*]const u8, f64, MapAppendMode) callconv(.C) c_int,
 
-    /// (map, key, i, size)
+    /// (map, key, d, size)
     mapSetFloatArray: ?*const fn (?*Map, [*]const u8, [*]const f64, c_int) callconv(.C) c_int,
 
     /// (map, key, index, error)
