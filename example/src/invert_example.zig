@@ -110,7 +110,7 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
         },
     };
 
-    vsapi.?.createVideoFilter.?(out, "Invert", vi, invertGetFrame, invertFree, fm.Parallel, &deps, 1, data, core);
+    vsapi.?.createVideoFilter.?(out, "Invert", vi, invertGetFrame, invertFree, fm.Parallel, &deps, deps.len, data, core);
 }
 
 export fn VapourSynthPluginInit2(plugin: *vs.Plugin, vspapi: *const vs.PLUGINAPI) void {
