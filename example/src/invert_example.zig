@@ -22,7 +22,7 @@ const InvertData = struct {
 
 export fn invertGetFrame(n: c_int, activation_reason: ar, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
     _ = frame_data;
-    var d: *InvertData = @ptrCast(@alignCast(instance_data));
+    const d: *InvertData = @ptrCast(@alignCast(instance_data));
 
     if (activation_reason == ar.Initial) {
         vsapi.?.requestFrameFilter.?(n, d.node, frame_ctx);
@@ -36,7 +36,7 @@ export fn invertGetFrame(n: c_int, activation_reason: ar, instance_data: ?*anyop
 
         const height = vsapi.?.getFrameHeight.?(src, 0);
         const width = vsapi.?.getFrameWidth.?(src, 0);
-        var dst = vsapi.?.newVideoFrame.?(fi, width, height, src, core);
+        const dst = vsapi.?.newVideoFrame.?(fi, width, height, src, core);
 
         var plane: c_int = 0;
         while (plane < fi.numPlanes) : (plane += 1) {
@@ -66,7 +66,7 @@ export fn invertGetFrame(n: c_int, activation_reason: ar, instance_data: ?*anyop
 
 export fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
     _ = core;
-    var d: *InvertData = @ptrCast(@alignCast(instance_data));
+    const d: *InvertData = @ptrCast(@alignCast(instance_data));
     vsapi.?.freeNode.?(d.node);
     allocator.destroy(d);
 }
@@ -77,7 +77,7 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
     var err: c_int = undefined;
 
     d.node = vsapi.?.mapGetNode.?(in, "clip", 0, &err).?;
-    var vi: *const vs.VideoInfo = vsapi.?.getVideoInfo.?(d.node);
+    const vi: *const vs.VideoInfo = vsapi.?.getVideoInfo.?(d.node);
 
     if (!vsh.isConstantVideoFormat(vi) or (vi.format.sampleType != st.Integer) or (vi.format.bitsPerSample != @as(c_int, 8))) {
         vsapi.?.mapSetError.?(out, "Invert: only constant format 8bit integer input supported");
@@ -100,7 +100,7 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
 
     d.enabled = enabled == 1;
 
-    var data: *InvertData = allocator.create(InvertData) catch unreachable;
+    const data: *InvertData = allocator.create(InvertData) catch unreachable;
     data.* = d;
 
     var deps = [_]vs.FilterDependency{
