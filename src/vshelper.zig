@@ -65,6 +65,6 @@ pub fn areValidDimensions(fi: *const vs.VideoFormat, width: c_int, height: c_int
     return !((width % (1 << fi.subSamplingW)) || (height % (1 << fi.subSamplingH)));
 }
 
-pub inline fn ceil_n(x: u32, n: u32) u32 {
+pub inline fn ceil_n(x: usize, n: usize) usize {
     return (x + (n - 1)) & ~(n - 1);
 }
