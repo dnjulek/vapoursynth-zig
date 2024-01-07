@@ -4,7 +4,8 @@
     .paths = .{""},
     .dependencies = .{
         .vapoursynth = .{
-            .url = "https://github.com/dnjulek/vapoursynth-zig/archive/***COMMIT_HERE***.tar.gz",
+            .url = "https://github.com/dnjulek/vapoursynth-zig/archive/8f00a018ed680886283ee0b5070ae02f01d468a0.tar.gz",
+            .hash = "12207d0f77de3ea85b5c8b1f49296605834f915338b0a93da180639760011458c22c",
         },
     },
 }
