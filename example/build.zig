@@ -16,11 +16,11 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    lib.addModule("vapoursynth", vapoursynth_dep.module("vapoursynth"));
+    lib.root_module.addImport("vapoursynth", vapoursynth_dep.module("vapoursynth"));
     lib.linkLibC();
 
-    if (lib.optimize == .ReleaseFast) {
-        lib.strip = true;
+    if (lib.root_module.optimize == .ReleaseFast) {
+        lib.root_module.strip = true;
     }
 
     b.installArtifact(lib);
