@@ -67,7 +67,7 @@ pub fn areValidDimensions(fi: *const vs.VideoFormat, width: c_int, height: c_int
 }
 
 /// multiplies and divides a rational number, such as a frame duration, in place and reduces the result
-inline fn muldivRational(num: *i64, den: *i64, mul: i64, div: i64) void {
+pub inline fn muldivRational(num: *i64, den: *i64, mul: i64, div: i64) void {
     std.debug.assert(div != 0);
 
     num.* *= mul;
