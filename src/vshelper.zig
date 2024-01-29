@@ -1,5 +1,6 @@
 //! https://github.com/vapoursynth/vapoursynth/blob/master/include/VSHelper4.h
 
+const std = @import("std");
 const vs = @import("vapoursynth4.zig");
 const cf = vs.ColorFamily;
 
@@ -63,6 +64,29 @@ pub inline fn bitblt(dstp: anytype, dst_stride: usize, srcp: anytype, src_stride
 /// returns non-zero for valid width and height
 pub fn areValidDimensions(fi: *const vs.VideoFormat, width: c_int, height: c_int) callconv(.C) c_int {
     return !((width % (1 << fi.subSamplingW)) || (height % (1 << fi.subSamplingH)));
+}
+
+/// multiplies and divides a rational number, such as a frame duration, in place and reduces the result
+inline fn muldivRational(num: *i64, den: *i64, mul: i64, div: i64) void {
+    std.debug.assert(div != 0);
+
+    num.* *= mul;
+    den.* *= div;
+    var a: i64 = num.*;
+    var b: i64 = den.*;
+
+    while (b != 0) {
+        const t: i64 = a;
+        a = b;
+        b = @mod(t, b);
+
+        if (a < 0) {
+            a = -a;
+        }
+
+        num.* = @divTrunc(num.*, a);
+        den.* = @divTrunc(den.*, a);
+    }
 }
 
 pub inline fn ceil_n(x: usize, n: usize) usize {
