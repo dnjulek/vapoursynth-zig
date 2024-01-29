@@ -74,3 +74,9 @@ pub const ColorPrimaries = enum(c_int) {
     ST432_1 = 12,
     EBU3213_E = 22,
 };
+
+pub const DataType = enum(c_int) {
+    U8 = 1,
+    U16 = 2,
+    F32 = 4,
+};
