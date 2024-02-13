@@ -2,6 +2,7 @@
 
 const std = @import("std");
 const vs = @import("vapoursynth4.zig");
+const math = std.math;
 const cf = vs.ColorFamily;
 
 pub const STD_PLUGIN_ID = "com.vapoursynth.std";
@@ -91,4 +92,16 @@ pub inline fn muldivRational(num: *i64, den: *i64, mul: i64, div: i64) void {
 
 pub inline fn ceil_n(x: usize, n: usize) usize {
     return (x + (n - 1)) & ~(n - 1);
+}
+
+pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*]const u8, index: c_int, vsapi: ?*const vs.API) ?T {
+    var err: c_int = undefined;
+    const val: T = switch (@typeInfo(T)) {
+        .Int => math.lossyCast(T, vsapi.?.mapGetInt.?(in, key, index, &err)),
+        .Float => math.lossyCast(T, vsapi.?.mapGetFloat.?(in, key, index, &err)),
+        .Bool => vsapi.?.mapGetInt.?(in, key, index, &err) != 0,
+        else => @compileError("mapGetN only works with Int, Float and Bool types"),
+    };
+
+    return if (err == 0) val else null;
 }
