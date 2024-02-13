@@ -85,12 +85,8 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
         return;
     }
 
-    var enabled: i32 = undefined;
-    // math.lossyCast = mapGetIntSaturated or vsh_int64ToIntS (same for float)
-    enabled = math.lossyCast(i32, vsapi.?.mapGetInt.?(in, "enabled", 0, &err));
-    if (err != 0) {
-        enabled = 1;
-    }
+    // https://ziglang.org/documentation/master/#Optionals
+    const enabled = vsh.mapGetN(i32, in, "enabled", 0, vsapi) orelse 1;
 
     if ((enabled < 0) or (enabled > 1)) {
         vsapi.?.mapSetError.?(out, "Invert: enabled must be 0 or 1");
