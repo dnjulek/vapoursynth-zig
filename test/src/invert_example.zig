@@ -11,6 +11,7 @@ const ar = vs.ActivationReason;
 const rp = vs.RequestPattern;
 const fm = vs.FilterMode;
 const st = vs.SampleType;
+const pe = vs.MapPropertyError;
 
 // https://ziglang.org/documentation/master/#Choosing-an-Allocator
 const allocator = std.heap.c_allocator;
@@ -74,7 +75,7 @@ export fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const
 export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
     _ = user_data;
     var d: InvertData = undefined;
-    var err: c_int = undefined;
+    var err: pe = undefined;
 
     d.node = vsapi.?.mapGetNode.?(in, "clip", 0, &err).?;
     const vi: *const vs.VideoInfo = vsapi.?.getVideoInfo.?(d.node);
