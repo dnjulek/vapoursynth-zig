@@ -331,6 +331,8 @@ pub const GetVapourSynthAPI = ?*const fn (c_int) callconv(.C) *const API;
 /// and createAudioFilter() or createVideoFilter() should be called. This is where the filter should perform any other initialisation it requires.
 /// If for some reason you cannot create the filter, you have to free any created node references using freeNode(), call mapSetError() on out, and return.
 pub const PublicFunction = ?*const fn (?*const Map, ?*Map, userData: ?*anyopaque, ?*Core, *const API) callconv(.C) void;
+/// Same as PublicFunction type, required to use registerFunction in separate zig file without dependency loop error.
+pub const PublicFunction2 = ?*const fn (?*const Map, ?*Map, userData: ?*anyopaque, ?*Core, *const API) callconv(.C) void;
 /// A plugin’s entry point. It must be called VapourSynthPluginInit2. This function is called after the core loads the shared library. Its purpose is to configure the plugin and to register the filters the plugin wants to export.
 pub const InitPlugin = ?*const fn (?*Plugin, *const PLUGINAPI) callconv(.C) void;
 pub const FreeFunctionData = ?*const fn (?*anyopaque) callconv(.C) void;
@@ -353,7 +355,7 @@ pub const PLUGINAPI = extern struct {
     /// Used to provide information about a plugin when loaded. Must be called exactly once from the VapourSynthPluginInit2 entry point. It is recommended to use the makeVersion fn when providing the pluginVersion.
     configPlugin: ?*const fn (identifier: [*]const u8, pluginNamespace: [*]const u8, name: [*]const u8, pluginVersion: c_int, apiVersion: c_int, flag: c_int, ?*Plugin) callconv(.C) c_int,
     /// Function that registers a filter exported by the plugin. A plugin can export any number of filters. This function may only be called during the plugin loading phase unless the pcModifiable flag was set by configPlugin.
-    registerFunction: ?*const fn (name: [*]const u8, args: [*]const u8, returnType: [*]const u8, argsFunc: PublicFunction, functionData: ?*anyopaque, ?*Plugin) callconv(.C) c_int,
+    registerFunction: ?*const fn (name: [*]const u8, args: [*]const u8, returnType: [*]const u8, argsFunc: PublicFunction2, functionData: ?*anyopaque, ?*Plugin) callconv(.C) c_int,
 };
 
 /// Contains information about a VSCore instance.
