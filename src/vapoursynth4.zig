@@ -507,7 +507,7 @@ pub const API = extern struct {
     mapSetInt: ?*const fn (?*Map, key: [*]const u8, i64, MapAppendMode) callconv(.C) c_int,
     /// Adds an array of integers to a map. Use this function if there are a lot of numbers to add, because it is faster than calling mapSetInt() in a loop.
     /// If map already contains a property with this key, that property will be overwritten and all old values will be lost.
-    mapSetIntArray: ?*const fn (?*Map, key: [*]const u8, [*]const i64, c_int) callconv(.C) c_int,
+    mapSetIntArray: ?*const fn (?*Map, key: [*]const u8, arr: [*]const i64, size: c_int) callconv(.C) c_int,
     ///Retrieves a floating point number from a map. Returns the number on success, or 0 in case of error.
     mapGetFloat: ?*const fn (?*const Map, key: [*]const u8, index: c_int, *MapPropertyError) callconv(.C) f64,
     /// Works just like mapGetFloat() except that the value returned is also converted to a f32.
@@ -518,7 +518,7 @@ pub const API = extern struct {
     /// Sets a float to the specified key in a map.
     mapSetFloat: ?*const fn (?*Map, key: [*]const u8, n: f64, MapAppendMode) callconv(.C) c_int,
     /// Adds an array of floating point numbers to a map. Use this function if there are a lot of numbers to add, because it is faster than calling mapSetFloat() in a loop.
-    mapSetFloatArray: ?*const fn (?*Map, key: [*]const u8, arr: [*]const f64, c_int) callconv(.C) c_int,
+    mapSetFloatArray: ?*const fn (?*Map, key: [*]const u8, arr: [*]const f64, size: c_int) callconv(.C) c_int,
     /// Retrieves arbitrary binary data from a map. Checking mapGetDataTypeHint() may provide a hint about whether or not the data is human readable.
     mapGetData: ?*const fn (?*const Map, key: [*]const u8, index: c_int, *MapPropertyError) callconv(.C) [*]const u8,
     /// Returns the size in bytes of a property of type ptData (see VSPropertyType), or 0 in case of error. The terminating NULL byte added by mapSetData() is not counted.
