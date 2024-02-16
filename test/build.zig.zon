@@ -1,0 +1,10 @@
+.{
+    .name = "invert_example",
+    .version = "1.0.0",
+    .paths = .{""},
+    .dependencies = .{
+        .vapoursynth = .{
+            .path = "../",
+        },
+    },
+}
