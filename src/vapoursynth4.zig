@@ -483,7 +483,7 @@ pub const API = extern struct {
     /// For errors encountered in a filter’s “getframe” function, use setFilterError.
     mapSetError: ?*const fn (?*Map, errorMessage: [*]const u8) callconv(.C) void,
     /// Returns a pointer to the error message contained in the map, or NULL if there is no error set. The pointer is valid until the next modifying operation on the map.
-    mapGetError: ?*const fn (?*const Map) callconv(.C) [*]const u8,
+    mapGetError: ?*const fn (?*const Map) callconv(.C) ?[*]const u8,
     /// Returns the number of keys contained in a property map.
     mapNumKeys: ?*const fn (?*const Map) callconv(.C) c_int,
     /// Returns the nth key from a property map. Passing an invalid index will cause a fatal error. The pointer is valid as long as the key exists in the map.
@@ -502,7 +502,7 @@ pub const API = extern struct {
     mapGetIntSaturated: ?*const fn (?*const Map, key: [*]const u8, index: c_int, *MapPropertyError) callconv(.C) c_int,
     /// Retrieves an array of integers from a map. Use this function if there are a lot of numbers associated with a key, because it is faster than calling mapGetInt() in a loop.
     /// Returns a pointer to the first element of the array on success, or NULL in case of error. Use mapNumElements() to know the total number of elements associated with a key.
-    mapGetIntArray: ?*const fn (?*const Map, key: [*]const u8, *MapPropertyError) callconv(.C) [*]const i64,
+    mapGetIntArray: ?*const fn (?*const Map, key: [*]const u8, *MapPropertyError) callconv(.C) ?[*]const i64,
     /// Sets an integer to the specified key in a map. Multiple values can be associated with one key, but they must all be the same type.
     mapSetInt: ?*const fn (?*Map, key: [*]const u8, i64, MapAppendMode) callconv(.C) c_int,
     /// Adds an array of integers to a map. Use this function if there are a lot of numbers to add, because it is faster than calling mapSetInt() in a loop.
@@ -514,7 +514,7 @@ pub const API = extern struct {
     mapGetFloatSaturated: ?*const fn (?*const Map, key: [*]const u8, index: c_int, *MapPropertyError) callconv(.C) f32,
     /// Retrieves an array of floating point numbers from a map. Use this function if there are a lot of numbers associated with a key, because it is faster than calling mapGetFloat() in a loop.
     /// Returns a pointer to the first element of the array on success, or NULL in case of error. Use mapNumElements() to know the total number of elements associated with a key.
-    mapGetFloatArray: ?*const fn (?*const Map, key: [*]const u8, *MapPropertyError) callconv(.C) [*]const f64,
+    mapGetFloatArray: ?*const fn (?*const Map, key: [*]const u8, *MapPropertyError) callconv(.C) ?[*]const f64,
     /// Sets a float to the specified key in a map.
     mapSetFloat: ?*const fn (?*Map, key: [*]const u8, n: f64, MapAppendMode) callconv(.C) c_int,
     /// Adds an array of floating point numbers to a map. Use this function if there are a lot of numbers to add, because it is faster than calling mapSetFloat() in a loop.
