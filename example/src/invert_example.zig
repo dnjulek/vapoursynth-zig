@@ -7,11 +7,6 @@ const math = std.math;
 const vs = vapoursynth.vapoursynth4;
 const vsh = vapoursynth.vshelper;
 
-const ar = vs.ActivationReason;
-const rp = vs.RequestPattern;
-const fm = vs.FilterMode;
-const st = vs.SampleType;
-
 // https://ziglang.org/documentation/master/#Choosing-an-Allocator
 const allocator = std.heap.c_allocator;
 
@@ -20,13 +15,13 @@ const InvertData = struct {
     enabled: bool,
 };
 
-export fn invertGetFrame(n: c_int, activation_reason: ar, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
+export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
     _ = frame_data;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
 
-    if (activation_reason == ar.Initial) {
+    if (activation_reason == .Initial) {
         vsapi.?.requestFrameFilter.?(n, d.node, frame_ctx);
-    } else if (activation_reason == ar.AllFramesReady) {
+    } else if (activation_reason == .AllFramesReady) {
         const src = vsapi.?.getFrameFilter.?(n, d.node, frame_ctx);
 
         // https://ziglang.org/documentation/master/#defer
@@ -74,12 +69,12 @@ export fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const
 export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
     _ = user_data;
     var d: InvertData = undefined;
-    var err: c_int = undefined;
+    var err: vs.MapPropertyError = undefined;
 
     d.node = vsapi.?.mapGetNode.?(in, "clip", 0, &err).?;
     const vi: *const vs.VideoInfo = vsapi.?.getVideoInfo.?(d.node);
 
-    if (!vsh.isConstantVideoFormat(vi) or (vi.format.sampleType != st.Integer) or (vi.format.bitsPerSample != @as(c_int, 8))) {
+    if (!vsh.isConstantVideoFormat(vi) or (vi.format.sampleType != .Integer) or (vi.format.bitsPerSample != @as(c_int, 8))) {
         vsapi.?.mapSetError.?(out, "Invert: only constant format 8bit integer input supported");
         vsapi.?.freeNode.?(d.node);
         return;
@@ -102,11 +97,11 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
     var deps = [_]vs.FilterDependency{
         vs.FilterDependency{
             .source = d.node,
-            .requestPattern = rp.StrictSpatial,
+            .requestPattern = .StrictSpatial,
         },
     };
 
-    vsapi.?.createVideoFilter.?(out, "Invert", vi, invertGetFrame, invertFree, fm.Parallel, &deps, deps.len, data, core);
+    vsapi.?.createVideoFilter.?(out, "Invert", vi, invertGetFrame, invertFree, .Parallel, &deps, deps.len, data, core);
 }
 
 export fn VapourSynthPluginInit2(plugin: *vs.Plugin, vspapi: *const vs.PLUGINAPI) void {

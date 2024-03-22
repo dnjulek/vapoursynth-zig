@@ -3,8 +3,6 @@
 const std = @import("std");
 const vs = @import("vapoursynth4.zig");
 const math = std.math;
-const cf = vs.ColorFamily;
-const pe = vs.MapPropertyError;
 
 pub const STD_PLUGIN_ID = "com.vapoursynth.std";
 pub const RESIZE_PLUGIN_ID = "com.vapoursynth.resize";
@@ -12,7 +10,7 @@ pub const TEXT_PLUGIN_ID = "com.vapoursynth.text";
 
 /// convenience function for checking if the format never changes between frames
 pub fn isConstantVideoFormat(vi: *const vs.VideoInfo) callconv(.C) bool {
-    return (vi.height > 0) and (vi.width > 0) and (vi.format.colorFamily != cf.Undefined);
+    return (vi.height > 0) and (vi.width > 0) and (vi.format.colorFamily != .Undefined);
 }
 
 /// convenience function to check if two clips have the same format (unknown/changeable will be considered the same too)
@@ -96,7 +94,7 @@ pub inline fn ceil_n(x: usize, n: usize) usize {
 }
 
 pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*]const u8, index: c_int, vsapi: ?*const vs.API) ?T {
-    var err: pe = undefined;
+    var err: vs.MapPropertyError = undefined;
     const val: T = switch (@typeInfo(T)) {
         .Int => math.lossyCast(T, vsapi.?.mapGetInt.?(in, key, index, &err)),
         .Float => math.lossyCast(T, vsapi.?.mapGetFloat.?(in, key, index, &err)),
@@ -104,5 +102,5 @@ pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*]const u8, index: c_
         else => @compileError("mapGetN only works with Int, Float and Bool types"),
     };
 
-    return if (err == pe.Success) val else null;
+    return if (err == .Success) val else null;
 }

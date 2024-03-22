@@ -56,57 +56,57 @@ pub inline fn makeVideoID(color_family: ColorFamily, sample_type: SampleType, bi
 pub const PresetVideoFormat = enum(c_int) {
     None = 0,
 
-    Gray8 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 8, 0, 0),
-    Gray9 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 9, 0, 0),
-    Gray10 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 10, 0, 0),
-    Gray12 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 12, 0, 0),
-    Gray14 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 14, 0, 0),
-    Gray16 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 16, 0, 0),
-    Gray32 = makeVideoID(ColorFamily.Gray, SampleType.Integer, 32, 0, 0),
+    Gray8 = makeVideoID(.Gray, .Integer, 8, 0, 0),
+    Gray9 = makeVideoID(.Gray, .Integer, 9, 0, 0),
+    Gray10 = makeVideoID(.Gray, .Integer, 10, 0, 0),
+    Gray12 = makeVideoID(.Gray, .Integer, 12, 0, 0),
+    Gray14 = makeVideoID(.Gray, .Integer, 14, 0, 0),
+    Gray16 = makeVideoID(.Gray, .Integer, 16, 0, 0),
+    Gray32 = makeVideoID(.Gray, .Integer, 32, 0, 0),
 
-    GrayH = makeVideoID(ColorFamily.Gray, SampleType.Float, 16, 0, 0),
-    GrayS = makeVideoID(ColorFamily.Gray, SampleType.Float, 32, 0, 0),
+    GrayH = makeVideoID(.Gray, .Float, 16, 0, 0),
+    GrayS = makeVideoID(.Gray, .Float, 32, 0, 0),
 
-    YUV410P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 2, 2),
-    YUV411P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 2, 0),
-    YUV440P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 0, 1),
+    YUV410P8 = makeVideoID(.YUV, .Integer, 8, 2, 2),
+    YUV411P8 = makeVideoID(.YUV, .Integer, 8, 2, 0),
+    YUV440P8 = makeVideoID(.YUV, .Integer, 8, 0, 1),
 
-    YUV420P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 1, 1),
-    YUV422P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 1, 0),
-    YUV444P8 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 8, 0, 0),
+    YUV420P8 = makeVideoID(.YUV, .Integer, 8, 1, 1),
+    YUV422P8 = makeVideoID(.YUV, .Integer, 8, 1, 0),
+    YUV444P8 = makeVideoID(.YUV, .Integer, 8, 0, 0),
 
-    YUV420P9 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 9, 1, 1),
-    YUV422P9 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 9, 1, 0),
-    YUV444P9 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 9, 0, 0),
+    YUV420P9 = makeVideoID(.YUV, .Integer, 9, 1, 1),
+    YUV422P9 = makeVideoID(.YUV, .Integer, 9, 1, 0),
+    YUV444P9 = makeVideoID(.YUV, .Integer, 9, 0, 0),
 
-    YUV420P10 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 10, 1, 1),
-    YUV422P10 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 10, 1, 0),
-    YUV444P10 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 10, 0, 0),
+    YUV420P10 = makeVideoID(.YUV, .Integer, 10, 1, 1),
+    YUV422P10 = makeVideoID(.YUV, .Integer, 10, 1, 0),
+    YUV444P10 = makeVideoID(.YUV, .Integer, 10, 0, 0),
 
-    YUV420P12 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 12, 1, 1),
-    YUV422P12 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 12, 1, 0),
-    YUV444P12 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 12, 0, 0),
+    YUV420P12 = makeVideoID(.YUV, .Integer, 12, 1, 1),
+    YUV422P12 = makeVideoID(.YUV, .Integer, 12, 1, 0),
+    YUV444P12 = makeVideoID(.YUV, .Integer, 12, 0, 0),
 
-    YUV420P14 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 14, 1, 1),
-    YUV422P14 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 14, 1, 0),
-    YUV444P14 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 14, 0, 0),
+    YUV420P14 = makeVideoID(.YUV, .Integer, 14, 1, 1),
+    YUV422P14 = makeVideoID(.YUV, .Integer, 14, 1, 0),
+    YUV444P14 = makeVideoID(.YUV, .Integer, 14, 0, 0),
 
-    YUV420P16 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 16, 1, 1),
-    YUV422P16 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 16, 1, 0),
-    YUV444P16 = makeVideoID(ColorFamily.YUV, SampleType.Integer, 16, 0, 0),
+    YUV420P16 = makeVideoID(.YUV, .Integer, 16, 1, 1),
+    YUV422P16 = makeVideoID(.YUV, .Integer, 16, 1, 0),
+    YUV444P16 = makeVideoID(.YUV, .Integer, 16, 0, 0),
 
-    YUV444PH = makeVideoID(ColorFamily.YUV, SampleType.Float, 16, 0, 0),
-    YUV444PS = makeVideoID(ColorFamily.YUV, SampleType.Float, 32, 0, 0),
+    YUV444PH = makeVideoID(.YUV, .Float, 16, 0, 0),
+    YUV444PS = makeVideoID(.YUV, .Float, 32, 0, 0),
 
-    RGB24 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 8, 0, 0),
-    RGB27 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 9, 0, 0),
-    RGB30 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 10, 0, 0),
-    RGB36 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 12, 0, 0),
-    RGB42 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 14, 0, 0),
-    RGB48 = makeVideoID(ColorFamily.RGB, SampleType.Integer, 16, 0, 0),
+    RGB24 = makeVideoID(.RGB, .Integer, 8, 0, 0),
+    RGB27 = makeVideoID(.RGB, .Integer, 9, 0, 0),
+    RGB30 = makeVideoID(.RGB, .Integer, 10, 0, 0),
+    RGB36 = makeVideoID(.RGB, .Integer, 12, 0, 0),
+    RGB42 = makeVideoID(.RGB, .Integer, 14, 0, 0),
+    RGB48 = makeVideoID(.RGB, .Integer, 16, 0, 0),
 
-    RGBH = makeVideoID(ColorFamily.RGB, SampleType.Float, 16, 0, 0),
-    RGBS = makeVideoID(ColorFamily.RGB, SampleType.Float, 32, 0, 0),
+    RGBH = makeVideoID(.RGB, .Float, 16, 0, 0),
+    RGBS = makeVideoID(.RGB, .Float, 32, 0, 0),
 };
 
 /// Controls how a filter will be multithreaded, if at all.
@@ -529,7 +529,7 @@ pub const API = extern struct {
     mapSetData: ?*const fn (?*Map, key: [*]const u8, data: [*]const u8, size: c_int, DataTypeHint, MapAppendMode) callconv(.C) c_int,
     /// Retrieves a node from a map. Returns a pointer to the node on success, or NULL in case of error.
     /// This function increases the node’s reference count, so freeNode() must be used when the node is no longer needed.
-    mapGetNode: ?*const fn (?*const Map, key: [*]const u8, index: c_int, *MapPropertyError) callconv(.C) ?*Node,
+    mapGetNode: ?*const fn (?*const Map, key: [*]const u8, index: c_int, ?*MapPropertyError) callconv(.C) ?*Node,
     /// Sets a node to the specified key in a map.
     mapSetNode: ?*const fn (?*Map, key: [*]const u8, ?*Node, MapAppendMode) callconv(.C) c_int,
     /// Sets a node to the specified key in a map and decreases the reference count.
