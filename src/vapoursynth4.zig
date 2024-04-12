@@ -395,7 +395,7 @@ pub const API = extern struct {
     /// The new frame contains uninitialised memory.
     newVideoFrame: ?*const fn (*const VideoFormat, width: c_int, height: c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
     /// same as newVideoFrame but allows the specified planes to be effectively copied from the source frames
-    newVideoFrame2: ?*const fn (*const VideoFormat, width: c_int, height: c_int, *?*const Frame, plane: *const c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+    newVideoFrame2: ?*const fn (*const VideoFormat, width: c_int, height: c_int, [*]?*const Frame, plane: [*]const c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
     /// Creates a new audio frame, optionally copying the properties attached to another frame. It is a fatal error to pass invalid arguments to this function.
     /// The new frame contains uninitialised memory.
     newAudioFrame: ?*const fn (*const AudioFormat, numSamples: c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
