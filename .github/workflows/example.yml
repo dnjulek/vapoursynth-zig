@@ -32,6 +32,6 @@ jobs:
       # Runs a set of commands using the runners shell     
       - name: build
         run: |
-          cd example/
+          cd examples/example-zigapi
           zig build -Doptimize=ReleaseFast
           ls zig-out/lib
