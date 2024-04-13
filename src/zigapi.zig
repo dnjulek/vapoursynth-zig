@@ -82,11 +82,11 @@ pub const Frame = struct {
         return .{ self.geWidth(plane), self.geHeight(plane), self.getStride(plane) };
     }
 
-    pub fn getDimensions2(self: Self, plane: u32) struct { stride: u32, height: u32, width: u32 } {
+    pub fn getDimensions2(self: Self, plane: u32) struct { width: u32, height: u32, stride: u32 } {
         return .{
-            .stride = self.getStride(plane),
-            .height = self.geHeight(plane),
             .width = self.geWidth(plane),
+            .height = self.geHeight(plane),
+            .stride = self.getStride(plane),
         };
     }
 
