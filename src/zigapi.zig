@@ -66,6 +66,23 @@ pub const Frame = struct {
         };
     }
 
+    pub fn copyFrame(self: Self) Self {
+        return .{
+            .frame_ctx = self.frame_ctx,
+            .core = self.core,
+            .vsapi = self.vsapi,
+            .frame = self.vsapi.?.copyFrame.?(self.frame, self.core),
+        };
+    }
+
+    pub fn getPropertiesRO(self: Self) ?*const vs.Map {
+        return self.vsapi.?.getFramePropertiesRO.?(self.frame);
+    }
+
+    pub fn getPropertiesRW(self: Self) ?*vs.Map {
+        return self.vsapi.?.getFramePropertiesRW.?(self.frame);
+    }
+
     pub fn geHeight(self: Self, plane: u32) u32 {
         return @bitCast(self.vsapi.?.getFrameHeight.?(self.frame, @bitCast(plane)));
     }
