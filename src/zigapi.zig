@@ -194,7 +194,7 @@ pub const Map = struct {
         const len = self.numElements(key);
         if (len) |n| {
             var err: vs.MapPropertyError = undefined;
-            const arr_ptr = self.vsapi.?.mapGetIntArray.?(self.in, key.ptr, 0, &err);
+            const arr_ptr = self.vsapi.?.mapGetIntArray.?(self.in, key.ptr, &err);
             return if (err == .Success) arr_ptr.?[0..n] else null;
         } else return null;
     }
@@ -203,7 +203,7 @@ pub const Map = struct {
         const len = self.numElements(key);
         if (len) |n| {
             var err: vs.MapPropertyError = undefined;
-            const arr_ptr = self.vsapi.?.mapGetFloatArray.?(self.in, key.ptr, 0, &err);
+            const arr_ptr = self.vsapi.?.mapGetFloatArray.?(self.in, key.ptr, &err);
             return if (err == .Success) arr_ptr.?[0..n] else null;
         } else return null;
     }
