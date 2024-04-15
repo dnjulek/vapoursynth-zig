@@ -80,7 +80,7 @@ pub const Frame = struct {
     }
 
     pub fn getPropertiesRW(self: Self) ?*vs.Map {
-        return self.vsapi.?.getFramePropertiesRW.?(self.frame);
+        return self.vsapi.?.getFramePropertiesRW.?(@constCast(self.frame));
     }
 
     pub fn geHeight(self: Self, plane: u32) u32 {
