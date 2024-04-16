@@ -211,7 +211,7 @@ pub const Map = struct {
     pub fn getData(self: Self, comptime key: []const u8, data_allocator: std.mem.Allocator, data_buff: *?[]u8) ?[]u8 {
         var err: vs.MapPropertyError = undefined;
         data_buff.* = null;
-        const data_ptr = self.self.vsapi.?.mapGetData.?(self.in, key.ptr, 0, &err);
+        const data_ptr = self.vsapi.?.mapGetData.?(self.in, key.ptr, 0, &err);
         if (err != .Success) {
             return null;
         }
