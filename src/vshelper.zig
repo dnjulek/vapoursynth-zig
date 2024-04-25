@@ -106,3 +106,10 @@ pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*]const u8, index: c_
 
     return if (err == .Success) val else null;
 }
+
+/// Format the string with a null-terminator to work properly with C API, you need to free the buf manually.
+pub fn printf(allocator: std.mem.Allocator, buf: *?[]u8, comptime fmt: []const u8, args: anytype) []const u8 {
+    const err_msg = "Out of memory occurred while writing string.";
+    buf.* = allocator.alloc(u8, std.fmt.count(fmt, args) + 1) catch null; // +1 for "\x00" in bufPrintZ
+    return if (buf.*) |b| std.fmt.bufPrintZ(b, fmt, args) catch err_msg else err_msg;
+}
