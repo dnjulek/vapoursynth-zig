@@ -89,10 +89,12 @@ pub inline fn muldivRational(num: *i64, den: *i64, mul: i64, div: i64) void {
     }
 }
 
-pub inline fn ceil_n(x: usize, n: usize) usize {
+pub inline fn ceilN(x: usize, n: usize) usize {
     return (x + (n - 1)) & ~(n - 1);
 }
 
+/// Helper to use Zig Optionals and saturate to return type
+/// https://ziglang.org/documentation/master/#Optionals
 pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*]const u8, index: c_int, vsapi: ?*const vs.API) ?T {
     var err: vs.MapPropertyError = undefined;
     const val: T = switch (@typeInfo(T)) {
