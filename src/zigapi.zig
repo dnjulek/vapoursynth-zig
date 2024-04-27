@@ -107,13 +107,13 @@ pub const Frame = struct {
         };
     }
 
-    pub fn getReadPtr(self: Self, plane: u32) []const u8 {
+    pub fn getReadSlice(self: Self, plane: u32) []const u8 {
         const ptr = self.vsapi.?.getReadPtr.?(self.frame, @intCast(plane));
         const len = self.getHeight(plane) * self.getStride(plane);
         return ptr[0..len];
     }
 
-    pub fn getWritePtr(self: Self, plane: u32) []u8 {
+    pub fn getWriteSlice(self: Self, plane: u32) []u8 {
         const ptr = self.vsapi.?.getWritePtr.?(@constCast(self.frame), @intCast(plane));
         const len = self.getHeight(plane) * self.getStride(plane);
         return ptr[0..len];
