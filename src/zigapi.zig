@@ -9,8 +9,8 @@ pub const Frame = struct {
     frame: ?*const vs.Frame,
 
     const Self = @This();
-    pub fn init(node: ?*vs.Node, n: c_int, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) Self {
-        const frame = vsapi.?.getFrameFilter.?(n, node, frame_ctx);
+    pub fn init(node: ?*vs.Node, n: u32, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) Self {
+        const frame = vsapi.?.getFrameFilter.?(@intCast(n), node, frame_ctx);
         return .{
             .frame_ctx = frame_ctx,
             .core = core,
@@ -160,9 +160,9 @@ pub const Map = struct {
         return if (err == .Success) val else null;
     }
 
-    pub fn getInt2(self: Self, comptime T: type, comptime key: []const u8, index: c_int) ?T {
+    pub fn getInt2(self: Self, comptime T: type, comptime key: []const u8, index: u32) ?T {
         var err: vs.MapPropertyError = undefined;
-        const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.in, key.ptr, index, &err));
+        const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.in, key.ptr, @intCast(index), &err));
         return if (err == .Success) val else null;
     }
 
@@ -172,9 +172,9 @@ pub const Map = struct {
         return if (err == .Success) val else null;
     }
 
-    pub fn getFloat2(self: Self, comptime T: type, comptime key: []const u8, index: c_int) ?T {
+    pub fn getFloat2(self: Self, comptime T: type, comptime key: []const u8, index: u32) ?T {
         var err: vs.MapPropertyError = undefined;
-        const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.in, key.ptr, index, &err));
+        const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.in, key.ptr, @intCast(index), &err));
         return if (err == .Success) val else null;
     }
 
@@ -184,9 +184,9 @@ pub const Map = struct {
         return if (err == .Success) val else null;
     }
 
-    pub fn getBool2(self: Self, comptime key: []const u8, index: c_int) ?bool {
+    pub fn getBool2(self: Self, comptime key: []const u8, index: u32) ?bool {
         var err: vs.MapPropertyError = undefined;
-        const val = self.vsapi.?.mapGetInt.?(self.in, key.ptr, index, &err) != 0;
+        const val = self.vsapi.?.mapGetInt.?(self.in, key.ptr, @intCast(index), &err) != 0;
         return if (err == .Success) val else null;
     }
 
