@@ -30,8 +30,8 @@ export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, insta
 
         var plane: u32 = 0;
         while (plane < d.vi.format.numPlanes) : (plane += 1) {
-            var srcp = src.getReadPtr(plane);
-            var dstp = dst.getWritePtr(plane);
+            var srcp = src.getReadSlice(plane);
+            var dstp = dst.getWriteSlice(plane);
 
             // getDimensions returns a tuple with [width, height, stride],
             // use getDimensions2 if you want a struct.

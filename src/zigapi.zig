@@ -9,8 +9,8 @@ pub const Frame = struct {
     frame: ?*const vs.Frame,
 
     const Self = @This();
-    pub fn init(node: ?*vs.Node, n: c_int, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) Self {
-        const frame = vsapi.?.getFrameFilter.?(n, node, frame_ctx);
+    pub fn init(node: ?*vs.Node, n: u32, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) Self {
+        const frame = vsapi.?.getFrameFilter.?(@intCast(n), node, frame_ctx);
         return .{
             .frame_ctx = frame_ctx,
             .core = core,
@@ -83,39 +83,39 @@ pub const Frame = struct {
         return self.vsapi.?.getFramePropertiesRW.?(@constCast(self.frame));
     }
 
-    pub fn geHeight(self: Self, plane: u32) u32 {
-        return @bitCast(self.vsapi.?.getFrameHeight.?(self.frame, @bitCast(plane)));
+    pub fn getHeight(self: Self, plane: u32) u32 {
+        return @intCast(self.vsapi.?.getFrameHeight.?(self.frame, @intCast(plane)));
     }
 
-    pub fn geWidth(self: Self, plane: u32) u32 {
-        return @bitCast(self.vsapi.?.getFrameWidth.?(self.frame, @bitCast(plane)));
+    pub fn getWidth(self: Self, plane: u32) u32 {
+        return @intCast(self.vsapi.?.getFrameWidth.?(self.frame, @intCast(plane)));
     }
 
     pub fn getStride(self: Self, plane: u32) u32 {
-        return @intCast(self.vsapi.?.getStride.?(self.frame, @bitCast(plane)));
+        return @intCast(self.vsapi.?.getStride.?(self.frame, @intCast(plane)));
     }
 
     pub fn getDimensions(self: Self, plane: u32) struct { u32, u32, u32 } {
-        return .{ self.geWidth(plane), self.geHeight(plane), self.getStride(plane) };
+        return .{ self.getWidth(plane), self.getHeight(plane), self.getStride(plane) };
     }
 
     pub fn getDimensions2(self: Self, plane: u32) struct { width: u32, height: u32, stride: u32 } {
         return .{
-            .width = self.geWidth(plane),
-            .height = self.geHeight(plane),
+            .width = self.getWidth(plane),
+            .height = self.getHeight(plane),
             .stride = self.getStride(plane),
         };
     }
 
-    pub fn getReadPtr(self: Self, plane: u32) []const u8 {
-        const ptr = self.vsapi.?.getReadPtr.?(self.frame, @bitCast(plane));
-        const len = self.geHeight(plane) * self.getStride(plane);
+    pub fn getReadSlice(self: Self, plane: u32) []const u8 {
+        const ptr = self.vsapi.?.getReadPtr.?(self.frame, @intCast(plane));
+        const len = self.getHeight(plane) * self.getStride(plane);
         return ptr[0..len];
     }
 
-    pub fn getWritePtr(self: Self, plane: u32) []u8 {
-        const ptr = self.vsapi.?.getWritePtr.?(@constCast(self.frame), @bitCast(plane));
-        const len = self.geHeight(plane) * self.getStride(plane);
+    pub fn getWriteSlice(self: Self, plane: u32) []u8 {
+        const ptr = self.vsapi.?.getWritePtr.?(@constCast(self.frame), @intCast(plane));
+        const len = self.getHeight(plane) * self.getStride(plane);
         return ptr[0..len];
     }
 };
@@ -160,9 +160,9 @@ pub const Map = struct {
         return if (err == .Success) val else null;
     }
 
-    pub fn getInt2(self: Self, comptime T: type, comptime key: []const u8, index: c_int) ?T {
+    pub fn getInt2(self: Self, comptime T: type, comptime key: []const u8, index: u32) ?T {
         var err: vs.MapPropertyError = undefined;
-        const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.in, key.ptr, index, &err));
+        const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.in, key.ptr, @intCast(index), &err));
         return if (err == .Success) val else null;
     }
 
@@ -172,9 +172,9 @@ pub const Map = struct {
         return if (err == .Success) val else null;
     }
 
-    pub fn getFloat2(self: Self, comptime T: type, comptime key: []const u8, index: c_int) ?T {
+    pub fn getFloat2(self: Self, comptime T: type, comptime key: []const u8, index: u32) ?T {
         var err: vs.MapPropertyError = undefined;
-        const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.in, key.ptr, index, &err));
+        const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.in, key.ptr, @intCast(index), &err));
         return if (err == .Success) val else null;
     }
 
@@ -184,9 +184,9 @@ pub const Map = struct {
         return if (err == .Success) val else null;
     }
 
-    pub fn getBool2(self: Self, comptime key: []const u8, index: c_int) ?bool {
+    pub fn getBool2(self: Self, comptime key: []const u8, index: u32) ?bool {
         var err: vs.MapPropertyError = undefined;
-        const val = self.vsapi.?.mapGetInt.?(self.in, key.ptr, index, &err) != 0;
+        const val = self.vsapi.?.mapGetInt.?(self.in, key.ptr, @intCast(index), &err) != 0;
         return if (err == .Success) val else null;
     }
 
