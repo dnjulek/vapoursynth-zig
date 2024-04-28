@@ -95,12 +95,12 @@ pub inline fn ceilN(x: usize, n: usize) usize {
 
 /// Helper to use Zig Optionals and saturate to return type
 /// https://ziglang.org/documentation/master/#Optionals
-pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*]const u8, index: c_int, vsapi: ?*const vs.API) ?T {
+pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*]const u8, index: u32, vsapi: ?*const vs.API) ?T {
     var err: vs.MapPropertyError = undefined;
     const val: T = switch (@typeInfo(T)) {
-        .Int => math.lossyCast(T, vsapi.?.mapGetInt.?(in, key, index, &err)),
-        .Float => math.lossyCast(T, vsapi.?.mapGetFloat.?(in, key, index, &err)),
-        .Bool => vsapi.?.mapGetInt.?(in, key, index, &err) != 0,
+        .Int => math.lossyCast(T, vsapi.?.mapGetInt.?(in, key, @intCast(index), &err)),
+        .Float => math.lossyCast(T, vsapi.?.mapGetFloat.?(in, key, @intCast(index), &err)),
+        .Bool => vsapi.?.mapGetInt.?(in, key, @intCast(index), &err) != 0,
         else => @compileError("mapGetN only works with Int, Float and Bool types"),
     };
 
