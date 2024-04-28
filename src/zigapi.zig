@@ -9,8 +9,8 @@ pub const Frame = struct {
     frame: ?*const vs.Frame,
 
     const Self = @This();
-    pub fn init(node: ?*vs.Node, n: u32, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) Self {
-        const frame = vsapi.?.getFrameFilter.?(@intCast(n), node, frame_ctx);
+    pub fn init(node: ?*vs.Node, n: c_int, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) Self {
+        const frame = vsapi.?.getFrameFilter.?(n, node, frame_ctx);
         return .{
             .frame_ctx = frame_ctx,
             .core = core,
