@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 12, .patch = 0, .pre = "dev.2158" };
+pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 13, .patch = 0, .pre = "dev.133" };
 
 pub fn build(b: *std.Build) void {
     ensureZigVersion() catch return;
@@ -9,7 +9,7 @@ pub fn build(b: *std.Build) void {
 
     const lib = b.addSharedLibrary(.{
         .name = "invert_example",
-        .root_source_file = .{ .path = "src/invert_example.zig" },
+        .root_source_file = b.path("src/invert_example.zig"),
         .target = target,
         .optimize = optimize,
     });
