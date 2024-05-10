@@ -4,8 +4,8 @@
     .paths = .{""},
     .dependencies = .{
         .vapoursynth = .{
-            .url = "https://github.com/dnjulek/vapoursynth-zig/archive/3db0d78da4f32921523653ae8797522f6711cada.tar.gz",
-            .hash = "1220f3787e80ed7916463c15a23a02aa3126a6cc6cd529ba525f4a904ba9fca6997f",
+            .url = "https://github.com/dnjulek/vapoursynth-zig/archive/d63bcabf7a8bb15765bd5f3cd3ac0e616c7fd85d.tar.gz",
+            .hash = "122052c56de9675478b4bd37b56615d4ec072a6881d7dd333c364a32d2557abadb7a",
         },
     },
 }
