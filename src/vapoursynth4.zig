@@ -47,8 +47,10 @@ pub const SampleType = enum(c_int) {
     Float = 1,
 };
 
-pub inline fn makeVideoID(color_family: ColorFamily, sample_type: SampleType, bits_per_sample: c_int, sub_sampling_w: c_int, sub_sampling_h: c_int) PresetVideoFormat {
-    return ((color_family << 28) | (sample_type << 24) | (bits_per_sample << 16) | (sub_sampling_w << 8) | (sub_sampling_h << 0));
+pub inline fn makeVideoID(color_family: ColorFamily, sample_type: SampleType, bits_per_sample: c_int, sub_sampling_w: c_int, sub_sampling_h: c_int) c_int {
+    const cf: c_int = @intFromEnum(color_family);
+    const st: c_int = @intFromEnum(sample_type);
+    return ((cf << 28) | (st << 24) | (bits_per_sample << 16) | (sub_sampling_w << 8) | (sub_sampling_h << 0));
 }
 
 /// The presets suffixed with H and S have floating point sample type. The H and S suffixes stand for half precision and single precision, respectively.
