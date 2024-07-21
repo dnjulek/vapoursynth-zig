@@ -450,7 +450,7 @@ pub const API = extern struct {
     getVideoFormatByID: ?*const fn (*VideoFormat, id: u32, ?*Core) callconv(.C) c_int,
     /// Fetches a frame synchronously. The frame is available when the function returns.
     /// This function is meant for external applications using the core as a library, or if frame requests are necessary during a filter’s initialization.
-    getFrame: ?*const fn (n: c_int, ?*Node, errorMsg: [*]const u8, bufSize: c_int) callconv(.C) ?*const Frame,
+    getFrame: ?*const fn (n: c_int, ?*Node, errorMsg: ?[*]const u8, bufSize: c_int) callconv(.C) ?*const Frame,
     /// Requests the generation of a frame. When the frame is ready, a user-provided function is called. Note that the completion callback will only be called from a single thread at a time.
     /// This function is meant for applications using VapourSynth as a library.
     getFrameAsync: ?*const fn (n: c_int, ?*Node, FrameDoneCallback, userData: ?*anyopaque) callconv(.C) void,
