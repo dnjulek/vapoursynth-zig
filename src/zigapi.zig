@@ -118,6 +118,18 @@ pub const Frame = struct {
         const len = self.getHeight(plane) * self.getStride(plane);
         return ptr[0..len];
     }
+
+    pub fn getReadSlice2(self: Self, comptime T: type, plane: u32) []const T {
+        const ptr = self.vsapi.?.getReadPtr.?(self.frame, @intCast(plane));
+        const len = self.getHeight(plane) * self.getStride(plane);
+        return @as([*]const T, @ptrCast(@alignCast(ptr)))[0..len];
+    }
+
+    pub fn getWriteSlice2(self: Self, comptime T: type, plane: u32) []T {
+        const ptr = self.vsapi.?.getWritePtr.?(@constCast(self.frame), @intCast(plane));
+        const len = self.getHeight(plane) * self.getStride(plane);
+        return @as([*]const T, @ptrCast(@alignCast(ptr)))[0..len];
+    }
 };
 
 pub const Map = struct {
