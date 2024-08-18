@@ -128,7 +128,7 @@ pub const Frame = struct {
     pub fn getWriteSlice2(self: Self, comptime T: type, plane: usize) []T {
         const ptr = self.vsapi.?.getWritePtr.?(@constCast(self.frame), @intCast(plane));
         const len = self.getHeight(plane) * self.getStride(plane);
-        return @as([*]const T, @ptrCast(@alignCast(ptr)))[0..len];
+        return @as([*]T, @ptrCast(@alignCast(ptr)))[0..len];
     }
 };
 
