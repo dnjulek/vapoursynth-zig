@@ -99,14 +99,6 @@ pub const Frame = struct {
         return .{ self.getWidth(plane), self.getHeight(plane), self.getStride(plane) };
     }
 
-    pub fn getDimensions2(self: Self, plane: usize) struct { width: u32, height: u32, stride: u32 } {
-        return .{
-            .width = self.getWidth(plane),
-            .height = self.getHeight(plane),
-            .stride = self.getStride(plane),
-        };
-    }
-
     pub fn getReadSlice(self: Self, plane: usize) []const u8 {
         const ptr = self.vsapi.?.getReadPtr.?(self.frame, @intCast(plane));
         const len = self.getHeight(plane) * self.getStride(plane);
@@ -119,16 +111,32 @@ pub const Frame = struct {
         return ptr[0..len];
     }
 
+    pub fn getStride2(self: Self, comptime T: type, plane: usize) u32 {
+        return @intCast(self.vsapi.?.getStride.?(self.frame, @intCast(plane)) >> (@sizeOf(T) >> 1));
+    }
+
+    pub fn getDimensions2(self: Self, comptime T: type, plane: usize) struct { u32, u32, u32 } {
+        return .{ self.getWidth(plane), self.getHeight(plane), self.getStride2(T, plane) };
+    }
+
     pub fn getReadSlice2(self: Self, comptime T: type, plane: usize) []const T {
         const ptr = self.vsapi.?.getReadPtr.?(self.frame, @intCast(plane));
-        const len = self.getHeight(plane) * self.getStride(plane);
+        const len = self.getHeight(plane) * self.getStride2(T, plane);
         return @as([*]const T, @ptrCast(@alignCast(ptr)))[0..len];
     }
 
     pub fn getWriteSlice2(self: Self, comptime T: type, plane: usize) []T {
         const ptr = self.vsapi.?.getWritePtr.?(@constCast(self.frame), @intCast(plane));
-        const len = self.getHeight(plane) * self.getStride(plane);
+        const len = self.getHeight(plane) * self.getStride2(T, plane);
         return @as([*]T, @ptrCast(@alignCast(ptr)))[0..len];
+    }
+
+    pub fn getDimensions3(self: Self, plane: usize) struct { width: u32, height: u32, stride: u32 } {
+        return .{
+            .width = self.getWidth(plane),
+            .height = self.getHeight(plane),
+            .stride = self.getStride(plane),
+        };
     }
 };
 
