@@ -98,9 +98,9 @@ pub inline fn ceilN(x: usize, n: usize) usize {
 pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*]const u8, index: u32, vsapi: ?*const vs.API) ?T {
     var err: vs.MapPropertyError = undefined;
     const val: T = switch (@typeInfo(T)) {
-        .Int => math.lossyCast(T, vsapi.?.mapGetInt.?(in, key, @intCast(index), &err)),
-        .Float => math.lossyCast(T, vsapi.?.mapGetFloat.?(in, key, @intCast(index), &err)),
-        .Bool => vsapi.?.mapGetInt.?(in, key, @intCast(index), &err) != 0,
+        .int => math.lossyCast(T, vsapi.?.mapGetInt.?(in, key, @intCast(index), &err)),
+        .float => math.lossyCast(T, vsapi.?.mapGetFloat.?(in, key, @intCast(index), &err)),
+        .bool => vsapi.?.mapGetInt.?(in, key, @intCast(index), &err) != 0,
         else => @compileError("mapGetN only works with Int, Float and Bool types"),
     };
 
