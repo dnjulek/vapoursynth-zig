@@ -45,7 +45,7 @@ pub const API = extern struct {
     evalSetWorkingDir: ?*const fn (handle: ?*VSScript, set_cwd: c_int) callconv(.C) void,
     /// Write a list of set output index values to dst but at most size values.
     /// Always returns the total number of available output index values.
-    getAvailableOutputNodes: ?*const fn (handle: ?*VSScript, size: c_int, dst: *c_int) callconv(.C) c_int,
+    getAvailableOutputNodes: ?*const fn (handle: ?*VSScript, size: c_int, dst: ?*c_int) callconv(.C) c_int,
 };
 
 pub extern fn getVSScriptAPI(version: c_int) ?*const API;
