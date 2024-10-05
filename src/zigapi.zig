@@ -75,6 +75,14 @@ pub const Frame = struct {
         };
     }
 
+    pub fn setInt(self: Self, key: [*]const u8, n: i64) void {
+        _ = self.vsapi.?.mapSetInt.?(self.getPropertiesRW(), key, n, .Replace);
+    }
+
+    pub fn setFloat(self: Self, key: [*]const u8, n: f64) void {
+        _ = self.vsapi.?.mapSetFloat.?(self.getPropertiesRW(), key, n, .Replace);
+    }
+
     pub fn getPropertiesRO(self: Self) ?*const vs.Map {
         return self.vsapi.?.getFramePropertiesRO.?(self.frame);
     }
