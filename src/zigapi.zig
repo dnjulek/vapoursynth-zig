@@ -66,6 +66,23 @@ pub const Frame = struct {
         };
     }
 
+    pub fn newVideoFrame3(self: Self, width: u32, height: u32) Self {
+        const frame = self.vsapi.?.newVideoFrame.?(
+            self.vsapi.?.getVideoFrameFormat.?(self.frame),
+            @intCast(width),
+            @intCast(height),
+            self.frame,
+            self.core,
+        );
+
+        return .{
+            .frame_ctx = self.frame_ctx,
+            .core = self.core,
+            .vsapi = self.vsapi,
+            .frame = frame,
+        };
+    }
+
     pub fn copyFrame(self: Self) Self {
         return .{
             .frame_ctx = self.frame_ctx,
