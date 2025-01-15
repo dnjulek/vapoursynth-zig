@@ -2,7 +2,7 @@ const std = @import("std");
 const vs = @import("vapoursynth4.zig");
 const math = std.math;
 
-pub const Frame = struct {
+pub const ZFrame = struct {
     frame_ctx: ?*vs.FrameContext,
     core: ?*vs.Core,
     vsapi: ?*const vs.API,
