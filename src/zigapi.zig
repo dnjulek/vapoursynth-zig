@@ -148,56 +148,85 @@ pub const Frame = struct {
         };
     }
 
-    //-------- get props --------//
-
-    pub fn getPropertiesRO(self: Self) ?*const vs.Map {
-        return self.vsapi.?.getFramePropertiesRO.?(self.frame);
+    pub fn getPropertiesRO(self: Self) PropertiesRO {
+        return .{
+            .props = self.vsapi.?.getFramePropertiesRO.?(self.frame),
+            .vsapi = self.vsapi,
+        };
     }
 
-    pub fn numElements(self: Self, comptime key: []const u8) ?u32 {
-        const ne = self.vsapi.?.mapNumElements.?(self.getPropertiesRO(), key.ptr);
-        return if (ne < 1) null else @as(u32, @bitCast(ne));
+    pub fn getPropertiesRW(self: Self) PropertiesRW {
+        return .{
+            .props = self.vsapi.?.getFramePropertiesRW.?(@constCast(self.frame)),
+            .vsapi = self.vsapi,
+        };
+    }
+};
+
+pub const PropertiesRW = struct {
+    props: ?*vs.Map,
+    vsapi: ?*const vs.API,
+
+    const Self = @This();
+    pub fn setInt(self: Self, key: []const u8, n: i64, mode: vs.MapAppendMode) void {
+        _ = self.vsapi.?.mapSetInt.?(self.props, key.ptr, n, mode);
     }
 
-    pub fn dataSize(self: Self, comptime key: []const u8, index: i32) ?u32 {
-        var err: vs.MapPropertyError = undefined;
-        const len = self.vsapi.?.mapGetDataSize.?(self.getPropertiesRO(), key.ptr, index, &err);
-        return if (len < 1 or err != .Success) null else @as(u32, @bitCast(len));
+    pub fn setFloat(self: Self, key: []const u8, n: f64, mode: vs.MapAppendMode) void {
+        _ = self.vsapi.?.mapSetFloat.?(self.props, key.ptr, n, mode);
     }
+
+    pub fn setIntArray(self: Self, comptime key: []const u8, arr: []const i64) void {
+        _ = self.vsapi.?.mapSetIntArray.?(self.props, key.ptr, arr.ptr, @intCast(arr.len));
+    }
+
+    pub fn setFloatArray(self: Self, comptime key: []const u8, arr: []const f64) void {
+        _ = self.vsapi.?.mapSetFloatArray.?(self.props, key.ptr, arr.ptr, @intCast(arr.len));
+    }
+
+    pub fn setData(self: Self, comptime key: []const u8, data: []const u8, dth: vs.DataTypeHint, mode: vs.MapAppendMode) void {
+        _ = self.vsapi.?.mapSetData.?(self.props, key.ptr, data.ptr, @intCast(data.len), dth, mode);
+    }
+};
+
+pub const PropertiesRO = struct {
+    const Self = @This();
+    props: ?*const vs.Map,
+    vsapi: ?*const vs.API,
 
     pub fn getInt(self: Self, comptime T: type, comptime key: []const u8) ?T {
         var err: vs.MapPropertyError = undefined;
-        const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.getPropertiesRO(), key.ptr, 0, &err));
+        const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.props, key.ptr, 0, &err));
         return if (err == .Success) val else null;
     }
 
     pub fn getInt2(self: Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
         var err: vs.MapPropertyError = undefined;
-        const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.getPropertiesRO(), key.ptr, @intCast(index), &err));
+        const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.props, key.ptr, @intCast(index), &err));
         return if (err == .Success) val else null;
     }
 
     pub fn getFloat(self: Self, comptime T: type, comptime key: []const u8) ?T {
         var err: vs.MapPropertyError = undefined;
-        const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.getPropertiesRO(), key.ptr, 0, &err));
+        const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.props, key.ptr, 0, &err));
         return if (err == .Success) val else null;
     }
 
     pub fn getFloat2(self: Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
         var err: vs.MapPropertyError = undefined;
-        const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.getPropertiesRO(), key.ptr, @intCast(index), &err));
+        const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.props, key.ptr, @intCast(index), &err));
         return if (err == .Success) val else null;
     }
 
     pub fn getBool(self: Self, comptime key: []const u8) ?bool {
         var err: vs.MapPropertyError = undefined;
-        const val = self.vsapi.?.mapGetInt.?(self.getPropertiesRO(), key.ptr, 0, &err) != 0;
+        const val = self.vsapi.?.mapGetInt.?(self.props, key.ptr, 0, &err) != 0;
         return if (err == .Success) val else null;
     }
 
     pub fn getBool2(self: Self, comptime key: []const u8, index: usize) ?bool {
         var err: vs.MapPropertyError = undefined;
-        const val = self.vsapi.?.mapGetInt.?(self.getPropertiesRO(), key.ptr, @intCast(index), &err) != 0;
+        const val = self.vsapi.?.mapGetInt.?(self.props, key.ptr, @intCast(index), &err) != 0;
         return if (err == .Success) val else null;
     }
 
@@ -205,7 +234,7 @@ pub const Frame = struct {
         const len = self.numElements(key);
         if (len) |n| {
             var err: vs.MapPropertyError = undefined;
-            const arr_ptr = self.vsapi.?.mapGetIntArray.?(self.getPropertiesRO(), key.ptr, &err);
+            const arr_ptr = self.vsapi.?.mapGetIntArray.?(self.props, key.ptr, &err);
             return if (err == .Success) arr_ptr.?[0..n] else null;
         } else return null;
     }
@@ -214,7 +243,7 @@ pub const Frame = struct {
         const len = self.numElements(key);
         if (len) |n| {
             var err: vs.MapPropertyError = undefined;
-            const arr_ptr = self.vsapi.?.mapGetFloatArray.?(self.getPropertiesRO(), key.ptr, &err);
+            const arr_ptr = self.vsapi.?.mapGetFloatArray.?(self.props, key.ptr, &err);
             return if (err == .Success) arr_ptr.?[0..n] else null;
         } else return null;
     }
@@ -223,35 +252,20 @@ pub const Frame = struct {
         var err: vs.MapPropertyError = undefined;
         const len = self.dataSize(key, 0);
         if (len) |n| {
-            const ptr = self.vsapi.?.mapGetData.?(self.getPropertiesRO(), key.ptr, index, &err);
+            const ptr = self.vsapi.?.mapGetData.?(self.props, key.ptr, index, &err);
             return if (err == .Success) ptr.?[0..n] else null;
         } else return null;
     }
 
-    //-------- set props --------//
-
-    pub fn getPropertiesRW(self: Self) ?*vs.Map {
-        return self.vsapi.?.getFramePropertiesRW.?(@constCast(self.frame));
+    fn numElements(self: Self, comptime key: []const u8) ?u32 {
+        const ne = self.vsapi.?.mapNumElements.?(self.props, key.ptr);
+        return if (ne < 1) null else @as(u32, @bitCast(ne));
     }
 
-    pub fn setInt(self: Self, key: []const u8, n: i64, mode: vs.MapAppendMode) void {
-        _ = self.vsapi.?.mapSetInt.?(self.getPropertiesRW(), key.ptr, n, mode);
-    }
-
-    pub fn setFloat(self: Self, key: []const u8, n: f64, mode: vs.MapAppendMode) void {
-        _ = self.vsapi.?.mapSetFloat.?(self.getPropertiesRW(), key.ptr, n, mode);
-    }
-
-    pub fn setIntArray(self: Self, comptime key: []const u8, arr: []const i64) void {
-        _ = self.vsapi.?.mapSetIntArray.?(self.getPropertiesRW(), key.ptr, arr.ptr, @intCast(arr.len));
-    }
-
-    pub fn setFloatArray(self: Self, comptime key: []const u8, arr: []const f64) void {
-        _ = self.vsapi.?.mapSetFloatArray.?(self.getPropertiesRW(), key.ptr, arr.ptr, @intCast(arr.len));
-    }
-
-    pub fn setData(self: Self, comptime key: []const u8, data: []const u8, dth: vs.DataTypeHint, mode: vs.MapAppendMode) void {
-        _ = self.vsapi.?.mapSetData.?(self.getPropertiesRW(), key.ptr, data.ptr, @intCast(data.len), dth, mode);
+    fn dataSize(self: Self, comptime key: []const u8, index: i32) ?u32 {
+        var err: vs.MapPropertyError = undefined;
+        const len = self.vsapi.?.mapGetDataSize.?(self.props, key.ptr, index, &err);
+        return if (len < 1 or err != .Success) null else @as(u32, @bitCast(len));
     }
 };
 
@@ -356,12 +370,12 @@ pub const Map = struct {
         self.vsapi.?.mapSetError.?(self.out, err_msg.ptr);
     }
 
-    pub fn numElements(self: Self, comptime key: []const u8) ?u32 {
+    fn numElements(self: Self, comptime key: []const u8) ?u32 {
         const ne = self.vsapi.?.mapNumElements.?(self.in, key.ptr);
         return if (ne < 1) null else @as(u32, @bitCast(ne));
     }
 
-    pub fn dataSize(self: Self, comptime key: []const u8, index: i32) ?u32 {
+    fn dataSize(self: Self, comptime key: []const u8, index: i32) ?u32 {
         var err: vs.MapPropertyError = undefined;
         const len = self.vsapi.?.mapGetDataSize.?(self.in, key.ptr, index, &err);
         return if (len < 1 or err != .Success) null else @as(u32, @bitCast(len));
