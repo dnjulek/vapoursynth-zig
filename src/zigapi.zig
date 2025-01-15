@@ -243,15 +243,15 @@ pub const Frame = struct {
     }
 
     pub fn setIntArray(self: Self, comptime key: []const u8, arr: []const i64) void {
-        _ = self.vsapi.?.mapSetIntArray.?(self.getPropertiesRW(), key.ptr, arr, @intCast(arr.len));
+        _ = self.vsapi.?.mapSetIntArray.?(self.getPropertiesRW(), key.ptr, arr.ptr, @intCast(arr.len));
     }
 
     pub fn setFloatArray(self: Self, comptime key: []const u8, arr: []const f64) void {
-        _ = self.vsapi.?.mapSetFloatArray.?(self.getPropertiesRW(), key.ptr, arr, @intCast(arr.len));
+        _ = self.vsapi.?.mapSetFloatArray.?(self.getPropertiesRW(), key.ptr, arr.ptr, @intCast(arr.len));
     }
 
     pub fn setData(self: Self, comptime key: []const u8, data: []const u8, dth: vs.DataTypeHint, mode: vs.MapAppendMode) void {
-        _ = self.vsapi.?.mapSetData.?(self.getPropertiesRW(), key.ptr, data, @intCast(data.len), dth, mode);
+        _ = self.vsapi.?.mapSetData.?(self.getPropertiesRW(), key.ptr, data.ptr, @intCast(data.len), dth, mode);
     }
 };
 
