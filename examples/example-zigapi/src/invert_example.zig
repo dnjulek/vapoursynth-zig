@@ -24,9 +24,14 @@ export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, insta
     if (activation_reason == .Initial) {
         vsapi.?.requestFrameFilter.?(n, d.node, frame_ctx);
     } else if (activation_reason == .AllFramesReady) {
-        var src = zapi.Frame.init(d.node, n, frame_ctx, core, vsapi);
+        var src = zapi.ZFrame.init(d.node, n, frame_ctx, core, vsapi);
         defer src.deinit();
         var dst = src.newVideoFrame();
+
+        const src_prop = src.getPropertiesRO();
+        const dst_prop = dst.getPropertiesRW();
+        const prop_example = src_prop.getInt(i32, "_Matrix") orelse 2;
+        dst_prop.setInt("prop_example", prop_example, .Replace);
 
         var plane: u32 = 0;
         while (plane < d.vi.format.numPlanes) : (plane += 1) {
@@ -65,23 +70,24 @@ export fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const
 export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
     _ = user_data;
     var d: InvertData = undefined;
-    var map = zapi.Map.init(in, out, vsapi);
+    const map_in = zapi.ZMap.init(in, vsapi);
+    const map_out = zapi.ZMap.init(out, vsapi);
 
     // getNodeVi returns a tuple with [vs.Node, vs.VideoInfo],
     // use getNodeVi2 if you want a struct.
-    d.node, d.vi = map.getNodeVi("clip");
+    d.node, d.vi = map_in.getNodeVi("clip");
 
     if (!vsh.isConstantVideoFormat(d.vi) or (d.vi.format.sampleType != .Integer) or (d.vi.format.bitsPerSample != 8)) {
-        map.setError("Invert: only constant format 8bit integer input supported");
+        map_out.setError("Invert: only constant format 8bit integer input supported");
         vsapi.?.freeNode.?(d.node);
         return;
     }
 
     // https://ziglang.org/documentation/master/#Optionals
-    const enabled = map.getInt(i32, "enabled") orelse 1;
+    const enabled = map_in.getInt(i32, "enabled") orelse 1;
 
     if ((enabled < 0) or (enabled > 1)) {
-        map.setError("Invert: enabled must be 0 or 1");
+        map_out.setError("Invert: enabled must be 0 or 1");
         vsapi.?.freeNode.?(d.node);
         return;
     }

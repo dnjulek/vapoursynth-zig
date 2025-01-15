@@ -4,6 +4,9 @@ To use this module in your project you will need:
 1. A [build.zig.zon](/examples/example/build.zig.zon) file like this.
 2. These lines in your [build.zig](/examples/example/build.zig):
 
+To update the .zon file run:\
+``zig fetch --save git+https://github.com/dnjulek/vapoursynth-zig.git``
+
 ```zig
 const vapoursynth_dep = b.dependency("vapoursynth", .{
     .target = target,
