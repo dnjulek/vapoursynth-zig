@@ -9,15 +9,13 @@ pub const ZFrame = struct {
 };
 
 const ZFrameRO = struct {
+    const Self = @This();
+
     frame_ctx: ?*vs.FrameContext,
     core: ?*vs.Core,
     vsapi: ?*const vs.API,
     frame: ?*const vs.Frame,
 
-    node: ?*vs.Node,
-    n: c_int,
-
-    const Self = @This();
     pub fn init(node: ?*vs.Node, n: c_int, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) Self {
         const frame = vsapi.?.getFrameFilter.?(n, node, frame_ctx);
         return .{
@@ -25,8 +23,6 @@ const ZFrameRO = struct {
             .core = core,
             .vsapi = vsapi,
             .frame = frame,
-            .node = node,
-            .n = n,
         };
     }
 
@@ -161,13 +157,13 @@ const ZFrameRO = struct {
 };
 
 const ZFrameRW = struct {
+    const Self = @This();
+
     frame_ctx: ?*vs.FrameContext,
     core: ?*vs.Core,
     vsapi: ?*const vs.API,
     frame: ?*vs.Frame,
     ro: *const ZFrameRO,
-
-    const Self = @This();
 
     pub fn deinit(self: *Self) void {
         self.vsapi.?.freeFrame.?(self.frame);
@@ -257,6 +253,7 @@ pub const ZMap = struct {
 /// read-only Map
 const ZMapRO = struct {
     const Self = @This();
+
     map: ?*const vs.Map,
     vsapi: ?*const vs.API,
 
@@ -365,6 +362,7 @@ const ZMapRO = struct {
 /// read and write Map
 const ZMapRW = struct {
     const Self = @This();
+
     map: ?*vs.Map,
     vsapi: ?*const vs.API,
     ro: ZMapRO,
