@@ -48,7 +48,7 @@ const ZFrameRO = struct {
             .core = self.core,
             .vsapi = self.vsapi,
             .frame = frame,
-            .ro = ZFrameRO.init(self.node, self.n, self.frame_ctx, self.core, self.vsapi),
+            .ro = &self,
         };
     }
 
@@ -75,7 +75,7 @@ const ZFrameRO = struct {
             .core = self.core,
             .vsapi = self.vsapi,
             .frame = frame,
-            .ro = ZFrameRO.init(self.node, self.n, self.frame_ctx, self.core, self.vsapi),
+            .ro = &self,
         };
     }
 
@@ -93,7 +93,7 @@ const ZFrameRO = struct {
             .core = self.core,
             .vsapi = self.vsapi,
             .frame = frame,
-            .ro = ZFrameRO.init(self.node, self.n, self.frame_ctx, self.core, self.vsapi),
+            .ro = &self,
         };
     }
 
@@ -103,7 +103,7 @@ const ZFrameRO = struct {
             .core = self.core,
             .vsapi = self.vsapi,
             .frame = self.vsapi.?.copyFrame.?(self.frame, self.core),
-            .ro = ZFrameRO.init(self.node, self.n, self.frame_ctx, self.core, self.vsapi),
+            .ro = &self,
         };
     }
 
@@ -165,22 +165,12 @@ const ZFrameRW = struct {
     core: ?*vs.Core,
     vsapi: ?*const vs.API,
     frame: ?*vs.Frame,
-    ro: ZFrameRO,
+    ro: *const ZFrameRO,
 
     const Self = @This();
-    pub fn init(node: ?*vs.Node, n: c_int, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) Self {
-        const frame = vsapi.?.getFrameFilter.?(n, node, frame_ctx);
-        return .{
-            .frame_ctx = frame_ctx,
-            .core = core,
-            .vsapi = vsapi,
-            .frame = frame,
-            .ro = ZFrameRO.init(node, n, frame_ctx, core, vsapi),
-        };
-    }
 
     pub fn deinit(self: *Self) void {
-        return self.ro.deinit();
+        self.vsapi.?.freeFrame.?(self.frame);
     }
 
     /// read and write
