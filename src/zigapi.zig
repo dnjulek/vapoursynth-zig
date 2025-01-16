@@ -8,7 +8,7 @@ pub const ZFrame = struct {
     }
 };
 
-const ZFrameRO = struct {
+pub const ZFrameRO = struct {
     const Self = @This();
 
     frame_ctx: ?*vs.FrameContext,
@@ -156,7 +156,7 @@ const ZFrameRO = struct {
     }
 };
 
-const ZFrameRW = struct {
+pub const ZFrameRW = struct {
     const Self = @This();
 
     frame_ctx: ?*vs.FrameContext,
@@ -251,7 +251,7 @@ pub const ZMap = struct {
 };
 
 /// read-only Map
-const ZMapRO = struct {
+pub const ZMapRO = struct {
     const Self = @This();
 
     map: ?*const vs.Map,
@@ -360,7 +360,7 @@ const ZMapRO = struct {
 };
 
 /// read and write Map
-const ZMapRW = struct {
+pub const ZMapRW = struct {
     const Self = @This();
 
     map: ?*vs.Map,
