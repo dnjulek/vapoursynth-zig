@@ -129,12 +129,6 @@ const ZFrameRO = struct {
         return ptr[0..len];
     }
 
-    pub fn getWriteSlice(self: Self, plane: usize) []u8 {
-        const ptr = self.vsapi.?.getWritePtr.?(@constCast(self.frame), @intCast(plane));
-        const len = self.getHeight(plane) * self.getStride(plane);
-        return ptr[0..len];
-    }
-
     pub fn getStride2(self: Self, comptime T: type, plane: usize) u32 {
         return @intCast(self.vsapi.?.getStride.?(self.frame, @intCast(plane)) >> (@sizeOf(T) >> 1));
     }
@@ -147,12 +141,6 @@ const ZFrameRO = struct {
         const ptr = self.vsapi.?.getReadPtr.?(self.frame, @intCast(plane));
         const len = self.getHeight(plane) * self.getStride2(T, plane);
         return @as([*]const T, @ptrCast(@alignCast(ptr)))[0..len];
-    }
-
-    pub fn getWriteSlice2(self: Self, comptime T: type, plane: usize) []T {
-        const ptr = self.vsapi.?.getWritePtr.?(@constCast(self.frame), @intCast(plane));
-        const len = self.getHeight(plane) * self.getStride2(T, plane);
-        return @as([*]T, @ptrCast(@alignCast(ptr)))[0..len];
     }
 
     pub fn getDimensions3(self: Self, plane: usize) struct { width: u32, height: u32, stride: u32 } {
@@ -191,6 +179,10 @@ const ZFrameRW = struct {
         };
     }
 
+    pub fn deinit(self: *Self) void {
+        return self.ro.deinit();
+    }
+
     /// read and write
     pub fn getProperties(self: Self) ZMapRW {
         const map = self.vsapi.?.getFramePropertiesRW.?(self.frame);
@@ -201,8 +193,16 @@ const ZFrameRW = struct {
         };
     }
 
-    pub fn deinit(self: *Self) void {
-        return self.ro.deinit();
+    pub fn getWriteSlice(self: Self, plane: usize) []u8 {
+        const ptr = self.vsapi.?.getWritePtr.?(self.frame, @intCast(plane));
+        const len = self.getHeight(plane) * self.getStride(plane);
+        return ptr[0..len];
+    }
+
+    pub fn getWriteSlice2(self: Self, comptime T: type, plane: usize) []T {
+        const ptr = self.vsapi.?.getWritePtr.?(self.frame, @intCast(plane));
+        const len = self.getHeight(plane) * self.getStride2(T, plane);
+        return @as([*]T, @ptrCast(@alignCast(ptr)))[0..len];
     }
 
     pub fn newVideoFrame(self: Self) ZFrameRW {
@@ -241,10 +241,6 @@ const ZFrameRW = struct {
         return self.ro.getReadSlice(plane);
     }
 
-    pub fn getWriteSlice(self: Self, plane: usize) []u8 {
-        return self.ro.getWriteSlice(plane);
-    }
-
     pub fn getStride2(self: Self, comptime T: type, plane: usize) u32 {
         return self.ro.getStride2(T, plane);
     }
@@ -255,10 +251,6 @@ const ZFrameRW = struct {
 
     pub fn getReadSlice2(self: Self, comptime T: type, plane: usize) []const T {
         return self.ro.getReadSlice2(T, plane);
-    }
-
-    pub fn getWriteSlice2(self: Self, comptime T: type, plane: usize) []T {
-        return self.ro.getWriteSlice2(T, plane);
     }
 
     pub fn getDimensions3(self: Self, plane: usize) struct { width: u32, height: u32, stride: u32 } {
