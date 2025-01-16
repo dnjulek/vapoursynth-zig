@@ -24,9 +24,9 @@ export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, insta
     if (activation_reason == .Initial) {
         vsapi.?.requestFrameFilter.?(n, d.node, frame_ctx);
     } else if (activation_reason == .AllFramesReady) {
-        var src = zapi.ZFrame.init(d.node, n, frame_ctx, core, vsapi);
+        const src = zapi.ZFrame.init(d.node, n, frame_ctx, core, vsapi);
         defer src.deinit();
-        var dst = src.newVideoFrame();
+        const dst = src.newVideoFrame();
 
         const src_prop = src.getProperties();
         const dst_prop = dst.getProperties();

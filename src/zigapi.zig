@@ -26,11 +26,11 @@ const ZFrameRO = struct {
         };
     }
 
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *const Self) void {
         self.vsapi.?.freeFrame.?(self.frame);
     }
 
-    pub fn newVideoFrame(self: Self) ZFrameRW {
+    pub fn newVideoFrame(self: *const Self) ZFrameRW {
         const frame = self.vsapi.?.newVideoFrame.?(
             self.vsapi.?.getVideoFrameFormat.?(self.frame),
             self.vsapi.?.getFrameWidth.?(self.frame, 0),
@@ -44,11 +44,11 @@ const ZFrameRO = struct {
             .core = self.core,
             .vsapi = self.vsapi,
             .frame = frame,
-            .ro = &self,
+            .ro = self,
         };
     }
 
-    pub fn newVideoFrame2(self: Self, process: [3]bool) ZFrameRW {
+    pub fn newVideoFrame2(self: *const Self, process: [3]bool) ZFrameRW {
         var planes = [3]c_int{ 0, 1, 2 };
         var cp_planes = [3]?*const vs.Frame{
             if (process[0]) null else self.frame,
@@ -71,11 +71,11 @@ const ZFrameRO = struct {
             .core = self.core,
             .vsapi = self.vsapi,
             .frame = frame,
-            .ro = &self,
+            .ro = self,
         };
     }
 
-    pub fn newVideoFrame3(self: Self, width: u32, height: u32) ZFrameRW {
+    pub fn newVideoFrame3(self: *const Self, width: u32, height: u32) ZFrameRW {
         const frame = self.vsapi.?.newVideoFrame.?(
             self.vsapi.?.getVideoFrameFormat.?(self.frame),
             @intCast(width),
@@ -89,57 +89,57 @@ const ZFrameRO = struct {
             .core = self.core,
             .vsapi = self.vsapi,
             .frame = frame,
-            .ro = &self,
+            .ro = self,
         };
     }
 
-    pub fn copyFrame(self: Self) ZFrameRW {
+    pub fn copyFrame(self: *const Self) ZFrameRW {
         return .{
             .frame_ctx = self.frame_ctx,
             .core = self.core,
             .vsapi = self.vsapi,
             .frame = self.vsapi.?.copyFrame.?(self.frame, self.core),
-            .ro = &self,
+            .ro = self,
         };
     }
 
-    pub fn getHeight(self: Self, plane: usize) u32 {
+    pub fn getHeight(self: *const Self, plane: usize) u32 {
         return @intCast(self.vsapi.?.getFrameHeight.?(self.frame, @intCast(plane)));
     }
 
-    pub fn getWidth(self: Self, plane: usize) u32 {
+    pub fn getWidth(self: *const Self, plane: usize) u32 {
         return @intCast(self.vsapi.?.getFrameWidth.?(self.frame, @intCast(plane)));
     }
 
-    pub fn getStride(self: Self, plane: usize) u32 {
+    pub fn getStride(self: *const Self, plane: usize) u32 {
         return @intCast(self.vsapi.?.getStride.?(self.frame, @intCast(plane)));
     }
 
-    pub fn getDimensions(self: Self, plane: usize) struct { u32, u32, u32 } {
+    pub fn getDimensions(self: *const Self, plane: usize) struct { u32, u32, u32 } {
         return .{ self.getWidth(plane), self.getHeight(plane), self.getStride(plane) };
     }
 
-    pub fn getReadSlice(self: Self, plane: usize) []const u8 {
+    pub fn getReadSlice(self: *const Self, plane: usize) []const u8 {
         const ptr = self.vsapi.?.getReadPtr.?(self.frame, @intCast(plane));
         const len = self.getHeight(plane) * self.getStride(plane);
         return ptr[0..len];
     }
 
-    pub fn getStride2(self: Self, comptime T: type, plane: usize) u32 {
+    pub fn getStride2(self: *const Self, comptime T: type, plane: usize) u32 {
         return @intCast(self.vsapi.?.getStride.?(self.frame, @intCast(plane)) >> (@sizeOf(T) >> 1));
     }
 
-    pub fn getDimensions2(self: Self, comptime T: type, plane: usize) struct { u32, u32, u32 } {
+    pub fn getDimensions2(self: *const Self, comptime T: type, plane: usize) struct { u32, u32, u32 } {
         return .{ self.getWidth(plane), self.getHeight(plane), self.getStride2(T, plane) };
     }
 
-    pub fn getReadSlice2(self: Self, comptime T: type, plane: usize) []const T {
+    pub fn getReadSlice2(self: *const Self, comptime T: type, plane: usize) []const T {
         const ptr = self.vsapi.?.getReadPtr.?(self.frame, @intCast(plane));
         const len = self.getHeight(plane) * self.getStride2(T, plane);
         return @as([*]const T, @ptrCast(@alignCast(ptr)))[0..len];
     }
 
-    pub fn getDimensions3(self: Self, plane: usize) struct { width: u32, height: u32, stride: u32 } {
+    pub fn getDimensions3(self: *const Self, plane: usize) struct { width: u32, height: u32, stride: u32 } {
         return .{
             .width = self.getWidth(plane),
             .height = self.getHeight(plane),
@@ -148,7 +148,7 @@ const ZFrameRO = struct {
     }
 
     /// read-only!
-    pub fn getProperties(self: Self) ZMapRO {
+    pub fn getProperties(self: *const Self) ZMapRO {
         return .{
             .map = self.vsapi.?.getFramePropertiesRO.?(self.frame),
             .vsapi = self.vsapi,
@@ -165,81 +165,81 @@ const ZFrameRW = struct {
     frame: ?*vs.Frame,
     ro: *const ZFrameRO,
 
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *const Self) void {
         self.vsapi.?.freeFrame.?(self.frame);
     }
 
     /// read and write
-    pub fn getProperties(self: Self) ZMapRW {
+    pub fn getProperties(self: *const Self) ZMapRW {
         const map = self.vsapi.?.getFramePropertiesRW.?(self.frame);
         return .{
             .map = map,
             .vsapi = self.vsapi,
-            .ro = ZMapRO.init(map, self.vsapi),
+            .ro = &ZMapRO.init(map, self.vsapi),
         };
     }
 
-    pub fn getWriteSlice(self: Self, plane: usize) []u8 {
+    pub fn getWriteSlice(self: *const Self, plane: usize) []u8 {
         const ptr = self.vsapi.?.getWritePtr.?(self.frame, @intCast(plane));
         const len = self.getHeight(plane) * self.getStride(plane);
         return ptr[0..len];
     }
 
-    pub fn getWriteSlice2(self: Self, comptime T: type, plane: usize) []T {
+    pub fn getWriteSlice2(self: *const Self, comptime T: type, plane: usize) []T {
         const ptr = self.vsapi.?.getWritePtr.?(self.frame, @intCast(plane));
         const len = self.getHeight(plane) * self.getStride2(T, plane);
         return @as([*]T, @ptrCast(@alignCast(ptr)))[0..len];
     }
 
-    pub fn newVideoFrame(self: Self) ZFrameRW {
+    pub fn newVideoFrame(self: *const Self) ZFrameRW {
         return self.ro.newVideoFrame();
     }
 
-    pub fn newVideoFrame2(self: Self, process: [3]bool) ZFrameRW {
+    pub fn newVideoFrame2(self: *const Self, process: [3]bool) ZFrameRW {
         return self.ro.newVideoFrame2(process);
     }
 
-    pub fn newVideoFrame3(self: Self, width: u32, height: u32) ZFrameRW {
+    pub fn newVideoFrame3(self: *const Self, width: u32, height: u32) ZFrameRW {
         return self.ro.newVideoFrame3(width, height);
     }
 
-    pub fn copyFrame(self: Self) ZFrameRW {
+    pub fn copyFrame(self: *const Self) ZFrameRW {
         return self.ro.copyFrame();
     }
 
-    pub fn getHeight(self: Self, plane: usize) u32 {
+    pub fn getHeight(self: *const Self, plane: usize) u32 {
         return self.ro.getHeight(plane);
     }
 
-    pub fn getWidth(self: Self, plane: usize) u32 {
+    pub fn getWidth(self: *const Self, plane: usize) u32 {
         return self.ro.getWidth(plane);
     }
 
-    pub fn getStride(self: Self, plane: usize) u32 {
+    pub fn getStride(self: *const Self, plane: usize) u32 {
         return self.ro.getStride(plane);
     }
 
-    pub fn getDimensions(self: Self, plane: usize) struct { u32, u32, u32 } {
+    pub fn getDimensions(self: *const Self, plane: usize) struct { u32, u32, u32 } {
         return self.ro.getDimensions(plane);
     }
 
-    pub fn getReadSlice(self: Self, plane: usize) []const u8 {
+    pub fn getReadSlice(self: *const Self, plane: usize) []const u8 {
         return self.ro.getReadSlice(plane);
     }
 
-    pub fn getStride2(self: Self, comptime T: type, plane: usize) u32 {
+    pub fn getStride2(self: *const Self, comptime T: type, plane: usize) u32 {
         return self.ro.getStride2(T, plane);
     }
 
-    pub fn getDimensions2(self: Self, comptime T: type, plane: usize) struct { u32, u32, u32 } {
+    pub fn getDimensions2(self: *const Self, comptime T: type, plane: usize) struct { u32, u32, u32 } {
         return self.ro.getDimensions2(T, plane);
     }
 
-    pub fn getReadSlice2(self: Self, comptime T: type, plane: usize) []const T {
+    pub fn getReadSlice2(self: *const Self, comptime T: type, plane: usize) []const T {
         return self.ro.getReadSlice2(T, plane);
     }
 
-    pub fn getDimensions3(self: Self, plane: usize) struct { width: u32, height: u32, stride: u32 } {
+    pub fn getDimensions3(self: *const Self, plane: usize) struct { width: u32, height: u32, stride: u32 } {
         return self.ro.getDimensions3(plane);
     }
 };
@@ -264,63 +264,63 @@ const ZMapRO = struct {
         };
     }
 
-    pub fn getNode(self: Self, comptime key: []const u8) ?*vs.Node {
+    pub fn getNode(self: *const Self, comptime key: []const u8) ?*vs.Node {
         var err: vs.MapPropertyError = undefined;
         const node = self.vsapi.?.mapGetNode.?(self.map, key.ptr, 0, &err);
         return node;
     }
 
-    pub fn getNodeVi(self: Self, comptime key: []const u8) struct { ?*vs.Node, *const vs.VideoInfo } {
+    pub fn getNodeVi(self: *const Self, comptime key: []const u8) struct { ?*vs.Node, *const vs.VideoInfo } {
         var err: vs.MapPropertyError = undefined;
         const node = self.vsapi.?.mapGetNode.?(self.map, key.ptr, 0, &err);
         const vi = self.vsapi.?.getVideoInfo.?(node);
         return .{ node, vi };
     }
 
-    pub fn getNodeVi2(self: Self, comptime key: []const u8) struct { node: ?*vs.Node, vi: *const vs.VideoInfo } {
+    pub fn getNodeVi2(self: *const Self, comptime key: []const u8) struct { node: ?*vs.Node, vi: *const vs.VideoInfo } {
         var err: vs.MapPropertyError = undefined;
         const node = self.vsapi.?.mapGetNode.?(self.map, key.ptr, 0, &err);
         const vi = self.vsapi.?.getVideoInfo.?(node);
         return .{ .node = node, .vi = vi };
     }
 
-    pub fn getInt(self: Self, comptime T: type, comptime key: []const u8) ?T {
+    pub fn getInt(self: *const Self, comptime T: type, comptime key: []const u8) ?T {
         var err: vs.MapPropertyError = undefined;
         const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.map, key.ptr, 0, &err));
         return if (err == .Success) val else null;
     }
 
-    pub fn getInt2(self: Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
+    pub fn getInt2(self: *const Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
         var err: vs.MapPropertyError = undefined;
         const val: T = math.lossyCast(T, self.vsapi.?.mapGetInt.?(self.map, key.ptr, @intCast(index), &err));
         return if (err == .Success) val else null;
     }
 
-    pub fn getFloat(self: Self, comptime T: type, comptime key: []const u8) ?T {
+    pub fn getFloat(self: *const Self, comptime T: type, comptime key: []const u8) ?T {
         var err: vs.MapPropertyError = undefined;
         const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.map, key.ptr, 0, &err));
         return if (err == .Success) val else null;
     }
 
-    pub fn getFloat2(self: Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
+    pub fn getFloat2(self: *const Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
         var err: vs.MapPropertyError = undefined;
         const val: T = math.lossyCast(T, self.vsapi.?.mapGetFloat.?(self.map, key.ptr, @intCast(index), &err));
         return if (err == .Success) val else null;
     }
 
-    pub fn getBool(self: Self, comptime key: []const u8) ?bool {
+    pub fn getBool(self: *const Self, comptime key: []const u8) ?bool {
         var err: vs.MapPropertyError = undefined;
         const val = self.vsapi.?.mapGetInt.?(self.map, key.ptr, 0, &err) != 0;
         return if (err == .Success) val else null;
     }
 
-    pub fn getBool2(self: Self, comptime key: []const u8, index: usize) ?bool {
+    pub fn getBool2(self: *const Self, comptime key: []const u8, index: usize) ?bool {
         var err: vs.MapPropertyError = undefined;
         const val = self.vsapi.?.mapGetInt.?(self.map, key.ptr, @intCast(index), &err) != 0;
         return if (err == .Success) val else null;
     }
 
-    pub fn getIntArray(self: Self, comptime key: []const u8) ?[]const i64 {
+    pub fn getIntArray(self: *const Self, comptime key: []const u8) ?[]const i64 {
         const len = self.numElements(key);
         if (len) |n| {
             var err: vs.MapPropertyError = undefined;
@@ -329,7 +329,7 @@ const ZMapRO = struct {
         } else return null;
     }
 
-    pub fn getFloatArray(self: Self, comptime key: []const u8) ?[]const f64 {
+    pub fn getFloatArray(self: *const Self, comptime key: []const u8) ?[]const f64 {
         const len = self.numElements(key);
         if (len) |n| {
             var err: vs.MapPropertyError = undefined;
@@ -338,7 +338,7 @@ const ZMapRO = struct {
         } else return null;
     }
 
-    pub fn getData(self: Self, comptime key: []const u8, index: i32) ?[]const u8 {
+    pub fn getData(self: *const Self, comptime key: []const u8, index: i32) ?[]const u8 {
         var err: vs.MapPropertyError = undefined;
         const len = self.dataSize(key, 0);
         if (len) |n| {
@@ -347,12 +347,12 @@ const ZMapRO = struct {
         } else return null;
     }
 
-    fn numElements(self: Self, comptime key: []const u8) ?u32 {
+    fn numElements(self: *const Self, comptime key: []const u8) ?u32 {
         const ne = self.vsapi.?.mapNumElements.?(self.map, key.ptr);
         return if (ne < 1) null else @as(u32, @bitCast(ne));
     }
 
-    fn dataSize(self: Self, comptime key: []const u8, index: i32) ?u32 {
+    fn dataSize(self: *const Self, comptime key: []const u8, index: i32) ?u32 {
         var err: vs.MapPropertyError = undefined;
         const len = self.vsapi.?.mapGetDataSize.?(self.map, key.ptr, index, &err);
         return if (len < 1 or err != .Success) null else @as(u32, @bitCast(len));
@@ -365,87 +365,87 @@ const ZMapRW = struct {
 
     map: ?*vs.Map,
     vsapi: ?*const vs.API,
-    ro: ZMapRO,
+    ro: *const ZMapRO,
 
     pub fn init(map: ?*vs.Map, vsapi: ?*const vs.API) Self {
         return .{
             .map = map,
             .vsapi = vsapi,
-            .ro = ZMapRO.init(map, vsapi),
+            .ro = &ZMapRO.init(map, vsapi),
         };
     }
 
-    pub fn setInt(self: Self, key: []const u8, n: i64, mode: vs.MapAppendMode) void {
+    pub fn setInt(self: *const Self, key: []const u8, n: i64, mode: vs.MapAppendMode) void {
         _ = self.vsapi.?.mapSetInt.?(self.map, key.ptr, n, mode);
     }
 
-    pub fn setFloat(self: Self, key: []const u8, n: f64, mode: vs.MapAppendMode) void {
+    pub fn setFloat(self: *const Self, key: []const u8, n: f64, mode: vs.MapAppendMode) void {
         _ = self.vsapi.?.mapSetFloat.?(self.map, key.ptr, n, mode);
     }
 
-    pub fn setIntArray(self: Self, comptime key: []const u8, arr: []const i64) void {
+    pub fn setIntArray(self: *const Self, comptime key: []const u8, arr: []const i64) void {
         _ = self.vsapi.?.mapSetIntArray.?(self.map, key.ptr, arr.ptr, @intCast(arr.len));
     }
 
-    pub fn setFloatArray(self: Self, comptime key: []const u8, arr: []const f64) void {
+    pub fn setFloatArray(self: *const Self, comptime key: []const u8, arr: []const f64) void {
         _ = self.vsapi.?.mapSetFloatArray.?(self.map, key.ptr, arr.ptr, @intCast(arr.len));
     }
 
-    pub fn setData(self: Self, comptime key: []const u8, data: []const u8, dth: vs.DataTypeHint, mode: vs.MapAppendMode) void {
+    pub fn setData(self: *const Self, comptime key: []const u8, data: []const u8, dth: vs.DataTypeHint, mode: vs.MapAppendMode) void {
         _ = self.vsapi.?.mapSetData.?(self.map, key.ptr, data.ptr, @intCast(data.len), dth, mode);
     }
 
-    pub fn setError(self: Self, err_msg: []const u8) void {
+    pub fn setError(self: *const Self, err_msg: []const u8) void {
         self.vsapi.?.mapSetError.?(self.map, err_msg.ptr);
     }
 
     // ------ read ------ //
 
-    pub fn getNode(self: Self, comptime key: []const u8) ?*vs.Node {
+    pub fn getNode(self: *const Self, comptime key: []const u8) ?*vs.Node {
         return self.ro.getNode(key);
     }
 
-    pub fn getNodeVi(self: Self, comptime key: []const u8) struct { ?*vs.Node, *const vs.VideoInfo } {
+    pub fn getNodeVi(self: *const Self, comptime key: []const u8) struct { ?*vs.Node, *const vs.VideoInfo } {
         return self.ro.getNodeVi(key);
     }
 
-    pub fn getNodeVi2(self: Self, comptime key: []const u8) struct { node: ?*vs.Node, vi: *const vs.VideoInfo } {
+    pub fn getNodeVi2(self: *const Self, comptime key: []const u8) struct { node: ?*vs.Node, vi: *const vs.VideoInfo } {
         return self.ro.getNodeVi2(key);
     }
 
-    pub fn getInt(self: Self, comptime T: type, comptime key: []const u8) ?T {
+    pub fn getInt(self: *const Self, comptime T: type, comptime key: []const u8) ?T {
         return self.ro.getInt(T, key);
     }
 
-    pub fn getInt2(self: Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
+    pub fn getInt2(self: *const Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
         return self.ro.getInt2(T, key, index);
     }
 
-    pub fn getFloat(self: Self, comptime T: type, comptime key: []const u8) ?T {
+    pub fn getFloat(self: *const Self, comptime T: type, comptime key: []const u8) ?T {
         return self.ro.getFloat(T, key);
     }
 
-    pub fn getFloat2(self: Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
+    pub fn getFloat2(self: *const Self, comptime T: type, comptime key: []const u8, index: usize) ?T {
         return self.ro.getFloat2(T, key, index);
     }
 
-    pub fn getBool(self: Self, comptime key: []const u8) ?bool {
+    pub fn getBool(self: *const Self, comptime key: []const u8) ?bool {
         return self.ro.getBool(key);
     }
 
-    pub fn getBool2(self: Self, comptime key: []const u8, index: usize) ?bool {
+    pub fn getBool2(self: *const Self, comptime key: []const u8, index: usize) ?bool {
         return self.ro.getBool2(key, index);
     }
 
-    pub fn getIntArray(self: Self, comptime key: []const u8) ?[]const i64 {
+    pub fn getIntArray(self: *const Self, comptime key: []const u8) ?[]const i64 {
         return self.ro.getIntArray(key);
     }
 
-    pub fn getFloatArray(self: Self, comptime key: []const u8) ?[]const f64 {
+    pub fn getFloatArray(self: *const Self, comptime key: []const u8) ?[]const f64 {
         return self.ro.getFloatArray(key);
     }
 
-    pub fn getData(self: Self, comptime key: []const u8, index: i32) ?[]const u8 {
+    pub fn getData(self: *const Self, comptime key: []const u8, index: i32) ?[]const u8 {
         return self.ro.getData(key, index);
     }
 };
