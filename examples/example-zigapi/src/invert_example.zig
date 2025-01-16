@@ -28,8 +28,8 @@ export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, insta
         defer src.deinit();
         var dst = src.newVideoFrame();
 
-        const src_prop = src.getPropertiesRO();
-        const dst_prop = dst.getPropertiesRW();
+        const src_prop = src.getProperties();
+        const dst_prop = dst.getProperties();
         const prop_example = src_prop.getInt(i32, "_Matrix") orelse 2;
         dst_prop.setInt("prop_example", prop_example, .Replace);
 
