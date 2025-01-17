@@ -343,12 +343,12 @@ pub const ZMapRO = struct {
         } else return null;
     }
 
-    fn numElements(self: *const Self, comptime key: []const u8) ?u32 {
+    pub fn numElements(self: *const Self, comptime key: []const u8) ?u32 {
         const ne = self.vsapi.?.mapNumElements.?(self.map, key.ptr);
         return if (ne < 1) null else @as(u32, @bitCast(ne));
     }
 
-    fn dataSize(self: *const Self, comptime key: []const u8, index: i32) ?u32 {
+    pub fn dataSize(self: *const Self, comptime key: []const u8, index: i32) ?u32 {
         var err: vs.MapPropertyError = undefined;
         const len = self.vsapi.?.mapGetDataSize.?(self.map, key.ptr, index, &err);
         return if (len < 1 or err != .Success) null else @as(u32, @bitCast(len));
