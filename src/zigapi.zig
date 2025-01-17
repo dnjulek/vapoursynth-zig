@@ -2,11 +2,7 @@ const std = @import("std");
 const vs = @import("vapoursynth4.zig");
 const math = std.math;
 
-pub const ZFrame = struct {
-    pub fn init(node: ?*vs.Node, n: c_int, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) ZFrameRO {
-        return ZFrameRO.init(node, n, frame_ctx, core, vsapi);
-    }
-};
+pub const ZFrame = ZFrameRO;
 
 pub const ZFrameRO = struct {
     const Self = @This();
