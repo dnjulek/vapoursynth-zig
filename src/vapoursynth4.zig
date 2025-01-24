@@ -313,6 +313,8 @@ pub const RequestPattern = enum(c_int) {
     /// Only requests frame N to output frame N. The main difference to rpNoFrameReuse is that the requested frame is always fixed and known ahead of time.
     /// Filter examples Lut, Expr (conditionally, see rpGeneral note) and similar.
     StrictSpatial = 2,
+    /// Added in API 4.1 (vapoursynth-r66), This modes is basically identical rpNoFrameReuse except that it hints the last frame may be requested multiple times
+    FrameReuseLastOnly = 3,
 };
 
 /// Describes how the output of a node is cached.
