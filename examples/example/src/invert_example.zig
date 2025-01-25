@@ -109,10 +109,7 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
     data.* = d;
 
     var deps = [_]vs.FilterDependency{
-        vs.FilterDependency{
-            .source = d.node,
-            .requestPattern = .StrictSpatial,
-        },
+        .{ .source = d.node, .requestPattern = .StrictSpatial },
     };
 
     vsapi.?.createVideoFilter.?(out, "Invert", vi, invertGetFrame, invertFree, .Parallel, &deps, deps.len, data, core);
