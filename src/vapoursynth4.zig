@@ -136,18 +136,18 @@ pub const MediaType = enum(c_int) {
 /// Describes the format of a clip.
 /// Use queryVideoFormat() to fill it in with proper error checking. Manually filling out the struct is allowed but discouraged since illegal combinations of values will cause undefined behavior.
 pub const VideoFormat = extern struct {
-    colorFamily: ColorFamily,
-    sampleType: SampleType,
+    colorFamily: ColorFamily = .Undefined,
+    sampleType: SampleType = .Integer,
     /// Number of significant bits.
-    bitsPerSample: c_int,
+    bitsPerSample: c_int = 0,
     /// Number of bytes needed for a sample. This is always a power of 2 and the smallest possible that can fit the number of bits used per sample.
-    bytesPerSample: c_int,
+    bytesPerSample: c_int = 0,
     /// log2 subsampling factor, applied to second and third plane
-    subSamplingW: c_int,
+    subSamplingW: c_int = 0,
     /// log2 subsampling factor, applied to second and third plane
-    subSamplingH: c_int,
+    subSamplingH: c_int = 0,
     /// implicit from colorFamily
-    numPlanes: c_int,
+    numPlanes: c_int = 0,
 };
 
 /// Audio channel positions as an enum. Mirrors the FFmpeg audio channel constants in older api versions. See the header for all available values.
