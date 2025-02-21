@@ -1,5 +1,6 @@
 const std = @import("std");
 const vs = @import("vapoursynth4.zig");
+const vsc = @import("vsconstants.zig");
 const math = std.math;
 
 pub const ZFrame = ZFrameRO;
@@ -336,7 +337,7 @@ pub const ZMapRO = struct {
 
     pub fn getData(self: *const Self, comptime key: []const u8, index: i32) ?[]const u8 {
         var err: vs.MapPropertyError = undefined;
-        const len = self.dataSize(key, 0);
+        const len = self.dataSize(key, index);
         if (len) |n| {
             const ptr = self.vsapi.?.mapGetData.?(self.map, key.ptr, index, &err);
             return if (err == .Success) ptr.?[0..n] else null;
@@ -352,6 +353,83 @@ pub const ZMapRO = struct {
         var err: vs.MapPropertyError = undefined;
         const len = self.vsapi.?.mapGetDataSize.?(self.map, key.ptr, index, &err);
         return if (len < 1 or err != .Success) null else @as(u32, @bitCast(len));
+    }
+
+    // ------ Reserved Frame Properties ------ //
+
+    pub fn getChromaLocation(self: *const Self) ?vsc.ChromaLocation {
+        const value: i32 = self.getInt(i32, "_ChromaLocation") orelse return null;
+        return if (value < 0 or value > 5) null else @enumFromInt(value);
+    }
+
+    pub fn getColorRange(self: *const Self) ?vsc.ColorRange {
+        const value: i32 = self.getInt(i32, "_ColorRange") orelse return null;
+        return if (value < 0 or value > 1) null else @enumFromInt(value);
+    }
+
+    pub fn getFieldBased(self: *const Self) ?vsc.FieldBased {
+        const value: i32 = self.getInt(i32, "_FieldBased") orelse return null;
+        return if (value < 0 or value > 2) null else @enumFromInt(value);
+    }
+
+    pub fn getMatrix(self: *const Self) ?vsc.MatrixCoefficient {
+        const value: i32 = self.getInt(i32, "_Matrix") orelse return null;
+        for (std.enums.values(vsc.MatrixCoefficient)) |v| {
+            if (@as(i32, @intFromEnum(v)) == value) return v;
+        }
+        return null;
+    }
+
+    pub fn getPrimaries(self: *const Self) ?vsc.ColorPrimaries {
+        const value: i32 = self.getInt(i32, "_Primaries") orelse return null;
+        for (std.enums.values(vsc.ColorPrimaries)) |v| {
+            if (@as(i32, @intFromEnum(v)) == value) return v;
+        }
+        return null;
+    }
+
+    pub fn getTransfer(self: *const Self) ?vsc.TransferCharacteristics {
+        const value: i32 = self.getInt(i32, "_Transfer") orelse return null;
+        for (std.enums.values(vsc.TransferCharacteristics)) |v| {
+            if (@as(i32, @intFromEnum(v)) == value) return v;
+        }
+        return null;
+    }
+
+    pub fn getDurationNum(self: *const Self) ?i64 {
+        return self.getInt(i64, "_DurationNum");
+    }
+
+    pub fn getDurationDen(self: *const Self) ?i64 {
+        return self.getInt(i64, "_DurationDen");
+    }
+
+    pub fn getCombed(self: *const Self) ?bool {
+        return self.getBool("_Combed");
+    }
+
+    pub fn getField(self: *const Self) ?i64 {
+        return self.getInt(i64, "_Field");
+    }
+
+    pub fn getPictType(self: *const Self) ?[]const u8 {
+        return self.getData("_PictType", 0);
+    }
+
+    pub fn getSARNum(self: *const Self) ?i64 {
+        return self.getInt(i64, "_SARNum");
+    }
+
+    pub fn getSARDen(self: *const Self) ?i64 {
+        return self.getInt(i64, "_SARDen");
+    }
+
+    pub fn getSceneChangeNext(self: *const Self) ?bool {
+        return self.getBool("_SceneChangeNext");
+    }
+
+    pub fn getSceneChangePrev(self: *const Self) ?bool {
+        return self.getBool("_SceneChangePrev");
     }
 };
 
@@ -443,5 +521,127 @@ pub const ZMapRW = struct {
 
     pub fn getData(self: *const Self, comptime key: []const u8, index: i32) ?[]const u8 {
         return self.ro.getData(key, index);
+    }
+
+    // ------ Reserved Frame Properties ------ //
+
+    pub fn getChromaLocation(self: *const Self) ?vsc.ChromaLocation {
+        return self.ro.getChromaLocation();
+    }
+
+    pub fn getColorRange(self: *const Self) ?vsc.ColorRange {
+        return self.ro.getColorRange();
+    }
+
+    pub fn getFieldBased(self: *const Self) ?vsc.FieldBased {
+        return self.ro.getFieldBased();
+    }
+
+    pub fn getMatrix(self: *const Self) ?vsc.MatrixCoefficient {
+        return self.ro.getMatrix();
+    }
+
+    pub fn getPrimaries(self: *const Self) ?vsc.ColorPrimaries {
+        return self.ro.getPrimaries();
+    }
+
+    pub fn getTransfer(self: *const Self) ?vsc.TransferCharacteristics {
+        return self.ro.getTransfer();
+    }
+
+    pub fn getDurationNum(self: *const Self) ?i64 {
+        return self.ro.getDurationNum();
+    }
+
+    pub fn getDurationDen(self: *const Self) ?i64 {
+        return self.ro.getDurationDen();
+    }
+
+    pub fn getCombed(self: *const Self) ?bool {
+        return self.ro.getCombed();
+    }
+
+    pub fn getField(self: *const Self) ?i64 {
+        return self.ro.getField();
+    }
+
+    pub fn getPictType(self: *const Self) ?[]const u8 {
+        return self.ro.getPictType();
+    }
+
+    pub fn getSARNum(self: *const Self) ?i64 {
+        return self.ro.getSARNum();
+    }
+
+    pub fn getSARDen(self: *const Self) ?i64 {
+        return self.ro.getSARDen();
+    }
+
+    pub fn getSceneChangeNext(self: *const Self) ?bool {
+        return self.ro.getSceneChangeNext();
+    }
+
+    pub fn getSceneChangePrev(self: *const Self) ?bool {
+        return self.ro.getSceneChangePrev();
+    }
+
+    pub fn setChromaLocation(self: *const Self, n: vsc.ChromaLocation) void {
+        self.setInt("_ChromaLocation", @intFromEnum(n), .Replace);
+    }
+
+    pub fn setColorRange(self: *const Self, n: vsc.ColorRange) void {
+        self.setInt("_ColorRange", @intFromEnum(n), .Replace);
+    }
+
+    pub fn setFieldBased(self: *const Self, n: vsc.FieldBased) void {
+        self.setInt("_FieldBased", @intFromEnum(n), .Replace);
+    }
+
+    pub fn setMatrix(self: *const Self, n: vsc.MatrixCoefficient) void {
+        self.setInt("_Matrix", @intFromEnum(n), .Replace);
+    }
+
+    pub fn setPrimaries(self: *const Self, n: vsc.ColorPrimaries) void {
+        self.setInt("_Primaries", @intFromEnum(n), .Replace);
+    }
+
+    pub fn setTransfer(self: *const Self, n: vsc.TransferCharacteristics) void {
+        self.setInt("_Transfer", @intFromEnum(n), .Replace);
+    }
+
+    pub fn setDurationNum(self: *const Self, n: i64) void {
+        return self.setInt("_DurationNum", n, .Replace);
+    }
+
+    pub fn setDurationDen(self: *const Self, n: i64) void {
+        return self.setInt("_DurationDen", n, .Replace);
+    }
+
+    pub fn setCombed(self: *const Self, n: bool) void {
+        return self.setInt("_Combed", @intFromBool(n), .Replace);
+    }
+
+    pub fn setField(self: *const Self, n: i64) void {
+        return self.setInt("_Field", n, .Replace);
+    }
+
+    pub fn setPictType(self: *const Self, data: []const u8) void {
+        return self.setData("_PictType", data, .Utf8, .Replace);
+    }
+
+    pub fn setSARNum(self: *const Self, n: i64) void {
+        return self.setInt("_SARNum", n, .Replace);
+    }
+
+    pub fn setSARDen(self: *const Self, n: i64) void {
+        return self.setInt("_SARDen", n, .Replace);
+    }
+
+    pub fn setSceneChangeNext(self: *const Self, n: bool) void {
+        return self.setInt("_SceneChangeNext", @intFromBool(n), .Replace);
+    }
+
+    pub fn setSceneChangePrev(self: *const Self, n: bool) void {
+        return self.setInt("_SceneChangePrev", @intFromBool(n), .Replace);
     }
 };
