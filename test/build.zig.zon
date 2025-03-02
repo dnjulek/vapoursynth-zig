@@ -1,7 +1,8 @@
 .{
-    .name = "invert_example",
+    .name = .invert_example,
     .version = "1.0.0",
     .paths = .{""},
+    .fingerprint = 0xcda4a3d9b674b1a7,
     .dependencies = .{
         .vapoursynth = .{
             .path = "../",
