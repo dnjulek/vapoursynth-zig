@@ -1,12 +1,6 @@
 .{
-    .name = "vapoursynth",
+    .name = .vapoursynth,
     .version = "4.0.0",
-    .paths = .{
-        "LICENSE",
-        "README.md",
-        "build.zig",
-        "build.zig.zon",
-        "src",
-        "example",
-    },
+    .paths = .{""},
+    .fingerprint = 0xa0d1a22d430cb68c,
 }
