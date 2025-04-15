@@ -6,7 +6,8 @@ const vapoursynth = @import("vapoursynth");
 const math = std.math;
 const vs = vapoursynth.vapoursynth4;
 const vsh = vapoursynth.vshelper;
-const zapi = vapoursynth.zigapi;
+const vsc = vapoursynth.vsconstants;
+const ZAPI = vapoursynth.ZAPI;
 
 // https://ziglang.org/documentation/master/#Choosing-an-Allocator
 const allocator = std.heap.c_allocator;
@@ -20,18 +21,22 @@ const InvertData = struct {
 export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
     _ = frame_data;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
+    const zapi = ZAPI.init(vsapi);
 
     if (activation_reason == .Initial) {
-        vsapi.?.requestFrameFilter.?(n, d.node, frame_ctx);
+        zapi.requestFrameFilter(n, d.node, frame_ctx);
     } else if (activation_reason == .AllFramesReady) {
-        const src = zapi.ZFrame.init(d.node, n, frame_ctx, core, vsapi);
+        const src = zapi.initZFrame(d.node, n, frame_ctx, core);
         defer src.deinit();
         const dst = src.newVideoFrame();
 
-        const src_prop = src.getProperties();
-        const dst_prop = dst.getProperties();
-        const prop_example = src_prop.getInt(i32, "_Matrix") orelse 2;
-        dst_prop.setInt("prop_example", prop_example, .Replace);
+        const src_prop = src.getPropertiesRO();
+        const dst_prop = dst.getPropertiesRW();
+        const prop_example: vsc.MatrixCoefficient = src_prop.getMatrix() orelse .UNSPECIFIED;
+        dst_prop.setInt("prop_example", @intFromEnum(prop_example), .Replace);
+        dst_prop.setChromaLocation(.TOP_LEFT);
+        dst_prop.setCombed(false);
+        dst_prop.setColorRange(.FULL);
 
         var plane: u32 = 0;
         while (plane < d.vi.format.numPlanes) : (plane += 1) {
@@ -70,8 +75,10 @@ export fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const
 export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
     _ = user_data;
     var d: InvertData = undefined;
-    const map_in = zapi.ZMap.init(in, vsapi);
-    const map_out = zapi.ZMap.init(out, vsapi);
+
+    const zapi = ZAPI.init(vsapi);
+    const map_in = zapi.initZMap(in);
+    const map_out = zapi.initZMap(out);
 
     // getNodeVi returns a tuple with [vs.Node, vs.VideoInfo],
     // use getNodeVi2 if you want a struct.
@@ -79,7 +86,7 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
 
     if (!vsh.isConstantVideoFormat(d.vi) or (d.vi.format.sampleType != .Integer) or (d.vi.format.bitsPerSample != 8)) {
         map_out.setError("Invert: only constant format 8bit integer input supported");
-        vsapi.?.freeNode.?(d.node);
+        zapi.freeNode(d.node);
         return;
     }
 
@@ -88,7 +95,7 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
 
     if ((enabled < 0) or (enabled > 1)) {
         map_out.setError("Invert: enabled must be 0 or 1");
-        vsapi.?.freeNode.?(d.node);
+        zapi.freeNode(d.node);
         return;
     }
 
@@ -97,11 +104,11 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
     const data: *InvertData = allocator.create(InvertData) catch unreachable;
     data.* = d;
 
-    var deps = [_]vs.FilterDependency{
+    var dep = [_]vs.FilterDependency{
         .{ .source = d.node, .requestPattern = .StrictSpatial },
     };
 
-    vsapi.?.createVideoFilter.?(out, "Invert", d.vi, invertGetFrame, invertFree, .Parallel, &deps, deps.len, data, core);
+    zapi.createVideoFilter(out, "Invert", d.vi, invertGetFrame, invertFree, .Parallel, &dep, data, core);
 }
 
 export fn VapourSynthPluginInit2(plugin: *vs.Plugin, vspapi: *const vs.PLUGINAPI) void {
