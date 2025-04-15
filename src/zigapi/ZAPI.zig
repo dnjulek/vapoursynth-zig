@@ -9,7 +9,8 @@ const ZFrameRO = @import("ZFrameRO.zig");
 const ZFrameRW = @import("ZFrameRW.zig");
 const ZMapRO = @import("ZMapRO.zig");
 const ZMapRW = @import("ZMapRW.zig");
-const zmap = @import("ZMap.zig");
+const zmap = @import("zmap.zig");
+const zframe = @import("zframe.zig");
 
 const AudioFormat = vs.AudioFormat;
 const AudioInfo = vs.AudioInfo;
@@ -54,14 +55,15 @@ pub fn init(vsapi: ?*const vs.API) ZAPI {
     return .{ .vsapi = vsapi.? };
 }
 
-pub fn initZFrame(self: *const ZAPI, node: ?*vs.Node, n: c_int, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core) ZFrameRO {
-    const frame = self.vsapi.getFrameFilter.?(n, node, frame_ctx);
-    return .{
-        .frame_ctx = frame_ctx.?,
-        .core = core.?,
-        .api = self,
-        .frame = frame.?,
-    };
+pub fn initZFrame(
+    self: *const ZAPI,
+    node: ?*vs.Node,
+    n: c_int,
+    frame_ctx: ?*vs.FrameContext,
+    core: ?*vs.Core,
+) zframe.ZFrame(*const vs.Frame) {
+    const frame = self.vsapi.getFrameFilter.?(n, node, frame_ctx).?;
+    return zframe.ZFrame(@TypeOf(frame)).init(self, core.?, frame, frame_ctx.?);
 }
 
 pub fn initZMap(self: *const ZAPI, map: anytype) zmap.ZMap(@TypeOf(map)) {
