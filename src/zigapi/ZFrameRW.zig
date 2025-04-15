@@ -13,10 +13,6 @@ core: *vs.Core,
 api: *const ZAPI,
 frame: *vs.Frame,
 
-pub fn deinit(self: anytype) void {
-    self.api.freeFrame(self.frame);
-}
-
 /// Returns a read/write Map to a frame’s properties. The Map is valid as long as the frame lives.
 pub fn getPropertiesRW(self: anytype) zmap.ZMap(*vs.Map) {
     const map = self.api.getFramePropertiesRW(self.frame).?;

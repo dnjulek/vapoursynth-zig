@@ -4,10 +4,6 @@ const std = @import("std");
 const module = @import("../module.zig");
 const vs = module.vapoursynth4;
 const vsc = module.vsconstants;
-const ZFrameRO = @import("ZFrameRO.zig");
-const ZFrameRW = @import("ZFrameRW.zig");
-const ZMapRO = @import("ZMapRO.zig");
-const ZMapRW = @import("ZMapRW.zig");
 const zmap = @import("zmap.zig");
 const zframe = @import("zframe.zig");
 
