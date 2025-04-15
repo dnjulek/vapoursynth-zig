@@ -447,9 +447,9 @@ pub const API = extern struct {
     /// Fills out a VSAudioFormat struct based on the provided arguments. Validates the arguments before filling out format.
     queryAudioFormat: ?*const fn (*AudioFormat, SampleType, bitsPerSample: c_int, channelLayout: u64, ?*Core) callconv(.C) c_int,
     /// Get the id associated with a video format. Similar to queryVideoFormat() except that it returns a format id instead of filling out a VSVideoInfo struct.
-    queryVideoFormatID: ?*const fn (ColorFamily, SampleType, bitsPerSample: c_int, subSamplingW: c_int, subSamplingH: c_int, ?*Core) callconv(.C) u32,
+    queryVideoFormatID: ?*const fn (ColorFamily, SampleType, bitsPerSample: c_int, subSamplingW: c_int, subSamplingH: c_int, ?*Core) callconv(.C) PresetVideoFormat,
     /// Fills out the VSVideoFormat struct passed to format based
-    getVideoFormatByID: ?*const fn (*VideoFormat, id: u32, ?*Core) callconv(.C) c_int,
+    getVideoFormatByID: ?*const fn (*VideoFormat, id: PresetVideoFormat, ?*Core) callconv(.C) c_int,
     /// Fetches a frame synchronously. The frame is available when the function returns.
     /// This function is meant for external applications using the core as a library, or if frame requests are necessary during a filter’s initialization.
     getFrame: ?*const fn (n: c_int, ?*Node, errorMsg: ?[*:0]const u8, bufSize: c_int) callconv(.C) ?*const Frame,

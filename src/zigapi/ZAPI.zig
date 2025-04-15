@@ -39,6 +39,7 @@ const MessageType = vs.MessageType;
 const Node = vs.Node;
 const Plugin = vs.Plugin;
 const PluginFunction = vs.PluginFunction;
+const PresetVideoFormat = vs.PresetVideoFormat;
 const PropertyType = vs.PropertyType;
 const PublicFunction = vs.PublicFunction;
 const SampleType = vs.SampleType;
@@ -216,11 +217,11 @@ pub fn queryAudioFormat(self: *const ZAPI, af: *AudioFormat, st: SampleType, bps
     return self.vsapi.queryAudioFormat.?(af, st, bps, cl, core);
 }
 /// Get the id associated with a video format. Similar to queryVideoFormat() except that it returns a format id instead of filling out a VSVideoInfo struct.
-pub fn queryVideoFormatID(self: *const ZAPI, cf: ColorFamily, st: SampleType, bps: i32, ssw: i32, ssh: i32, core: ?*Core) u32 {
+pub fn queryVideoFormatID(self: *const ZAPI, cf: ColorFamily, st: SampleType, bps: i32, ssw: i32, ssh: i32, core: ?*Core) PresetVideoFormat {
     return self.vsapi.queryVideoFormatID.?(cf, st, bps, ssw, ssh, core);
 }
 /// Fills out the VSVideoFormat struct passed to format based
-pub fn getVideoFormatByID(self: *const ZAPI, vf: *VideoFormat, id: u32, core: ?*Core) i32 {
+pub fn getVideoFormatByID(self: *const ZAPI, vf: *VideoFormat, id: PresetVideoFormat, core: ?*Core) i32 {
     return self.vsapi.getVideoFormatByID.?(vf, id, core);
 }
 /// Fetches a frame synchronously. The frame is available when the function returns.
