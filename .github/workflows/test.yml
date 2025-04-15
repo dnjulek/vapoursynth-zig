@@ -33,5 +33,5 @@ jobs:
       - name: build
         run: |
           cd test/
-          zig build -Doptimize=ReleaseFast
-          ls zig-out/lib
+          zig build
+          vspipe -p ./tst.vpy .

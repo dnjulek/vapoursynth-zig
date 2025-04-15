@@ -36,7 +36,7 @@ export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, insta
         dst_prop.setInt("prop_example", @intFromEnum(prop_example), .Replace);
         dst_prop.setChromaLocation(.TOP_LEFT);
         dst_prop.setCombed(false);
-        dst_prop.setColorRange(.FULL);
+        dst_prop.setTransfer(.LOG_316);
 
         var plane: u32 = 0;
         while (plane < d.vi.format.numPlanes) : (plane += 1) {
