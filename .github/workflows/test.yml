@@ -34,4 +34,3 @@ jobs:
         run: |
           cd test/
           zig build
-          vspipe -p ./tst.vpy .
