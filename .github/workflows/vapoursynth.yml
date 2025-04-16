@@ -85,4 +85,4 @@ jobs:
     - name: Run test.vpy
       run: |
         export PATH="${{ runner.os }}-vapoursynth-build/vapoursynth:$PATH"
-        cd test/ && vspipe -p ./tst.vpy .        
+        cd test/ && vspipe -p ./tst.vpy .
