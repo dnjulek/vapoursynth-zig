@@ -4,7 +4,6 @@ const math = std.math;
 const module = @import("../module.zig");
 const vs = module.vapoursynth4;
 const ZAPI = @import("ZAPI.zig");
-const zmap = @import("zmap.zig");
 
 const ZFrameRO = @This();
 
@@ -68,7 +67,7 @@ pub fn getDimensions3(self: anytype, plane: usize) struct { width: u32, height: 
 }
 
 /// Returns a read-only Map to a frame’s properties. The Map is valid as long as the frame lives.
-pub fn getPropertiesRO(self: anytype) zmap.ZMap(*const vs.Map) {
+pub fn getPropertiesRO(self: anytype) ZAPI.ZMap(*const vs.Map) {
     const map = self.api.getFramePropertiesRO(self.frame).?;
-    return zmap.ZMap(@TypeOf(map)).init(map, self.api);
+    return ZAPI.ZMap(@TypeOf(map)).init(map, self.api);
 }

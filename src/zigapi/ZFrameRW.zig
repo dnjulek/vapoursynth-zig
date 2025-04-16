@@ -4,7 +4,6 @@ const math = std.math;
 const module = @import("../module.zig");
 const vs = module.vapoursynth4;
 const ZAPI = @import("ZAPI.zig");
-const zmap = @import("zmap.zig");
 
 const ZFrameRW = @This();
 
@@ -14,9 +13,9 @@ api: *const ZAPI,
 frame: *vs.Frame,
 
 /// Returns a read/write Map to a frame’s properties. The Map is valid as long as the frame lives.
-pub fn getPropertiesRW(self: anytype) zmap.ZMap(*vs.Map) {
+pub fn getPropertiesRW(self: anytype) ZAPI.ZMap(*vs.Map) {
     const map = self.api.getFramePropertiesRW(self.frame).?;
-    return zmap.ZMap(@TypeOf(map)).init(map, self.api);
+    return ZAPI.ZMap(@TypeOf(map)).init(map, self.api);
 }
 
 /// Returns a read-write slice to a plane or channel of a frame.
