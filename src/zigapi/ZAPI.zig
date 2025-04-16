@@ -4,8 +4,9 @@ const std = @import("std");
 const module = @import("../module.zig");
 const vs = module.vapoursynth4;
 const vsc = module.vsconstants;
-const zmap = @import("zmap.zig");
-const zframe = @import("zframe.zig");
+
+pub const ZMap = @import("zmap.zig").ZMap;
+pub const ZFrame = @import("zframe.zig").ZFrame;
 
 const AudioFormat = vs.AudioFormat;
 const AudioInfo = vs.AudioInfo;
@@ -56,18 +57,18 @@ pub fn initZFrame(
     n: c_int,
     frame_ctx: ?*vs.FrameContext,
     core: ?*vs.Core,
-) zframe.ZFrame(*const vs.Frame) {
+) ZFrame(*const vs.Frame) {
     const frame = self.vsapi.getFrameFilter.?(n, node, frame_ctx).?;
-    return zframe.ZFrame(@TypeOf(frame)).init(self, core.?, frame, frame_ctx.?);
+    return ZFrame(@TypeOf(frame)).init(self, core.?, frame, frame_ctx.?);
 }
 
-pub fn initZMap(self: *const ZAPI, map: anytype) zmap.ZMap(@TypeOf(map)) {
-    return zmap.ZMap(@TypeOf(map)).init(map, self);
+pub fn initZMap(self: *const ZAPI, map: anytype) ZMap(@TypeOf(map)) {
+    return ZMap(@TypeOf(map)).init(map, self);
 }
 
-pub fn createZMap(self: *const ZAPI) zmap.ZMap(*vs.Map) {
+pub fn createZMap(self: *const ZAPI) ZMap(*vs.Map) {
     const map = self.vsapi.createMap.?().?;
-    return zmap.ZMap(@TypeOf(map)).init(map, self);
+    return ZMap(@TypeOf(map)).init(map, self);
 }
 
 /// output nodes are appended to the clip key in the out map
