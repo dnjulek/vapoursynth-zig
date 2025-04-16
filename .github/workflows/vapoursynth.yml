@@ -1,0 +1,88 @@
+name: Test with VapourSynth
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4 
+
+    - name: Cache VapourSynth build
+      uses: actions/cache@v4
+      id: cache-vapoursynth
+      with:
+        path: |
+          ${{ runner.os }}-vapoursynth-build
+        key: ${{ runner.os }}-vapoursynth-R71
+        restore-keys: |
+          ${{ runner.os }}-vapoursynth-
+
+    - name: Install Python dependencies
+      shell: bash
+      run: pip install cython setuptools wheel
+
+    - name: Install VapourSynth (R71)
+      run: |
+        if [ ! -d "${{ runner.os }}-vapoursynth-build/vapoursynth" ]; then
+
+          echo "Cache miss. Building VapourSynth."
+          mkdir -p ${{ runner.os }}-vapoursynth-build
+          cd ${{ runner.os }}-vapoursynth-build
+
+          git clone --recurse-submodules https://github.com/sekrit-twc/zimg.git
+          cd zimg
+          ./autogen.sh
+          ./configure --prefix=/usr
+          make -j$(nproc)
+          sudo make install -j$(nproc)
+          cd ..
+
+          git clone --branch R71 --depth 1 https://github.com/vapoursynth/vapoursynth.git
+          cd vapoursynth
+          ./autogen.sh
+          ./configure --prefix=/usr
+          make -j$(nproc)
+          sudo make install -j$(nproc)
+
+          sudo mkdir -p /usr/lib/vapoursynth
+          pip install vapoursynth
+
+        else
+          echo "Cache hit. Using existing build."
+          cd ${{ runner.os }}-vapoursynth-build
+
+          cd zimg
+          sudo make install -j$(nproc)
+          cd ..
+
+          cd vapoursynth
+          sudo make install -j$(nproc)
+
+          sudo mkdir -p /usr/lib/vapoursynth
+          pip install vapoursynth
+        fi
+
+    - name: install zig
+      run: sudo snap install zig --classic --edge
+
+    - name: build example plugin
+      run: |
+        cd examples/example-zigapi
+        zig build
+
+    - name: build test plugin
+      run: |
+        cd test/
+        zig build
+
+    - name: Run test.vpy
+      run: |
+        export PATH="${{ runner.os }}-vapoursynth-build/vapoursynth:$PATH"
+        cd test/ && vspipe -p ./tst.vpy .        
