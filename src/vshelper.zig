@@ -8,6 +8,20 @@ pub const STD_PLUGIN_ID = "com.vapoursynth.std";
 pub const RESIZE_PLUGIN_ID = "com.vapoursynth.resize";
 pub const TEXT_PLUGIN_ID = "com.vapoursynth.text";
 
+pub const PluginID = enum {
+    Std,
+    Resize,
+    Text,
+
+    pub fn toString(self: PluginID) [:0]const u8 {
+        return switch (self) {
+            .Std => STD_PLUGIN_ID,
+            .Resize => RESIZE_PLUGIN_ID,
+            .Text => TEXT_PLUGIN_ID,
+        };
+    }
+};
+
 /// convenience function for checking if the format never changes between frames
 pub fn isConstantVideoFormat(vi: *const vs.VideoInfo) callconv(.C) bool {
     return (vi.height > 0) and (vi.width > 0) and (vi.format.colorFamily != .Undefined);

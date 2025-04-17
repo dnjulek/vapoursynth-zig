@@ -4,6 +4,7 @@ const std = @import("std");
 const module = @import("../module.zig");
 const vs = module.vapoursynth4;
 const vsc = module.vsconstants;
+const vsh = module.vshelper;
 
 const ZFrameRO = @import("ZFrameRO.zig");
 const ZFrameRW = @import("ZFrameRW.zig");
@@ -431,6 +432,11 @@ pub fn registerFunction(self: *const ZAPI, name: [:0]const u8, args: [:0]const u
 /// Returns a pointer to the plugin with the given identifier, or NULL if not found.
 pub fn getPluginByID(self: *const ZAPI, identifier: [:0]const u8, core: ?*Core) ?*Plugin {
     return self.vsapi.getPluginByID.?(identifier.ptr, core);
+}
+/// Returns a pointer to the plugin with the given identifier, or NULL if not found.
+/// Wrapper around getPluginByID() that takes a PluginID instead of a string.
+pub fn getPluginByID2(self: *const ZAPI, id: vsh.PluginID, core: ?*Core) ?*Plugin {
+    return self.vsapi.getPluginByID.?(id.toString().ptr, core);
 }
 /// Returns a pointer to the plugin with the given namespace, or NULL if not found.
 pub fn getPluginByNamespace(self: *const ZAPI, ns: [:0]const u8, core: ?*Core) ?*Plugin {
