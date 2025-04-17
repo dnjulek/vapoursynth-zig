@@ -24,15 +24,15 @@ pub fn setFloat(self: anytype, key: [:0]const u8, n: f64, mode: vs.MapAppendMode
 }
 
 pub fn setIntArray(self: anytype, comptime key: [:0]const u8, arr: []const i64) void {
-    _ = self.api.mapSetIntArray(self.map, key, arr, @intCast(arr.len));
+    _ = self.api.mapSetIntArray(self.map, key, arr);
 }
 
 pub fn setFloatArray(self: anytype, comptime key: [:0]const u8, arr: []const f64) void {
-    _ = self.api.mapSetFloatArray(self.map, key, arr, @intCast(arr.len));
+    _ = self.api.mapSetFloatArray(self.map, key, arr);
 }
 
 pub fn setData(self: anytype, comptime key: [:0]const u8, data: [:0]const u8, dth: vs.DataTypeHint, mode: vs.MapAppendMode) void {
-    _ = self.api.mapSetData(self.map, key, data, @intCast(data.len), dth, mode);
+    _ = self.api.mapSetData(self.map, key, data, dth, mode);
 }
 
 pub fn setError(self: anytype, err_msg: [:0]const u8) void {
