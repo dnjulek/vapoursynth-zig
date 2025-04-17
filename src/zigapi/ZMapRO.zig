@@ -129,6 +129,10 @@ pub fn getFunction(self: anytype, key: [:0]const u8, index: i32, err: ?*vs.MapPr
     return self.api.mapGetFunction(self.map, key, index, err);
 }
 
+pub fn invoke(self: anytype, plugin: ?*vs.Plugin, args: [:0]const u8) ZAPI.ZMap(*vs.Map) {
+    const ret = self.api.invoke(plugin, args, self.map);
+    return self.api.initZMap(ret.?);
+}
 // ------ Reserved Frame Properties ------ //
 
 pub fn getChromaLocation(self: anytype) ?vsc.ChromaLocation {
