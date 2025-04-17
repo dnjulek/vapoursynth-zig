@@ -420,7 +420,7 @@ pub const API = extern struct {
     getStride: ?*const fn (?*const Frame, plane: c_int) callconv(.C) c_longlong,
     /// Returns a read-only pointer to a plane or channel of a frame. Returns NULL if an invalid plane or channel number is passed.
     /// Don’t assume all three planes of a frame are allocated in one contiguous chunk (they’re not).
-    getReadPtr: ?*const fn (?*const Frame, plane: c_int) callconv(.C) [*:0]const u8,
+    getReadPtr: ?*const fn (?*const Frame, plane: c_int) callconv(.C) [*]const u8,
     /// Returns a read-write pointer to a plane or channel of a frame. Returns NULL if an invalid plane or channel number is passed.
     /// Don’t assume all three planes of a frame are allocated in one contiguous chunk (they’re not).
     getWritePtr: ?*const fn (?*Frame, plane: c_int) callconv(.C) [*]u8,
@@ -491,7 +491,7 @@ pub const API = extern struct {
     /// Returns the number of keys contained in a property map.
     mapNumKeys: ?*const fn (?*const Map) callconv(.C) c_int,
     /// Returns the nth key from a property map. Passing an invalid index will cause a fatal error. The pointer is valid as long as the key exists in the map.
-    mapGetKey: ?*const fn (?*const Map, index: c_int) callconv(.C) [*:0]const u8,
+    mapGetKey: ?*const fn (?*const Map, index: c_int) callconv(.C) ?[*:0]const u8,
     /// Removes the property with the given key. All values associated with the key are lost. Returns 0 if the key isn’t in the map. Otherwise it returns 1.
     mapDeleteKey: ?*const fn (?*Map, key: [*:0]const u8) callconv(.C) c_int,
     /// Returns the number of elements associated with a key in a property map. Returns -1 if there is no such key in the map.
@@ -524,7 +524,7 @@ pub const API = extern struct {
     /// Adds an array of floating point numbers to a map. Use this function if there are a lot of numbers to add, because it is faster than calling mapSetFloat() in a loop.
     mapSetFloatArray: ?*const fn (?*Map, key: [*:0]const u8, arr: [*]const f64, size: c_int) callconv(.C) c_int,
     /// Retrieves arbitrary binary data from a map. Checking mapGetDataTypeHint() may provide a hint about whether or not the data is human readable.
-    mapGetData: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) ?[*:0]const u8,
+    mapGetData: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) ?[*]const u8,
     /// Returns the size in bytes of a property of type ptData (see VSPropertyType), or 0 in case of error. The terminating NULL byte added by mapSetData() is not counted.
     mapGetDataSize: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) c_int,
     /// Returns the size in bytes of a property of type ptData (see VSPropertyType), or 0 in case of error. The terminating NULL byte added by mapSetData() is not counted.
@@ -562,23 +562,23 @@ pub const API = extern struct {
     /// Used to enumerate over all currently loaded plugins. The order is fixed but provides no other guarantees.
     getNextPlugin: ?*const fn (?*Plugin, ?*Core) callconv(.C) ?*Plugin,
     /// Returns the name of the plugin that was passed to configPlugin.
-    getPluginName: ?*const fn (?*Plugin) callconv(.C) [*:0]const u8,
+    getPluginName: ?*const fn (?*Plugin) callconv(.C) ?[*:0]const u8,
     /// Returns the identifier of the plugin that was passed to configPlugin.
-    getPluginID: ?*const fn (?*Plugin) callconv(.C) [*:0]const u8,
+    getPluginID: ?*const fn (?*Plugin) callconv(.C) ?[*:0]const u8,
     /// Returns the namespace the plugin currently is loaded in.
-    getPluginNamespace: ?*const fn (?*Plugin) callconv(.C) [*:0]const u8,
+    getPluginNamespace: ?*const fn (?*Plugin) callconv(.C) ?[*:0]const u8,
     /// Used to enumerate over all functions in a plugin. The order is fixed but provides no other guarantees.
     getNextPluginFunction: ?*const fn (?*PluginFunction, ?*Plugin) callconv(.C) ?*PluginFunction,
     /// Get a function belonging to a plugin by its name.
     getPluginFunctionByName: ?*const fn (name: [*:0]const u8, ?*Plugin) callconv(.C) ?*PluginFunction,
     /// Returns the name of the function that was passed to registerFunction.
-    getPluginFunctionName: ?*const fn (?*PluginFunction) callconv(.C) [*:0]const u8,
+    getPluginFunctionName: ?*const fn (?*PluginFunction) callconv(.C) ?[*:0]const u8,
     /// Returns the argument string of the function that was passed to registerFunction.
-    getPluginFunctionArguments: ?*const fn (?*PluginFunction) callconv(.C) [*:0]const u8,
+    getPluginFunctionArguments: ?*const fn (?*PluginFunction) callconv(.C) ?[*:0]const u8,
     /// Returns the return type string of the function that was passed to registerFunction.
-    getPluginFunctionReturnType: ?*const fn (?*PluginFunction) callconv(.C) [*:0]const u8,
+    getPluginFunctionReturnType: ?*const fn (?*PluginFunction) callconv(.C) ?[*:0]const u8,
     /// Returns the absolute path to the plugin, including the plugin’s file name. This is the real location of the plugin, i.e. there are no symbolic links in the path.
-    getPluginPath: ?*const fn (?*const Plugin) callconv(.C) [*:0]const u8,
+    getPluginPath: ?*const fn (?*const Plugin) callconv(.C) ?[*:0]const u8,
     /// Returns the version of the plugin. This is the same as the version number passed to configPlugin.
     getPluginVersion: ?*const fn (?*const Plugin) callconv(.C) c_int,
     /// Checks that the args passed to the filter are consistent with the argument list registered by the plugin that contains the filter, calls the filter’s
