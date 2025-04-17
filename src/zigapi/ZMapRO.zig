@@ -85,7 +85,7 @@ pub fn getFloatArray(self: anytype, comptime key: [:0]const u8) ?[]const f64 {
     } else return null;
 }
 
-pub fn getData(self: anytype, comptime key: [:0]const u8, index: i32) ?[:0]const u8 {
+pub fn getData(self: anytype, comptime key: [:0]const u8, index: i32) ?[]const u8 {
     var err: vs.MapPropertyError = undefined;
     const len = self.dataSize(key, index);
     if (len) |n| {
