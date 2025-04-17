@@ -39,6 +39,38 @@ pub fn setError(self: anytype, err_msg: [:0]const u8) void {
     self.api.mapSetError(self.map, err_msg);
 }
 
+pub fn deleteKey(self: anytype, key: [:0]const u8) void {
+    self.api.mapDeleteKey(self.map, key);
+}
+
+pub fn setEmpty(self: anytype, key: [:0]const u8, pt: vs.PropertyType) i32 {
+    return self.api.mapSetEmpty(self.map, key, pt);
+}
+
+pub fn setNode(self: anytype, key: [:0]const u8, node: ?*vs.Node, mode: vs.MapAppendMode) i32 {
+    return self.api.mapSetNode(self.map, key, node, mode);
+}
+
+pub fn consumeNode(self: anytype, key: [:0]const u8, node: ?*vs.Node, mode: vs.MapAppendMode) void {
+    self.api.mapConsumeNode(self.map, key, node, mode);
+}
+
+pub fn setFrame(self: anytype, key: [:0]const u8, frame: ?*vs.Frame, mode: vs.MapAppendMode) i32 {
+    return self.api.mapSetFrame(self.map, key, frame, mode);
+}
+
+pub fn consumeFrame(self: anytype, key: [:0]const u8, frame: ?*vs.Frame, mode: vs.MapAppendMode) i32 {
+    return self.api.mapConsumeFrame(self.map, key, frame, mode);
+}
+
+pub fn setFunction(self: anytype, key: [:0]const u8, func: ?*vs.Function, mode: vs.MapAppendMode) i32 {
+    return self.api.mapSetFunction(self.map, key, func, mode);
+}
+
+pub fn consumeFunction(self: anytype, key: [:0]const u8, func: ?*vs.Function, mode: vs.MapAppendMode) i32 {
+    return self.api.mapConsumeFunction(self.map, key, func, mode);
+}
+
 pub fn setChromaLocation(self: anytype, n: vsc.ChromaLocation) void {
     self.setInt("_ChromaLocation", @intFromEnum(n), .Replace);
 }

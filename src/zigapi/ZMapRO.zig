@@ -105,6 +105,30 @@ pub fn dataSize(self: anytype, comptime key: [:0]const u8, index: i32) ?u32 {
     return if (len < 1 or err != .Success) null else @as(u32, @bitCast(len));
 }
 
+pub fn numKeys(self: anytype) i32 {
+    return self.api.mapNumKeys(self.map);
+}
+
+pub fn getError(self: anytype) ?[*:0]const u8 {
+    return self.api.mapGetError(self.map);
+}
+
+pub fn getType(self: anytype, key: [:0]const u8) vs.PropertyType {
+    return self.api.mapGetType(self.map, key);
+}
+
+pub fn getDataTypeHint(self: anytype, key: [:0]const u8, index: i32, err: ?*vs.MapPropertyError) vs.DataTypeHint {
+    return self.api.mapGetDataTypeHint(self.map, key, index, err);
+}
+
+pub fn getFrame(self: anytype, key: [:0]const u8, index: i32, err: ?*vs.MapPropertyError) ?*vs.Frame {
+    return self.api.mapGetFrame(self.map, key, index, err);
+}
+
+pub fn getFunction(self: anytype, key: [:0]const u8, index: i32, err: ?*vs.MapPropertyError) ?*vs.Function {
+    return self.api.mapGetFunction(self.map, key, index, err);
+}
+
 // ------ Reserved Frame Properties ------ //
 
 pub fn getChromaLocation(self: anytype) ?vsc.ChromaLocation {
