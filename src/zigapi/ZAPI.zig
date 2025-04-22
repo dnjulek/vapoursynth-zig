@@ -488,8 +488,8 @@ pub fn getPluginVersion(self: *const ZAPI, plugin: ?*const Plugin) i32 {
 }
 /// Checks that the args passed to the filter are consistent with the argument list registered by the plugin that contains the filter, calls the filter’s
 /// “create” function, and checks that the filter returns the declared types. If everything goes smoothly, the filter will be ready to generate frames after invoke() returns.
-pub fn invoke(self: *const ZAPI, plugin: ?*Plugin, args: [:0]const u8, in: ?*const Map) ?*Map {
-    return self.vsapi.invoke.?(plugin, args.ptr, in);
+pub fn invoke(self: *const ZAPI, plugin: ?*Plugin, name: [:0]const u8, args: ?*const Map) ?*Map {
+    return self.vsapi.invoke.?(plugin, name.ptr, args);
 }
 /// Creates the VapourSynth processing core and returns a pointer to it. It is possible to create multiple cores but in most cases it shouldn’t be needed.
 pub fn createCore(self: *const ZAPI, flags: CoreCreationFlags) ?*Core {
