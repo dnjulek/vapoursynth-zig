@@ -150,28 +150,28 @@ pub fn getFieldBased(self: anytype) ?vsc.FieldBased {
     return if (value < 0 or value > 2) null else @enumFromInt(value);
 }
 
-pub fn getMatrix(self: anytype) ?vsc.MatrixCoefficient {
-    const value: i32 = self.getInt(i32, "_Matrix") orelse return null;
+pub fn getMatrix(self: anytype) vsc.MatrixCoefficient {
+    const value: i32 = self.getInt(i32, "_Matrix") orelse return .UNSPECIFIED;
     for (std.enums.values(vsc.MatrixCoefficient)) |v| {
         if (@as(i32, @intFromEnum(v)) == value) return v;
     }
-    return null;
+    return .UNSPECIFIED;
 }
 
-pub fn getPrimaries(self: anytype) ?vsc.ColorPrimaries {
-    const value: i32 = self.getInt(i32, "_Primaries") orelse return null;
+pub fn getPrimaries(self: anytype) vsc.ColorPrimaries {
+    const value: i32 = self.getInt(i32, "_Primaries") orelse return .UNSPECIFIED;
     for (std.enums.values(vsc.ColorPrimaries)) |v| {
         if (@as(i32, @intFromEnum(v)) == value) return v;
     }
-    return null;
+    return .UNSPECIFIED;
 }
 
-pub fn getTransfer(self: anytype) ?vsc.TransferCharacteristics {
-    const value: i32 = self.getInt(i32, "_Transfer") orelse return null;
+pub fn getTransfer(self: anytype) vsc.TransferCharacteristics {
+    const value: i32 = self.getInt(i32, "_Transfer") orelse return .UNSPECIFIED;
     for (std.enums.values(vsc.TransferCharacteristics)) |v| {
         if (@as(i32, @intFromEnum(v)) == value) return v;
     }
-    return null;
+    return .UNSPECIFIED;
 }
 
 pub fn getDurationNum(self: anytype) ?i64 {
