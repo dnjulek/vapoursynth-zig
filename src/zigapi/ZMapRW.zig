@@ -51,8 +51,8 @@ pub fn setNode(self: anytype, key: [:0]const u8, node: ?*vs.Node, mode: vs.MapAp
     return self.api.mapSetNode(self.map, key, node, mode);
 }
 
-pub fn consumeNode(self: anytype, key: [:0]const u8, node: ?*vs.Node, mode: vs.MapAppendMode) void {
-    self.api.mapConsumeNode(self.map, key, node, mode);
+pub fn consumeNode(self: anytype, key: [:0]const u8, node: ?*vs.Node, mode: vs.MapAppendMode) i32 {
+    return self.api.mapConsumeNode(self.map, key, node, mode);
 }
 
 pub fn setFrame(self: anytype, key: [:0]const u8, frame: ?*vs.Frame, mode: vs.MapAppendMode) i32 {
