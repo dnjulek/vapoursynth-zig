@@ -40,7 +40,7 @@ pub fn setError(self: anytype, err_msg: [:0]const u8) void {
 }
 
 pub fn deleteKey(self: anytype, key: [:0]const u8) void {
-    self.api.mapDeleteKey(self.map, key);
+    _ = self.api.mapDeleteKey(self.map, key);
 }
 
 pub fn setEmpty(self: anytype, key: [:0]const u8, pt: vs.PropertyType) i32 {
