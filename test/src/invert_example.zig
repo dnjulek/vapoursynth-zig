@@ -30,6 +30,8 @@ export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, insta
         defer src.deinit();
         const dst = src.newVideoFrame();
 
+        const src2 = zapi.initZFrameFromVi(d.vi, frame_ctx, core, .{ .cf = .Gray });
+
         const src_prop = src.getPropertiesRO();
         const dst_prop = dst.getPropertiesRW();
         const prop_example: vsc.MatrixCoefficient = src_prop.getMatrix();
@@ -58,6 +60,8 @@ export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, insta
                 srcp = srcp[stride..];
             }
         }
+
+        dst_prop.consumeAlpha(src2.frame);
 
         return dst.frame;
     }

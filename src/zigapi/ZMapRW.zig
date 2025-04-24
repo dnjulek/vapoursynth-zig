@@ -71,6 +71,14 @@ pub fn consumeFunction(self: anytype, key: [:0]const u8, func: ?*vs.Function, mo
     return self.api.mapConsumeFunction(self.map, key, func, mode);
 }
 
+pub fn setAlpha(self: anytype, frame: ?*vs.Frame) void {
+    _ = self.setFrame("_Alpha", frame, .Replace);
+}
+
+pub fn consumeAlpha(self: anytype, frame: ?*vs.Frame) void {
+    _ = self.consumeFrame("_Alpha", frame, .Replace);
+}
+
 pub fn setChromaLocation(self: anytype, n: vsc.ChromaLocation) void {
     self.setInt("_ChromaLocation", @intFromEnum(n), .Replace);
 }
