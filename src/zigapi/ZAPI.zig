@@ -75,20 +75,28 @@ pub fn createZMap(self: *const ZAPI) ZMap(*vs.Map) {
 }
 
 /// output nodes are appended to the clip key in the out map
-pub fn createVideoFilter(self: *const ZAPI, out: ?*Map, name: [:0]const u8, vi: *const VideoInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, dep: []const FilterDependency, data: ?*anyopaque, core: ?*Core) void {
-    self.vsapi.createVideoFilter.?(out, name.ptr, vi, gf, free, mode, dep.ptr, @intCast(dep.len), data, core);
+pub fn createVideoFilter(self: *const ZAPI, out: ?*Map, name: [:0]const u8, vi: *const VideoInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, data: ?*anyopaque, core: ?*Core) void {
+    const ptr = if (deps) |d| d.ptr else null;
+    const len: i32 = if (deps) |d| @intCast(d.len) else 0;
+    self.vsapi.createVideoFilter.?(out, name.ptr, vi, gf, free, mode, ptr, len, data, core);
 }
 /// same as createVideoFilter but returns a pointer to the VSNode directly or NULL on failure
-pub fn createVideoFilter2(self: *const ZAPI, name: [:0]const u8, vi: *const VideoInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, dep: []const FilterDependency, instance_data: ?*anyopaque, core: ?*Core) ?*Node {
-    return self.vsapi.createVideoFilter2.?(name.ptr, vi, gf, free, mode, dep.ptr, @intCast(dep.len), instance_data, core);
+pub fn createVideoFilter2(self: *const ZAPI, name: [:0]const u8, vi: *const VideoInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, instance_data: ?*anyopaque, core: ?*Core) ?*Node {
+    const ptr = if (deps) |d| d.ptr else null;
+    const len: i32 = if (deps) |d| @intCast(d.len) else 0;
+    return self.vsapi.createVideoFilter2.?(name.ptr, vi, gf, free, mode, ptr, len, instance_data, core);
 }
 /// output nodes are appended to the clip key in the out map
-pub fn createAudioFilter(self: *const ZAPI, out: ?*Map, name: [:0]const u8, ai: *const AudioInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, dep: []const FilterDependency, instance_data: ?*anyopaque, core: ?*Core) void {
-    self.vsapi.createAudioFilter.?(out, name.ptr, ai, gf, free, mode, dep.ptr, @intCast(dep.len), instance_data, core);
+pub fn createAudioFilter(self: *const ZAPI, out: ?*Map, name: [:0]const u8, ai: *const AudioInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, instance_data: ?*anyopaque, core: ?*Core) void {
+    const ptr = if (deps) |d| d.ptr else null;
+    const len: i32 = if (deps) |d| @intCast(d.len) else 0;
+    self.vsapi.createAudioFilter.?(out, name.ptr, ai, gf, free, mode, ptr, len, instance_data, core);
 }
 /// same as createAudioFilter but returns a pointer to the VSNode directly or NULL on failure
-pub fn createAudioFilter2(self: *const ZAPI, name: [:0]const u8, ai: *const AudioInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, dep: []const FilterDependency, instance_data: ?*anyopaque, core: ?*Core) ?*Node {
-    return self.vsapi.createAudioFilter2.?(name.ptr, ai, gf, free, mode, dep.ptr, @intCast(dep.len), instance_data, core);
+pub fn createAudioFilter2(self: *const ZAPI, name: [:0]const u8, ai: *const AudioInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, instance_data: ?*anyopaque, core: ?*Core) ?*Node {
+    const ptr = if (deps) |d| d.ptr else null;
+    const len: i32 = if (deps) |d| @intCast(d.len) else 0;
+    return self.vsapi.createAudioFilter2.?(name.ptr, ai, gf, free, mode, ptr, len, instance_data, core);
 }
 /// Use right after create*Filter*, sets the correct cache mode for using the cacheFrame API and returns the recommended upper number of additional frames to cache per request
 pub fn setLinearFilter(self: *const ZAPI, node: ?*Node) i32 {

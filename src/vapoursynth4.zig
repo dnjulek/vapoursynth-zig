@@ -372,13 +372,13 @@ pub const FilterDependency = extern struct {
 /// This giant struct is the way to access VapourSynth’s public API.
 pub const API = extern struct {
     /// output nodes are appended to the clip key in the out map
-    createVideoFilter: ?*const fn (out: ?*Map, name: [*:0]const u8, vi: *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, [*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) void,
+    createVideoFilter: ?*const fn (out: ?*Map, name: [*:0]const u8, vi: *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) void,
     /// same as createVideoFilter but returns a pointer to the VSNode directly or NULL on failure
-    createVideoFilter2: ?*const fn (name: [*:0]const u8, vi: *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, [*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) ?*Node,
+    createVideoFilter2: ?*const fn (name: [*:0]const u8, vi: *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) ?*Node,
     /// output nodes are appended to the clip key in the out map
-    createAudioFilter: ?*const fn (out: ?*Map, name: [*:0]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, [*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) void,
+    createAudioFilter: ?*const fn (out: ?*Map, name: [*:0]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) void,
     /// same as createAudioFilter but returns a pointer to the VSNode directly or NULL on failure
-    createAudioFilter2: ?*const fn (name: [*:0]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, [*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) ?*Node,
+    createAudioFilter2: ?*const fn (name: [*:0]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) ?*Node,
     /// Use right after create*Filter*, sets the correct cache mode for using the cacheFrame API and returns the recommended upper number of additional frames to cache per request
     setLinearFilter: ?*const fn (?*Node) callconv(.C) c_int,
     /// VSCacheMode, changing the cache mode also resets all options to their default
