@@ -97,15 +97,15 @@ pub fn initZFrameFromVi(
     var vf: VideoFormat = vi.format;
 
     if (!options.nullVf()) {
-        _ = self.queryVideoFormat(
-            &vf,
-            if (options.cf) |cf| cf else vf.colorFamily,
-            if (options.st) |st| st else vf.sampleType,
-            if (options.bps) |bps| bps else vf.bitsPerSample,
-            if (options.ssw) |ssw| ssw else vf.subSamplingW,
-            if (options.ssh) |ssh| ssh else vf.subSamplingH,
-            core,
-        );
+        const cf = if (options.cf) |cf| cf else vf.colorFamily;
+        const st = if (options.st) |st| st else vf.sampleType;
+        const bps = if (options.bps) |bps| bps else vf.bitsPerSample;
+        var ssw = if (options.ssw) |ssw| ssw else vf.subSamplingW;
+        var ssh = if (options.ssh) |ssh| ssh else vf.subSamplingH;
+        ssw = if (cf != .YUV) 0 else ssw;
+        ssh = if (cf != .YUV) 0 else ssh;
+
+        _ = self.queryVideoFormat(&vf, cf, st, bps, ssw, ssh, core);
     }
 
     const frame = self.newVideoFrame(
