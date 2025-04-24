@@ -72,9 +72,12 @@ const FromViOptions = struct {
     bps: ?i32 = null,
     ssw: ?i32 = null,
     ssh: ?i32 = null,
-    src: ?*const Frame = null,
 
-    pub fn isEmpty(self: *const FromViOptions) bool {
+    prop_src: ?*const Frame = null,
+    width: ?i32 = null,
+    height: ?i32 = null,
+
+    pub fn nullVf(self: *const FromViOptions) bool {
         return self.vf == null and
             self.cf == null and
             self.st == null and
@@ -93,7 +96,7 @@ pub fn initZFrameFromVi(
 ) ZFrame(*vs.Frame) {
     var vf: VideoFormat = vi.format;
 
-    if (!options.isEmpty()) {
+    if (!options.nullVf()) {
         _ = self.queryVideoFormat(
             &vf,
             if (options.cf) |cf| cf else vf.colorFamily,
@@ -105,7 +108,14 @@ pub fn initZFrameFromVi(
         );
     }
 
-    const frame = self.newVideoFrame(&vf, vi.width, vi.height, options.src, core).?;
+    const frame = self.newVideoFrame(
+        &vf,
+        if (options.width) |w| w else vi.width,
+        if (options.height) |h| h else vi.height,
+        options.prop_src,
+        core,
+    ).?;
+
     return ZFrame(@TypeOf(frame)).init(self, core.?, frame, frame_ctx.?);
 }
 
