@@ -65,6 +65,50 @@ pub fn initZFrame(
     return ZFrame(@TypeOf(frame)).init(self, core.?, frame, frame_ctx.?);
 }
 
+const FromViOptions = struct {
+    vf: ?*VideoFormat = null,
+    cf: ?ColorFamily = null,
+    st: ?SampleType = null,
+    bps: ?i32 = null,
+    ssw: ?i32 = null,
+    ssh: ?i32 = null,
+    src: ?*const Frame = null,
+
+    pub fn isEmpty(self: *const FromViOptions) bool {
+        return self.vf == null and
+            self.cf == null and
+            self.st == null and
+            self.bps == null and
+            self.ssw == null and
+            self.ssh == null;
+    }
+};
+
+pub fn initZFrameFromVi(
+    self: *const ZAPI,
+    vi: *const vs.VideoInfo,
+    frame_ctx: ?*vs.FrameContext,
+    core: ?*vs.Core,
+    options: FromViOptions,
+) ZFrame(*vs.Frame) {
+    var vf: VideoFormat = vi.format;
+
+    if (!options.isEmpty()) {
+        _ = self.queryVideoFormat(
+            &vf,
+            if (options.cf) |cf| cf else vf.colorFamily,
+            if (options.st) |st| st else vf.sampleType,
+            if (options.bps) |bps| bps else vf.bitsPerSample,
+            if (options.ssw) |ssw| ssw else vf.subSamplingW,
+            if (options.ssh) |ssh| ssh else vf.subSamplingH,
+            core,
+        );
+    }
+
+    const frame = self.newVideoFrame(&vf, vi.width, vi.height, options.src, core).?;
+    return ZFrame(@TypeOf(frame)).init(self, core.?, frame, frame_ctx.?);
+}
+
 pub fn initZMap(self: *const ZAPI, map: anytype) ZMap(@TypeOf(map)) {
     return ZMap(@TypeOf(map)).init(map, self);
 }
@@ -536,7 +580,7 @@ pub fn removeLogHandler(self: *const ZAPI, handle: ?*LogHandle, core: ?*Core) i3
     return self.vsapi.removeLogHandler.?(handle, core);
 }
 
-const Options = struct {
+const FrameOptions = struct {
     format: ?*const vs.VideoFormat = null,
     width: ?i32 = null,
     height: ?i32 = null,
@@ -608,7 +652,7 @@ pub fn ZFrame(comptime FrameType: type) type {
 
         /// Same as newVideoFrame but with custom format, width and height.
         /// Use this if you want to create a frame with a different format or size than the source frame.
-        pub fn newVideoFrame3(self: anytype, options: Options) ZFrame(*vs.Frame) {
+        pub fn newVideoFrame3(self: anytype, options: FrameOptions) ZFrame(*vs.Frame) {
             const format = if (options.format != null) options.format.? else self.api.getVideoFrameFormat(self.frame);
             const width = if (options.width != null) options.width.? else self.api.getFrameWidth(self.frame, 0);
             const height = if (options.height != null) options.height.? else self.api.getFrameHeight(self.frame, 0);
