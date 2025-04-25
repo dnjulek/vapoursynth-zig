@@ -16,6 +16,7 @@ const InvertData = struct {
     node: ?*vs.Node,
     vi: *const vs.VideoInfo,
     enabled: bool,
+    path: [][]const u8 = undefined,
 };
 
 export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
@@ -73,6 +74,8 @@ export fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const
     _ = core;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
     vsapi.?.freeNode.?(d.node);
+
+    allocator.free(d.path);
     allocator.destroy(d);
 }
 
@@ -105,6 +108,12 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
 
     d.enabled = enabled == 1;
 
+    d.path = map_in.getDataArray("path", allocator).?;
+
+    std.debug.print("path_0: {s}\n", .{d.path[0]});
+    std.debug.print("path_1: {s}\n", .{d.path[1]});
+    std.debug.print("path_2: {s}\n", .{d.path[2]});
+
     const prop = map_in.getData("prop", 0) orelse "empty";
     std.debug.print("prop in: {s}\n", .{prop});
 
@@ -120,5 +129,5 @@ export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque
 
 export fn VapourSynthPluginInit2(plugin: *vs.Plugin, vspapi: *const vs.PLUGINAPI) void {
     _ = vspapi.configPlugin.?("com.example.zinvert", "zinvert", "VapourSynth Invert Example", vs.makeVersion(1, 0), vs.VAPOURSYNTH_API_VERSION, 0, plugin);
-    _ = vspapi.registerFunction.?("Filter", "clip:vnode;enabled:int:opt;prop:data:opt;", "clip:vnode;", invertCreate, null, plugin);
+    _ = vspapi.registerFunction.?("Filter", "clip:vnode;enabled:int:opt;prop:data:opt;path:data[]:opt;", "clip:vnode;", invertCreate, null, plugin);
 }

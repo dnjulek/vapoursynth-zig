@@ -94,6 +94,17 @@ pub fn getData(self: anytype, comptime key: [:0]const u8, index: i32) ?[]const u
     } else return null;
 }
 
+pub fn getDataArray(self: anytype, comptime key: [:0]const u8, allocator: std.mem.Allocator) ?[][]const u8 {
+    const len: u32 = self.numElements(key) orelse return null;
+    const arr = allocator.alloc([]const u8, len) catch return null;
+
+    for (0..len) |i| {
+        arr[i] = self.getData(key, @intCast(i)).?;
+    }
+
+    return arr;
+}
+
 pub fn numElements(self: anytype, comptime key: [:0]const u8) ?u32 {
     const ne = self.api.mapNumElements(self.map, key);
     return if (ne < 1) null else @as(u32, @bitCast(ne));
