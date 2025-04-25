@@ -68,30 +68,24 @@ pub fn getBool2(self: anytype, comptime key: [:0]const u8, index: usize) ?bool {
 }
 
 pub fn getIntArray(self: anytype, comptime key: [:0]const u8) ?[]const i64 {
-    const len = self.numElements(key);
-    if (len) |n| {
-        var err: vs.MapPropertyError = undefined;
-        const arr_ptr = self.api.mapGetIntArray(self.map, key, &err);
-        return if (err == .Success) arr_ptr.?[0..n] else null;
-    } else return null;
+    const len: u32 = self.numElements(key) orelse return null;
+    var err: vs.MapPropertyError = undefined;
+    const arr_ptr = self.api.mapGetIntArray(self.map, key, &err);
+    return if (err == .Success) arr_ptr.?[0..len] else null;
 }
 
 pub fn getFloatArray(self: anytype, comptime key: [:0]const u8) ?[]const f64 {
-    const len = self.numElements(key);
-    if (len) |n| {
-        var err: vs.MapPropertyError = undefined;
-        const arr_ptr = self.api.mapGetFloatArray(self.map, key, &err);
-        return if (err == .Success) arr_ptr.?[0..n] else null;
-    } else return null;
+    const len: u32 = self.numElements(key) orelse return null;
+    var err: vs.MapPropertyError = undefined;
+    const arr_ptr = self.api.mapGetFloatArray(self.map, key, &err);
+    return if (err == .Success) arr_ptr.?[0..len] else null;
 }
 
 pub fn getData(self: anytype, comptime key: [:0]const u8, index: i32) ?[]const u8 {
     var err: vs.MapPropertyError = undefined;
-    const len = self.dataSize(key, index);
-    if (len) |n| {
-        const ptr = self.api.mapGetData(self.map, key, index, &err);
-        return if (err == .Success) ptr.?[0..n] else null;
-    } else return null;
+    const len: u32 = self.dataSize(key, index) orelse return null;
+    const ptr = self.api.mapGetData(self.map, key, index, &err);
+    return if (err == .Success) ptr.?[0..len] else null;
 }
 
 pub fn getDataArray(self: anytype, comptime key: [:0]const u8, allocator: std.mem.Allocator) ?[][]const u8 {
