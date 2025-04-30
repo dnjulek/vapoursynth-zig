@@ -16,7 +16,7 @@ const InvertData = struct {
     string_bufs: [2]?[]u8,
 };
 
-export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
+fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
     _ = frame_data;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
 
@@ -60,7 +60,7 @@ export fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, insta
     return null;
 }
 
-export fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
+fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
     _ = core;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
     vsapi.?.freeNode.?(d.node);
@@ -70,7 +70,7 @@ export fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const
     allocator.destroy(d);
 }
 
-export fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
+fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
     _ = user_data;
     var d: InvertData = undefined;
     var err: vs.MapPropertyError = undefined;
