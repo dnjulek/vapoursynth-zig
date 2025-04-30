@@ -346,7 +346,7 @@ pub const FilterGetFrame = ?*const fn (n: c_int, ActivationReason, instanceData:
 pub const FilterFree = ?*const fn (?*anyopaque, ?*Core, *const API) callconv(.C) void;
 
 /// Requests the generation of a frame. When the frame is ready, a user-provided function is called. Note that the completion callback will only be called from a single thread at a time.
-pub const FrameDoneCallback = ?*const fn (?*anyopaque, ?*const Frame, n: c_int, ?*Node, [*:0]const u8) callconv(.C) void;
+pub const FrameDoneCallback = ?*const fn (user_data: ?*anyopaque, f: ?*const Frame, n: c_int, node: ?*Node, error_msg: [*:0]const u8) callconv(.C) void;
 /// Custom message handler.
 pub const LogHandler = ?*const fn (MessageType, [*:0]const u8, userData: ?*anyopaque) callconv(.C) void;
 /// Called when a handler is removed.
