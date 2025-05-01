@@ -31,7 +31,7 @@ fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_dat
         defer src.deinit();
         const dst = src.newVideoFrame();
 
-        const src2 = zapi.initZFrameFromVi(d.vi, frame_ctx, core, .{ .cf = .Gray });
+        const src2 = zapi.initZFrameFromVi(d.vi, frame_ctx, null, core, .{ .cf = .Gray });
 
         const src_prop = src.getPropertiesRO();
         const dst_prop = dst.getPropertiesRW();

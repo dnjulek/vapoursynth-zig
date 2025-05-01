@@ -73,7 +73,6 @@ const FromViOptions = struct {
     ssw: ?i32 = null,
     ssh: ?i32 = null,
 
-    prop_src: ?*const Frame = null,
     width: ?i32 = null,
     height: ?i32 = null,
 
@@ -91,6 +90,7 @@ pub fn initZFrameFromVi(
     self: *const ZAPI,
     vi: *const vs.VideoInfo,
     frame_ctx: ?*vs.FrameContext,
+    src: ?*const Frame,
     core: ?*vs.Core,
     options: FromViOptions,
 ) ZFrame(*vs.Frame) {
@@ -112,7 +112,7 @@ pub fn initZFrameFromVi(
         &vf,
         if (options.width) |w| w else vi.width,
         if (options.height) |h| h else vi.height,
-        options.prop_src,
+        src,
         core,
     ).?;
 
