@@ -109,7 +109,7 @@ pub inline fn ceilN(x: usize, n: usize) usize {
 
 /// Helper to use Zig Optionals and saturate to return type
 /// https://ziglang.org/documentation/master/#Optionals
-pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*]const u8, index: u32, vsapi: ?*const vs.API) ?T {
+pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*:0]const u8, index: u32, vsapi: ?*const vs.API) ?T {
     var err: vs.MapPropertyError = undefined;
     const val: T = switch (@typeInfo(T)) {
         .int => math.lossyCast(T, vsapi.?.mapGetInt.?(in, key, @intCast(index), &err)),
