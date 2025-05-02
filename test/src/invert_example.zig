@@ -22,16 +22,16 @@ const InvertData = struct {
 fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
     _ = frame_data;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
-    const zapi = ZAPI.init(vsapi);
+    const zapi = ZAPI.init(vsapi, core);
 
     if (activation_reason == .Initial) {
         zapi.requestFrameFilter(n, d.node, frame_ctx);
     } else if (activation_reason == .AllFramesReady) {
-        const src = zapi.initZFrame(d.node, n, frame_ctx, core);
+        const src = zapi.initZFrame(d.node, n, frame_ctx);
         defer src.deinit();
         const dst = src.newVideoFrame();
 
-        const src2 = zapi.initZFrameFromVi(d.vi, frame_ctx, null, core, .{ .cf = .Gray });
+        const src2 = zapi.initZFrameFromVi(d.vi, frame_ctx, null, .{ .cf = .Gray });
 
         const src_prop = src.getPropertiesRO();
         const dst_prop = dst.getPropertiesRW();
@@ -83,7 +83,7 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core:
     _ = user_data;
     var d: InvertData = undefined;
 
-    const zapi = ZAPI.init(vsapi);
+    const zapi = ZAPI.init(vsapi, core);
     const map_in = zapi.initZMap(in);
     const map_out = zapi.initZMap(out);
 
@@ -124,7 +124,7 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core:
         .{ .source = d.node, .requestPattern = .StrictSpatial },
     };
 
-    zapi.createVideoFilter(out, "Invert", d.vi, invertGetFrame, invertFree, .Parallel, &dep, data, core);
+    zapi.createVideoFilter(out, "Invert", d.vi, invertGetFrame, invertFree, .Parallel, &dep, data);
 }
 
 export fn VapourSynthPluginInit2(plugin: *vs.Plugin, vspapi: *const vs.PLUGINAPI) void {

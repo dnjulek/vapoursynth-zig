@@ -9,82 +9,82 @@ const ZAPI = @import("ZAPI.zig");
 const ZMapRO = @This();
 
 map: *const vs.Map,
-api: *const ZAPI,
+zapi: *const ZAPI,
 
 pub fn getNode(self: anytype, comptime key: [:0]const u8) ?*vs.Node {
     var err: vs.MapPropertyError = undefined;
-    const node = self.api.mapGetNode(self.map, key, 0, &err);
+    const node = self.zapi.mapGetNode(self.map, key, 0, &err);
     return node;
 }
 
 pub fn getNodeVi(self: anytype, comptime key: [:0]const u8) struct { ?*vs.Node, *const vs.VideoInfo } {
     var err: vs.MapPropertyError = undefined;
-    const node = self.api.mapGetNode(self.map, key, 0, &err);
-    const vi = self.api.getVideoInfo(node);
+    const node = self.zapi.mapGetNode(self.map, key, 0, &err);
+    const vi = self.zapi.getVideoInfo(node);
     return .{ node, vi };
 }
 
 pub fn getNodeVi2(self: anytype, comptime key: [:0]const u8) struct { node: ?*vs.Node, vi: *const vs.VideoInfo } {
     var err: vs.MapPropertyError = undefined;
-    const node = self.api.mapGetNode(self.map, key, 0, &err);
-    const vi = self.api.getVideoInfo(node);
+    const node = self.zapi.mapGetNode(self.map, key, 0, &err);
+    const vi = self.zapi.getVideoInfo(node);
     return .{ .node = node, .vi = vi };
 }
 
 pub fn getInt(self: anytype, comptime T: type, comptime key: [:0]const u8) ?T {
     var err: vs.MapPropertyError = undefined;
-    const val: T = math.lossyCast(T, self.api.mapGetInt(self.map, key, 0, &err));
+    const val: T = math.lossyCast(T, self.zapi.mapGetInt(self.map, key, 0, &err));
     return if (err == .Success) val else null;
 }
 
 pub fn getInt2(self: anytype, comptime T: type, comptime key: [:0]const u8, index: usize) ?T {
     var err: vs.MapPropertyError = undefined;
-    const val: T = math.lossyCast(T, self.api.mapGetInt(self.map, key, @intCast(index), &err));
+    const val: T = math.lossyCast(T, self.zapi.mapGetInt(self.map, key, @intCast(index), &err));
     return if (err == .Success) val else null;
 }
 
 pub fn getFloat(self: anytype, comptime T: type, comptime key: [:0]const u8) ?T {
     var err: vs.MapPropertyError = undefined;
-    const val: T = math.lossyCast(T, self.api.mapGetFloat(self.map, key, 0, &err));
+    const val: T = math.lossyCast(T, self.zapi.mapGetFloat(self.map, key, 0, &err));
     return if (err == .Success) val else null;
 }
 
 pub fn getFloat2(self: anytype, comptime T: type, comptime key: [:0]const u8, index: usize) ?T {
     var err: vs.MapPropertyError = undefined;
-    const val: T = math.lossyCast(T, self.api.mapGetFloat(self.map, key, @intCast(index), &err));
+    const val: T = math.lossyCast(T, self.zapi.mapGetFloat(self.map, key, @intCast(index), &err));
     return if (err == .Success) val else null;
 }
 
 pub fn getBool(self: anytype, comptime key: [:0]const u8) ?bool {
     var err: vs.MapPropertyError = undefined;
-    const val = self.api.mapGetInt(self.map, key, 0, &err) != 0;
+    const val = self.zapi.mapGetInt(self.map, key, 0, &err) != 0;
     return if (err == .Success) val else null;
 }
 
 pub fn getBool2(self: anytype, comptime key: [:0]const u8, index: usize) ?bool {
     var err: vs.MapPropertyError = undefined;
-    const val = self.api.mapGetInt(self.map, key, @intCast(index), &err) != 0;
+    const val = self.zapi.mapGetInt(self.map, key, @intCast(index), &err) != 0;
     return if (err == .Success) val else null;
 }
 
 pub fn getIntArray(self: anytype, comptime key: [:0]const u8) ?[]const i64 {
     const len: u32 = self.numElements(key) orelse return null;
     var err: vs.MapPropertyError = undefined;
-    const arr_ptr = self.api.mapGetIntArray(self.map, key, &err);
+    const arr_ptr = self.zapi.mapGetIntArray(self.map, key, &err);
     return if (err == .Success) arr_ptr.?[0..len] else null;
 }
 
 pub fn getFloatArray(self: anytype, comptime key: [:0]const u8) ?[]const f64 {
     const len: u32 = self.numElements(key) orelse return null;
     var err: vs.MapPropertyError = undefined;
-    const arr_ptr = self.api.mapGetFloatArray(self.map, key, &err);
+    const arr_ptr = self.zapi.mapGetFloatArray(self.map, key, &err);
     return if (err == .Success) arr_ptr.?[0..len] else null;
 }
 
 pub fn getData(self: anytype, comptime key: [:0]const u8, index: i32) ?[]const u8 {
     var err: vs.MapPropertyError = undefined;
     const len: u32 = self.dataSize(key, index) orelse return null;
-    const ptr = self.api.mapGetData(self.map, key, index, &err);
+    const ptr = self.zapi.mapGetData(self.map, key, index, &err);
     return if (err == .Success) ptr.?[0..len] else null;
 }
 
@@ -100,43 +100,43 @@ pub fn getDataArray(self: anytype, comptime key: [:0]const u8, allocator: std.me
 }
 
 pub fn numElements(self: anytype, comptime key: [:0]const u8) ?u32 {
-    const ne = self.api.mapNumElements(self.map, key);
+    const ne = self.zapi.mapNumElements(self.map, key);
     return if (ne < 1) null else @as(u32, @bitCast(ne));
 }
 
 pub fn dataSize(self: anytype, comptime key: [:0]const u8, index: i32) ?u32 {
     var err: vs.MapPropertyError = undefined;
-    const len = self.api.mapGetDataSize(self.map, key, index, &err);
+    const len = self.zapi.mapGetDataSize(self.map, key, index, &err);
     return if (len < 1 or err != .Success) null else @as(u32, @bitCast(len));
 }
 
 pub fn numKeys(self: anytype) i32 {
-    return self.api.mapNumKeys(self.map);
+    return self.zapi.mapNumKeys(self.map);
 }
 
 pub fn getError(self: anytype) ?[*:0]const u8 {
-    return self.api.mapGetError(self.map);
+    return self.zapi.mapGetError(self.map);
 }
 
 pub fn getType(self: anytype, key: [:0]const u8) vs.PropertyType {
-    return self.api.mapGetType(self.map, key);
+    return self.zapi.mapGetType(self.map, key);
 }
 
 pub fn getDataTypeHint(self: anytype, key: [:0]const u8, index: i32, err: ?*vs.MapPropertyError) vs.DataTypeHint {
-    return self.api.mapGetDataTypeHint(self.map, key, index, err);
+    return self.zapi.mapGetDataTypeHint(self.map, key, index, err);
 }
 
 pub fn getFrame(self: anytype, key: [:0]const u8, index: i32, err: ?*vs.MapPropertyError) ?*vs.Frame {
-    return self.api.mapGetFrame(self.map, key, index, err);
+    return self.zapi.mapGetFrame(self.map, key, index, err);
 }
 
 pub fn getFunction(self: anytype, key: [:0]const u8, index: i32, err: ?*vs.MapPropertyError) ?*vs.Function {
-    return self.api.mapGetFunction(self.map, key, index, err);
+    return self.zapi.mapGetFunction(self.map, key, index, err);
 }
 
 pub fn invoke(self: anytype, plugin: ?*vs.Plugin, name: [:0]const u8) ZAPI.ZMap(*vs.Map) {
-    const ret = self.api.invoke(plugin, name, self.map);
-    return self.api.initZMap(ret.?);
+    const ret = self.zapi.invoke(plugin, name, self.map);
+    return self.zapi.initZMap(ret.?);
 }
 // ------ Reserved Frame Properties ------ //
 

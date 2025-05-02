@@ -49,20 +49,20 @@ const VideoInfo = vs.VideoInfo;
 const ZAPI = @This();
 
 vsapi: *const vs.API,
+core: *Core,
 
-pub fn init(vsapi: ?*const vs.API) ZAPI {
-    return .{ .vsapi = vsapi.? };
+pub fn init(vsapi: ?*const vs.API, core: ?*Core) ZAPI {
+    return .{ .vsapi = vsapi.?, .core = core.? };
 }
 
 pub fn initZFrame(
     self: *const ZAPI,
-    node: ?*vs.Node,
+    node: ?*Node,
     n: c_int,
-    frame_ctx: ?*vs.FrameContext,
-    core: ?*vs.Core,
-) ZFrame(*const vs.Frame) {
+    frame_ctx: ?*FrameContext,
+) ZFrame(*const Frame) {
     const frame = self.vsapi.getFrameFilter.?(n, node, frame_ctx).?;
-    return ZFrame(@TypeOf(frame)).init(self, core.?, frame, frame_ctx.?);
+    return ZFrame(@TypeOf(frame)).init(self, frame, frame_ctx.?);
 }
 
 const FromViOptions = struct {
@@ -88,12 +88,11 @@ const FromViOptions = struct {
 
 pub fn initZFrameFromVi(
     self: *const ZAPI,
-    vi: *const vs.VideoInfo,
-    frame_ctx: ?*vs.FrameContext,
+    vi: *const VideoInfo,
+    frame_ctx: ?*FrameContext,
     src: ?*const Frame,
-    core: ?*vs.Core,
     options: FromViOptions,
-) ZFrame(*vs.Frame) {
+) ZFrame(*Frame) {
     var vf: VideoFormat = vi.format;
 
     if (!options.nullVf()) {
@@ -105,7 +104,7 @@ pub fn initZFrameFromVi(
         ssw = if (cf != .YUV) 0 else ssw;
         ssh = if (cf != .YUV) 0 else ssh;
 
-        _ = self.queryVideoFormat(&vf, cf, st, bps, ssw, ssh, core);
+        _ = self.queryVideoFormat(&vf, cf, st, bps, ssw, ssh);
     }
 
     const frame = self.newVideoFrame(
@@ -113,44 +112,43 @@ pub fn initZFrameFromVi(
         if (options.width) |w| w else vi.width,
         if (options.height) |h| h else vi.height,
         src,
-        core,
     ).?;
 
-    return ZFrame(@TypeOf(frame)).init(self, core.?, frame, frame_ctx.?);
+    return ZFrame(@TypeOf(frame)).init(self, frame, frame_ctx.?);
 }
 
 pub fn initZMap(self: *const ZAPI, map: anytype) ZMap(@TypeOf(map)) {
     return ZMap(@TypeOf(map)).init(map, self);
 }
 
-pub fn createZMap(self: *const ZAPI) ZMap(*vs.Map) {
+pub fn createZMap(self: *const ZAPI) ZMap(*Map) {
     const map = self.vsapi.createMap.?().?;
     return ZMap(@TypeOf(map)).init(map, self);
 }
 
 /// output nodes are appended to the clip key in the out map
-pub fn createVideoFilter(self: *const ZAPI, out: ?*Map, name: [:0]const u8, vi: *const VideoInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, data: ?*anyopaque, core: ?*Core) void {
+pub fn createVideoFilter(self: *const ZAPI, out: ?*Map, name: [:0]const u8, vi: *const VideoInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, data: ?*anyopaque) void {
     const ptr = if (deps) |d| d.ptr else null;
     const len: i32 = if (deps) |d| @intCast(d.len) else 0;
-    self.vsapi.createVideoFilter.?(out, name.ptr, vi, gf, free, mode, ptr, len, data, core);
+    self.vsapi.createVideoFilter.?(out, name.ptr, vi, gf, free, mode, ptr, len, data, self.core);
 }
 /// same as createVideoFilter but returns a pointer to the VSNode directly or NULL on failure
-pub fn createVideoFilter2(self: *const ZAPI, name: [:0]const u8, vi: *const VideoInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, instance_data: ?*anyopaque, core: ?*Core) ?*Node {
+pub fn createVideoFilter2(self: *const ZAPI, name: [:0]const u8, vi: *const VideoInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, instance_data: ?*anyopaque) ?*Node {
     const ptr = if (deps) |d| d.ptr else null;
     const len: i32 = if (deps) |d| @intCast(d.len) else 0;
-    return self.vsapi.createVideoFilter2.?(name.ptr, vi, gf, free, mode, ptr, len, instance_data, core);
+    return self.vsapi.createVideoFilter2.?(name.ptr, vi, gf, free, mode, ptr, len, instance_data, self.core);
 }
 /// output nodes are appended to the clip key in the out map
-pub fn createAudioFilter(self: *const ZAPI, out: ?*Map, name: [:0]const u8, ai: *const AudioInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, instance_data: ?*anyopaque, core: ?*Core) void {
+pub fn createAudioFilter(self: *const ZAPI, out: ?*Map, name: [:0]const u8, ai: *const AudioInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, instance_data: ?*anyopaque) void {
     const ptr = if (deps) |d| d.ptr else null;
     const len: i32 = if (deps) |d| @intCast(d.len) else 0;
-    self.vsapi.createAudioFilter.?(out, name.ptr, ai, gf, free, mode, ptr, len, instance_data, core);
+    self.vsapi.createAudioFilter.?(out, name.ptr, ai, gf, free, mode, ptr, len, instance_data, self.core);
 }
 /// same as createAudioFilter but returns a pointer to the VSNode directly or NULL on failure
-pub fn createAudioFilter2(self: *const ZAPI, name: [:0]const u8, ai: *const AudioInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, instance_data: ?*anyopaque, core: ?*Core) ?*Node {
+pub fn createAudioFilter2(self: *const ZAPI, name: [:0]const u8, ai: *const AudioInfo, gf: FilterGetFrame, free: FilterFree, mode: FilterMode, deps: ?[]const FilterDependency, instance_data: ?*anyopaque) ?*Node {
     const ptr = if (deps) |d| d.ptr else null;
     const len: i32 = if (deps) |d| @intCast(d.len) else 0;
-    return self.vsapi.createAudioFilter2.?(name.ptr, ai, gf, free, mode, ptr, len, instance_data, core);
+    return self.vsapi.createAudioFilter2.?(name.ptr, ai, gf, free, mode, ptr, len, instance_data, self.core);
 }
 /// Use right after create*Filter*, sets the correct cache mode for using the cacheFrame API and returns the recommended upper number of additional frames to cache per request
 pub fn setLinearFilter(self: *const ZAPI, node: ?*Node) i32 {
@@ -186,21 +184,21 @@ pub fn getAudioInfo(self: *const ZAPI, node: ?*Node) *const AudioInfo {
 }
 /// Creates a new video frame, optionally copying the properties attached to another frame. It is a fatal error to pass invalid arguments to this function.
 /// The new frame contains uninitialised memory.
-pub fn newVideoFrame(self: *const ZAPI, vf: *const VideoFormat, width: i32, height: i32, src: ?*const Frame, core: ?*Core) ?*Frame {
-    return self.vsapi.newVideoFrame.?(vf, width, height, src, core);
+pub fn newVideoFrame(self: *const ZAPI, vf: *const VideoFormat, width: i32, height: i32, src: ?*const Frame) ?*Frame {
+    return self.vsapi.newVideoFrame.?(vf, width, height, src, self.core);
 }
 /// same as newVideoFrame but allows the specified planes to be effectively copied from the source frames
-pub fn newVideoFrame2(self: *const ZAPI, vf: *const VideoFormat, width: i32, height: i32, frames: []?*const Frame, plane: []const i32, src: ?*const Frame, core: ?*Core) ?*Frame {
-    return self.vsapi.newVideoFrame2.?(vf, width, height, frames.ptr, plane.ptr, src, core);
+pub fn newVideoFrame2(self: *const ZAPI, vf: *const VideoFormat, width: i32, height: i32, frames: []?*const Frame, plane: []const i32, src: ?*const Frame) ?*Frame {
+    return self.vsapi.newVideoFrame2.?(vf, width, height, frames.ptr, plane.ptr, src, self.core);
 }
 /// Creates a new audio frame, optionally copying the properties attached to another frame. It is a fatal error to pass invalid arguments to this function.
 /// The new frame contains uninitialised memory.
-pub fn newAudioFrame(self: *const ZAPI, af: *const AudioFormat, num_samples: i32, src: ?*const Frame, core: ?*Core) ?*Frame {
-    return self.vsapi.newAudioFrame.?(af, num_samples, src, core);
+pub fn newAudioFrame(self: *const ZAPI, af: *const AudioFormat, num_samples: i32, src: ?*const Frame) ?*Frame {
+    return self.vsapi.newAudioFrame.?(af, num_samples, src, self.core);
 }
 /// same as newAudioFrame but allows the specified channels to be effectively copied from the source frames
-pub fn newAudioFrame2(self: *const ZAPI, af: *const AudioFormat, num_samples: i32, frames: []?*const Frame, channels: []const i32, src: ?*const Frame, core: ?*Core) ?*Frame {
-    return self.vsapi.newAudioFrame2.?(af, num_samples, frames.ptr, channels.ptr, src, core);
+pub fn newAudioFrame2(self: *const ZAPI, af: *const AudioFormat, num_samples: i32, frames: []?*const Frame, channels: []const i32, src: ?*const Frame) ?*Frame {
+    return self.vsapi.newAudioFrame2.?(af, num_samples, frames.ptr, channels.ptr, src, self.core);
 }
 /// Decrements the reference count of a frame and deletes it when it reaches 0.
 pub fn freeFrame(self: *const ZAPI, frame: ?*const Frame) void {
@@ -212,8 +210,8 @@ pub fn addFrameRef(self: *const ZAPI, frame: ?*const Frame) ?*const Frame {
 }
 /// Duplicates the frame (not just the reference). As the frame buffer is shared in a copy-on-write fashion, the frame content is not really duplicated until a write operation occurs. This is transparent for the user.
 /// Returns a pointer to the new frame. Ownership is transferred to the caller.
-pub fn copyFrame(self: *const ZAPI, frame: ?*const Frame, core: ?*Core) ?*Frame {
-    return self.vsapi.copyFrame.?(frame, core);
+pub fn copyFrame(self: *const ZAPI, frame: ?*const Frame) ?*Frame {
+    return self.vsapi.copyFrame.?(frame, self.core);
 }
 /// Returns a read-only pointer to a frame’s properties. The pointer is valid as long as the frame lives.
 pub fn getFramePropertiesRO(self: *const ZAPI, frame: ?*const Frame) ?*const Map {
@@ -272,23 +270,23 @@ pub fn getAudioFormatName(self: *const ZAPI, af: *const AudioFormat, buf: []u8) 
     return self.vsapi.getAudioFormatName.?(af, buf.ptr);
 }
 /// Fills out a VSVideoInfo struct based on the provided arguments. Validates the arguments before filling out format.
-pub fn queryVideoFormat(self: *const ZAPI, vf: *VideoFormat, cf: ColorFamily, st: SampleType, bps: i32, ssw: i32, ssh: i32, core: ?*Core) i32 {
-    return self.vsapi.queryVideoFormat.?(vf, cf, st, bps, ssw, ssh, core);
+pub fn queryVideoFormat(self: *const ZAPI, vf: *VideoFormat, cf: ColorFamily, st: SampleType, bps: i32, ssw: i32, ssh: i32) i32 {
+    return self.vsapi.queryVideoFormat.?(vf, cf, st, bps, ssw, ssh, self.core);
 }
 /// Fills out a VSAudioFormat struct based on the provided arguments. Validates the arguments before filling out format.
-pub fn queryAudioFormat(self: *const ZAPI, af: *AudioFormat, st: SampleType, bps: i32, cl: u64, core: ?*Core) i32 {
-    return self.vsapi.queryAudioFormat.?(af, st, bps, cl, core);
+pub fn queryAudioFormat(self: *const ZAPI, af: *AudioFormat, st: SampleType, bps: i32, cl: u64) i32 {
+    return self.vsapi.queryAudioFormat.?(af, st, bps, cl, self.core);
 }
 /// Get the id associated with a video format. Similar to queryVideoFormat() except that it returns a format id instead of filling out a VSVideoInfo struct.
-pub fn queryVideoFormatID(self: *const ZAPI, cf: ColorFamily, st: SampleType, bps: i32, ssw: i32, ssh: i32, core: ?*Core) PresetVideoFormat {
-    return self.vsapi.queryVideoFormatID.?(cf, st, bps, ssw, ssh, core);
+pub fn queryVideoFormatID(self: *const ZAPI, cf: ColorFamily, st: SampleType, bps: i32, ssw: i32, ssh: i32) PresetVideoFormat {
+    return self.vsapi.queryVideoFormatID.?(cf, st, bps, ssw, ssh, self.core);
 }
 /// Fills out the VSVideoFormat struct passed to format based
-pub fn getVideoFormatByID(self: *const ZAPI, vf: *VideoFormat, id: PresetVideoFormat, core: ?*Core) i32 {
-    return self.vsapi.getVideoFormatByID.?(vf, id, core);
+pub fn getVideoFormatByID(self: *const ZAPI, vf: *VideoFormat, id: PresetVideoFormat) i32 {
+    return self.vsapi.getVideoFormatByID.?(vf, id, self.core);
 }
-pub fn getVideoFormatID(self: *const ZAPI, vi: *const VideoInfo, core: ?*Core) PresetVideoFormat {
-    return self.queryVideoFormatID(vi.format.colorFamily, vi.format.sampleType, vi.format.bitsPerSample, vi.format.subSamplingW, vi.format.subSamplingH, core);
+pub fn getVideoFormatID(self: *const ZAPI, vi: *const VideoInfo) PresetVideoFormat {
+    return self.queryVideoFormatID(vi.format.colorFamily, vi.format.sampleType, vi.format.bitsPerSample, vi.format.subSamplingW, vi.format.subSamplingH, self.core);
 }
 /// Fetches a frame synchronously. The frame is available when the function returns.
 /// This function is meant for external applications using the core as a library, or if frame requests are necessary during a filter’s initialization.
@@ -324,8 +322,8 @@ pub fn setFilterError(self: *const ZAPI, error_message: [:0]const u8, context: ?
     self.vsapi.setFilterError.?(error_message.ptr, context);
 }
 // External functions
-pub fn createFunction(self: *const ZAPI, func: PublicFunction, user_data: ?*anyopaque, free: FreeFunctionData, core: ?*Core) ?*Function {
-    return self.vsapi.createFunction.?(func, user_data, free, core);
+pub fn createFunction(self: *const ZAPI, func: PublicFunction, user_data: ?*anyopaque, free: FreeFunctionData) ?*Function {
+    return self.vsapi.createFunction.?(func, user_data, free, self.core);
 }
 /// Decrements the reference count of a function and deletes it when it reaches 0.
 pub fn freeFunction(self: *const ZAPI, func: ?*Function) void {
@@ -492,21 +490,21 @@ pub fn registerFunction(self: *const ZAPI, name: [:0]const u8, args: [:0]const u
     return self.vsapi.registerFunction.?(name.ptr, args.ptr, return_type.ptr, func, data, plugin);
 }
 /// Returns a pointer to the plugin with the given identifier, or NULL if not found.
-pub fn getPluginByID(self: *const ZAPI, identifier: [:0]const u8, core: ?*Core) ?*Plugin {
-    return self.vsapi.getPluginByID.?(identifier.ptr, core);
+pub fn getPluginByID(self: *const ZAPI, identifier: [:0]const u8) ?*Plugin {
+    return self.vsapi.getPluginByID.?(identifier.ptr, self.core);
 }
 /// Returns a pointer to the plugin with the given identifier, or NULL if not found.
 /// Wrapper around getPluginByID() that takes a PluginID instead of a string.
-pub fn getPluginByID2(self: *const ZAPI, id: vsh.PluginID, core: ?*Core) ?*Plugin {
-    return self.vsapi.getPluginByID.?(id.toString().ptr, core);
+pub fn getPluginByID2(self: *const ZAPI, id: vsh.PluginID) ?*Plugin {
+    return self.vsapi.getPluginByID.?(id.toString().ptr, self.core);
 }
 /// Returns a pointer to the plugin with the given namespace, or NULL if not found.
-pub fn getPluginByNamespace(self: *const ZAPI, ns: [:0]const u8, core: ?*Core) ?*Plugin {
-    return self.vsapi.getPluginByNamespace.?(ns.ptr, core);
+pub fn getPluginByNamespace(self: *const ZAPI, ns: [:0]const u8) ?*Plugin {
+    return self.vsapi.getPluginByNamespace.?(ns.ptr, self.core);
 }
 /// Used to enumerate over all currently loaded plugins. The order is fixed but provides no other guarantees.
-pub fn getNextPlugin(self: *const ZAPI, plugin: ?*Plugin, core: ?*Core) ?*Plugin {
-    return self.vsapi.getNextPlugin.?(plugin, core);
+pub fn getNextPlugin(self: *const ZAPI, plugin: ?*Plugin) ?*Plugin {
+    return self.vsapi.getNextPlugin.?(plugin, self.core);
 }
 /// Returns the name of the plugin that was passed to configPlugin.
 pub fn getPluginName(self: *const ZAPI, plugin: ?*Plugin) ?[*:0]const u8 {
@@ -558,16 +556,16 @@ pub fn createCore(self: *const ZAPI, flags: CoreCreationFlags) ?*Core {
     return self.vsapi.createCore.?(flags);
 }
 /// Frees a core. Should only be done after all frame requests have completed and all objects belonging to the core have been released.
-pub fn freeCore(self: *const ZAPI, core: ?*Core) void {
-    self.vsapi.freeCore.?(core);
+pub fn freeCore(self: *const ZAPI) void {
+    self.vsapi.freeCore.?(self.core);
 }
 /// Sets the maximum size of the framebuffer cache. Returns the new maximum size.
-pub fn setMaxCacheSize(self: *const ZAPI, bytes: i64, core: ?*Core) i64 {
-    return self.vsapi.setMaxCacheSize.?(bytes, core);
+pub fn setMaxCacheSize(self: *const ZAPI, bytes: i64) i64 {
+    return self.vsapi.setMaxCacheSize.?(bytes, self.core);
 }
 /// Sets the number of threads used for processing. Pass 0 to automatically detect. Returns the number of threads that will be used for processing.
-pub fn setThreadCount(self: *const ZAPI, threads: i32, core: ?*Core) i32 {
-    return self.vsapi.setThreadCount.?(threads, core);
+pub fn setThreadCount(self: *const ZAPI, threads: i32) i32 {
+    return self.vsapi.setThreadCount.?(threads, self.core);
 }
 /// Returns information about the VapourSynth core.
 pub fn getCoreInfo(self: *const ZAPI, core: ?*Core, info: *CoreInfo) void {
@@ -578,37 +576,37 @@ pub fn getAPIVersion(self: *const ZAPI) i32 {
     return self.vsapi.getAPIVersion.?();
 }
 /// Send a message through VapourSynth’s logging framework. See addLogHandler.
-pub fn logMessage(self: *const ZAPI, mt: MessageType, msg: [:0]const u8, core: ?*Core) void {
-    self.vsapi.logMessage.?(mt, msg.ptr, core);
+pub fn logMessage(self: *const ZAPI, mt: MessageType, msg: [:0]const u8) void {
+    self.vsapi.logMessage.?(mt, msg.ptr, self.core);
 }
 /// Installs a custom handler for the various error messages VapourSynth emits. The message handler is per VSCore instance. Returns a unique handle.
-pub fn addLogHandler(self: *const ZAPI, handler: LogHandler, free: LogHandlerFree, user_data: ?*anyopaque, core: ?*Core) ?*LogHandle {
-    return self.vsapi.addLogHandler.?(handler, free, user_data, core);
+pub fn addLogHandler(self: *const ZAPI, handler: LogHandler, free: LogHandlerFree, user_data: ?*anyopaque) ?*LogHandle {
+    return self.vsapi.addLogHandler.?(handler, free, user_data, self.core);
 }
 /// Removes a custom handler. Return non-zero on success and zero if the handle is invalid.
-pub fn removeLogHandler(self: *const ZAPI, handle: ?*LogHandle, core: ?*Core) i32 {
-    return self.vsapi.removeLogHandler.?(handle, core);
+pub fn removeLogHandler(self: *const ZAPI, handle: ?*LogHandle) i32 {
+    return self.vsapi.removeLogHandler.?(handle, self.core);
 }
 
 const FrameOptions = struct {
-    format: ?*const vs.VideoFormat = null,
+    format: ?*const VideoFormat = null,
     width: ?i32 = null,
     height: ?i32 = null,
 };
 
 pub fn ZFrame(comptime FrameType: type) type {
     return struct {
-        api: *const ZAPI,
-        core: *vs.Core,
+        zapi: *const ZAPI,
+
         frame: FrameType,
-        frame_ctx: *vs.FrameContext,
+        frame_ctx: *FrameContext,
 
         const Self = @This();
 
-        pub fn init(api: *const ZAPI, core: *vs.Core, frame: FrameType, frame_ctx: *vs.FrameContext) Self {
+        pub fn init(zapi: *const ZAPI, frame: FrameType, frame_ctx: *FrameContext) Self {
             return Self{
-                .api = api,
-                .core = core,
+                .zapi = zapi,
+
                 .frame = frame,
                 .frame_ctx = frame_ctx,
             };
@@ -616,36 +614,34 @@ pub fn ZFrame(comptime FrameType: type) type {
 
         /// Creates a new reading and writing frame with the same properties as the input frame.
         /// Use deinit() to free the frame
-        pub fn newVideoFrame(self: anytype) ZFrame(*vs.Frame) {
-            const frame = self.api.newVideoFrame(
-                self.api.getVideoFrameFormat(self.frame),
-                self.api.getFrameWidth(self.frame, 0),
-                self.api.getFrameHeight(self.frame, 0),
+        pub fn newVideoFrame(self: anytype) ZFrame(*Frame) {
+            const frame = self.zapi.newVideoFrame(
+                self.zapi.getVideoFrameFormat(self.frame),
+                self.zapi.getFrameWidth(self.frame, 0),
+                self.zapi.getFrameHeight(self.frame, 0),
                 self.frame,
-                self.core,
             );
 
             return .{
-                .api = self.api,
-                .core = self.core,
+                .zapi = self.zapi,
                 .frame = frame.?,
                 .frame_ctx = self.frame_ctx,
             };
         }
 
         /// same as newVideoFrame but allows the specified planes to be effectively copied from the source frames
-        pub fn newVideoFrame2(self: anytype, process: [3]bool) ZFrame(*vs.Frame) {
+        pub fn newVideoFrame2(self: anytype, process: [3]bool) ZFrame(*Frame) {
             var planes = [3]c_int{ 0, 1, 2 };
-            var cp_planes = [3]?*const vs.Frame{
+            var cp_planes = [3]?*const Frame{
                 if (process[0]) null else self.frame,
                 if (process[1]) null else self.frame,
                 if (process[2]) null else self.frame,
             };
 
-            const frame = self.api.newVideoFrame2(
-                self.api.getVideoFrameFormat(self.frame),
-                self.api.getFrameWidth(self.frame, 0),
-                self.api.getFrameHeight(self.frame, 0),
+            const frame = self.zapi.newVideoFrame2(
+                self.zapi.getVideoFrameFormat(self.frame),
+                self.zapi.getFrameWidth(self.frame, 0),
+                self.zapi.getFrameHeight(self.frame, 0),
                 &cp_planes,
                 &planes,
                 self.frame,
@@ -662,12 +658,12 @@ pub fn ZFrame(comptime FrameType: type) type {
 
         /// Same as newVideoFrame but with custom format, width and height.
         /// Use this if you want to create a frame with a different format or size than the source frame.
-        pub fn newVideoFrame3(self: anytype, options: FrameOptions) ZFrame(*vs.Frame) {
-            const format = if (options.format != null) options.format.? else self.api.getVideoFrameFormat(self.frame);
-            const width = if (options.width != null) options.width.? else self.api.getFrameWidth(self.frame, 0);
-            const height = if (options.height != null) options.height.? else self.api.getFrameHeight(self.frame, 0);
+        pub fn newVideoFrame3(self: anytype, options: FrameOptions) ZFrame(*Frame) {
+            const format = if (options.format != null) options.format.? else self.zapi.getVideoFrameFormat(self.frame);
+            const width = if (options.width != null) options.width.? else self.zapi.getFrameWidth(self.frame, 0);
+            const height = if (options.height != null) options.height.? else self.zapi.getFrameHeight(self.frame, 0);
 
-            const frame = self.api.newVideoFrame(
+            const frame = self.zapi.newVideoFrame(
                 format,
                 width,
                 height,
@@ -685,17 +681,17 @@ pub fn ZFrame(comptime FrameType: type) type {
 
         /// Duplicates the frame (not just the reference). As the frame buffer is shared in a copy-on-write fashion, the frame content is not really duplicated until a write operation occurs. This is transparent for the user.
         /// Returns a pointer to the new frame. Ownership is transferred to the caller.
-        pub fn copyFrame(self: anytype) ZFrame(*vs.Frame) {
+        pub fn copyFrame(self: anytype) ZFrame(*Frame) {
             return .{
                 .api = self.api,
                 .core = self.core,
-                .frame = self.api.copyFrame(self.frame, self.core).?,
+                .frame = self.zapi.copyFrame(self.frame, self.core).?,
                 .frame_ctx = self.frame_ctx,
             };
         }
 
         pub fn deinit(self: anytype) void {
-            self.api.freeFrame(self.frame);
+            self.zapi.freeFrame(self.frame);
         }
 
         const tinfo = @typeInfo(FrameType);
@@ -711,14 +707,14 @@ pub fn ZMap(comptime MapType: type) type {
     return struct {
         const Self = @This();
         map: MapType,
-        api: *const ZAPI,
+        zapi: *const ZAPI,
 
-        pub fn init(map: MapType, api: *const ZAPI) Self {
-            return Self{ .map = map, .api = api };
+        pub fn init(map: MapType, zapi: *const ZAPI) Self {
+            return Self{ .map = map, .zapi = zapi };
         }
 
         pub fn free(self: *const Self) void {
-            self.api.freeMap(self.map);
+            self.zapi.freeMap(self.map);
         }
 
         const tinfo = @typeInfo(MapType);

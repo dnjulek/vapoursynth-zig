@@ -9,66 +9,66 @@ const ZAPI = @import("ZAPI.zig");
 const ZMapRW = @This();
 
 map: *vs.Map,
-api: *const ZAPI,
+zapi: *const ZAPI,
 
 pub fn clear(self: anytype) void {
-    self.api.clearMap(self.map);
+    self.zapi.clearMap(self.map);
 }
 
 pub fn setInt(self: anytype, key: [:0]const u8, n: i64, mode: vs.MapAppendMode) void {
-    _ = self.api.mapSetInt(self.map, key, n, mode);
+    _ = self.zapi.mapSetInt(self.map, key, n, mode);
 }
 
 pub fn setFloat(self: anytype, key: [:0]const u8, n: f64, mode: vs.MapAppendMode) void {
-    _ = self.api.mapSetFloat(self.map, key, n, mode);
+    _ = self.zapi.mapSetFloat(self.map, key, n, mode);
 }
 
 pub fn setIntArray(self: anytype, comptime key: [:0]const u8, arr: []const i64) void {
-    _ = self.api.mapSetIntArray(self.map, key, arr);
+    _ = self.zapi.mapSetIntArray(self.map, key, arr);
 }
 
 pub fn setFloatArray(self: anytype, comptime key: [:0]const u8, arr: []const f64) void {
-    _ = self.api.mapSetFloatArray(self.map, key, arr);
+    _ = self.zapi.mapSetFloatArray(self.map, key, arr);
 }
 
 pub fn setData(self: anytype, comptime key: [:0]const u8, data: [:0]const u8, dth: vs.DataTypeHint, mode: vs.MapAppendMode) void {
-    _ = self.api.mapSetData(self.map, key, data, dth, mode);
+    _ = self.zapi.mapSetData(self.map, key, data, dth, mode);
 }
 
 pub fn setError(self: anytype, err_msg: [:0]const u8) void {
-    self.api.mapSetError(self.map, err_msg);
+    self.zapi.mapSetError(self.map, err_msg);
 }
 
 pub fn deleteKey(self: anytype, key: [:0]const u8) void {
-    _ = self.api.mapDeleteKey(self.map, key);
+    _ = self.zapi.mapDeleteKey(self.map, key);
 }
 
 pub fn setEmpty(self: anytype, key: [:0]const u8, pt: vs.PropertyType) i32 {
-    return self.api.mapSetEmpty(self.map, key, pt);
+    return self.zapi.mapSetEmpty(self.map, key, pt);
 }
 
 pub fn setNode(self: anytype, key: [:0]const u8, node: ?*vs.Node, mode: vs.MapAppendMode) i32 {
-    return self.api.mapSetNode(self.map, key, node, mode);
+    return self.zapi.mapSetNode(self.map, key, node, mode);
 }
 
 pub fn consumeNode(self: anytype, key: [:0]const u8, node: ?*vs.Node, mode: vs.MapAppendMode) i32 {
-    return self.api.mapConsumeNode(self.map, key, node, mode);
+    return self.zapi.mapConsumeNode(self.map, key, node, mode);
 }
 
 pub fn setFrame(self: anytype, key: [:0]const u8, frame: ?*vs.Frame, mode: vs.MapAppendMode) i32 {
-    return self.api.mapSetFrame(self.map, key, frame, mode);
+    return self.zapi.mapSetFrame(self.map, key, frame, mode);
 }
 
 pub fn consumeFrame(self: anytype, key: [:0]const u8, frame: ?*vs.Frame, mode: vs.MapAppendMode) i32 {
-    return self.api.mapConsumeFrame(self.map, key, frame, mode);
+    return self.zapi.mapConsumeFrame(self.map, key, frame, mode);
 }
 
 pub fn setFunction(self: anytype, key: [:0]const u8, func: ?*vs.Function, mode: vs.MapAppendMode) i32 {
-    return self.api.mapSetFunction(self.map, key, func, mode);
+    return self.zapi.mapSetFunction(self.map, key, func, mode);
 }
 
 pub fn consumeFunction(self: anytype, key: [:0]const u8, func: ?*vs.Function, mode: vs.MapAppendMode) i32 {
-    return self.api.mapConsumeFunction(self.map, key, func, mode);
+    return self.zapi.mapConsumeFunction(self.map, key, func, mode);
 }
 
 pub fn setAlpha(self: anytype, frame: ?*vs.Frame) void {
