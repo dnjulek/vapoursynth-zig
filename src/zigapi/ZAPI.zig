@@ -286,7 +286,7 @@ pub fn getVideoFormatByID(self: *const ZAPI, vf: *VideoFormat, id: PresetVideoFo
     return self.vsapi.getVideoFormatByID.?(vf, id, self.core);
 }
 pub fn getVideoFormatID(self: *const ZAPI, vi: *const VideoInfo) PresetVideoFormat {
-    return self.queryVideoFormatID(vi.format.colorFamily, vi.format.sampleType, vi.format.bitsPerSample, vi.format.subSamplingW, vi.format.subSamplingH, self.core);
+    return self.queryVideoFormatID(vi.format.colorFamily, vi.format.sampleType, vi.format.bitsPerSample, vi.format.subSamplingW, vi.format.subSamplingH);
 }
 /// Fetches a frame synchronously. The frame is available when the function returns.
 /// This function is meant for external applications using the core as a library, or if frame requests are necessary during a filter’s initialization.
