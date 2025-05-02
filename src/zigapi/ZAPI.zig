@@ -645,12 +645,10 @@ pub fn ZFrame(comptime FrameType: type) type {
                 &cp_planes,
                 &planes,
                 self.frame,
-                self.core,
             );
 
             return .{
-                .api = self.api,
-                .core = self.core,
+                .zapi = self.zapi,
                 .frame = frame.?,
                 .frame_ctx = self.frame_ctx,
             };
@@ -668,12 +666,10 @@ pub fn ZFrame(comptime FrameType: type) type {
                 width,
                 height,
                 self.frame,
-                self.core,
             );
 
             return .{
-                .api = self.api,
-                .core = self.core,
+                .zapi = self.zapi,
                 .frame = frame.?,
                 .frame_ctx = self.frame_ctx,
             };
@@ -683,9 +679,8 @@ pub fn ZFrame(comptime FrameType: type) type {
         /// Returns a pointer to the new frame. Ownership is transferred to the caller.
         pub fn copyFrame(self: anytype) ZFrame(*Frame) {
             return .{
-                .api = self.api,
-                .core = self.core,
-                .frame = self.zapi.copyFrame(self.frame, self.core).?,
+                .zapi = self.zapi,
+                .frame = self.zapi.copyFrame(self.frame).?,
                 .frame_ctx = self.frame_ctx,
             };
         }
