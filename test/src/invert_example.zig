@@ -13,7 +13,7 @@ const ZAPI = vapoursynth.ZAPI;
 const allocator = std.heap.c_allocator;
 
 const InvertData = struct {
-    node: ?*vs.Node,
+    node: *vs.Node,
     vi: *const vs.VideoInfo,
     enabled: bool,
     path: [][]const u8 = undefined,
@@ -89,7 +89,7 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core:
 
     // getNodeVi returns a tuple with [vs.Node, vs.VideoInfo],
     // use getNodeVi2 if you want a struct.
-    d.node, d.vi = map_in.getNodeVi("clip");
+    d.node, d.vi = map_in.getNodeVi("clip").?; // since "clip" is not optional, we can use “.?” here.
 
     if (!vsh.isConstantVideoFormat(d.vi) or (d.vi.format.sampleType != .Integer) or (d.vi.format.bitsPerSample != 8)) {
         map_out.setError("Invert: only constant format 8bit integer input supported");

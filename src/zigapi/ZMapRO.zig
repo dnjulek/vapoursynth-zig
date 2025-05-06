@@ -17,18 +17,20 @@ pub fn getNode(self: anytype, comptime key: [:0]const u8) ?*vs.Node {
     return node;
 }
 
-pub fn getNodeVi(self: anytype, comptime key: [:0]const u8) struct { ?*vs.Node, *const vs.VideoInfo } {
+pub fn getNodeVi(self: anytype, comptime key: [:0]const u8) ?struct { *vs.Node, *const vs.VideoInfo } {
     var err: vs.MapPropertyError = undefined;
     const node = self.zapi.mapGetNode(self.map, key, 0, &err);
+    if (err != .Success) return null;
     const vi = self.zapi.getVideoInfo(node);
-    return .{ node, vi };
+    return .{ node.?, vi };
 }
 
-pub fn getNodeVi2(self: anytype, comptime key: [:0]const u8) struct { node: ?*vs.Node, vi: *const vs.VideoInfo } {
+pub fn getNodeVi2(self: anytype, comptime key: [:0]const u8) ?struct { node: *vs.Node, vi: *const vs.VideoInfo } {
     var err: vs.MapPropertyError = undefined;
     const node = self.zapi.mapGetNode(self.map, key, 0, &err);
+    if (err != .Success) return null;
     const vi = self.zapi.getVideoInfo(node);
-    return .{ .node = node, .vi = vi };
+    return .{ .node = node.?, .vi = vi };
 }
 
 pub fn getInt(self: anytype, comptime T: type, comptime key: [:0]const u8) ?T {
