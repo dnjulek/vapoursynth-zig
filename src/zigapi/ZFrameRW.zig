@@ -26,9 +26,19 @@ pub fn getWriteSlice(self: anytype, plane: usize) []u8 {
     return ptr[0..len];
 }
 
+/// Returns all 3 read-write planes of a frame, do not use with Gray format.
+pub fn getWriteSlices(self: anytype) [3][]u8 {
+    return .{ self.getWriteSlice(0), self.getWriteSlice(1), self.getWriteSlice(2) };
+}
+
 /// Same as getReadSlice but returns a slice of type T.
 pub fn getWriteSlice2(self: anytype, comptime T: type, plane: usize) []T {
     const ptr = self.zapi.getWritePtr(self.frame, @intCast(plane));
     const len = self.getHeight(plane) * self.getStride2(T, plane);
     return @as([*]T, @ptrCast(@alignCast(ptr)))[0..len];
+}
+
+/// Returns all 3 read-write planes of a frame, do not use with Gray format.
+pub fn getWriteSlices2(self: anytype, comptime T: type) [3][]T {
+    return .{ self.getWriteSlice2(T, 0), self.getWriteSlice2(T, 1), self.getWriteSlice2(T, 2) };
 }

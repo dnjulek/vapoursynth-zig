@@ -39,6 +39,11 @@ pub fn getReadSlice(self: anytype, plane: usize) []const u8 {
     return ptr[0..len];
 }
 
+/// Returns all 3 read-only planes of a frame, do not use with Gray format.
+pub fn getReadSlices(self: anytype) [3][]const u8 {
+    return .{ self.getReadSlice(0), self.getReadSlice(1), self.getReadSlice(2) };
+}
+
 /// Same as getStride but returns the stride for type T.
 pub fn getStride2(self: anytype, comptime T: type, plane: usize) u32 {
     return @intCast(self.zapi.getStride(self.frame, @intCast(plane)) >> (@sizeOf(T) >> 1));
@@ -54,6 +59,11 @@ pub fn getReadSlice2(self: anytype, comptime T: type, plane: usize) []const T {
     const ptr = self.zapi.getReadPtr(self.frame, @intCast(plane));
     const len = self.getHeight(plane) * self.getStride2(T, plane);
     return @as([*]const T, @ptrCast(@alignCast(ptr)))[0..len];
+}
+
+/// Returns all 3 read-only planes of a frame, do not use with Gray format.
+pub fn getReadSlices2(self: anytype, comptime T: type) [3][]const T {
+    return .{ self.getReadSlice2(T, 0), self.getReadSlice2(T, 1), self.getReadSlice2(T, 2) };
 }
 
 /// Same as getDimensions but returns the dimensions as a struct with named fields.
