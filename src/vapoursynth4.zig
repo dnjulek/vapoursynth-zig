@@ -48,8 +48,8 @@ pub const SampleType = enum(c_int) {
 };
 
 pub inline fn makeVideoID(color_family: ColorFamily, sample_type: SampleType, bits_per_sample: u32, sub_sampling_w: u32, sub_sampling_h: u32) u32 {
-    const cf: u32 = @intFromEnum(color_family);
-    const st: u32 = @intFromEnum(sample_type);
+    const cf: u32 = @intCast(@intFromEnum(color_family));
+    const st: u32 = @intCast(@intFromEnum(sample_type));
     return @intCast((cf << 28) | (st << 24) | (bits_per_sample << 16) | (sub_sampling_w << 8) | (sub_sampling_h << 0));
 }
 
