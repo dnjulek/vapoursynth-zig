@@ -1,5 +1,8 @@
 //! https://github.com/vapoursynth/vapoursynth/blob/master/include/VapourSynth4.h
 
+const builtin = @import("builtin");
+const build_options = @import("build_options");
+
 /// Used to create version numbers.
 pub inline fn makeVersion(major: c_int, minor: c_int) c_int {
     return (major << @as(c_int, 16)) | minor;
@@ -8,7 +11,7 @@ pub inline fn makeVersion(major: c_int, minor: c_int) c_int {
 /// Major API version.
 pub const VAPOURSYNTH_API_MAJOR: c_int = 4;
 /// Minor API version. It is bumped when new functions are added to API or core behavior is noticeably changed.
-pub const VAPOURSYNTH_API_MINOR: c_int = 1;
+pub const VAPOURSYNTH_API_MINOR: c_int = if (build_options.vs_use_api_41 or build_options.vs_use_latest_api) 1 else 0;
 /// API version. The high 16 bits are VAPOURSYNTH_API_MAJOR, the low 16 bits are VAPOURSYNTH_API_MINOR.
 pub const VAPOURSYNTH_API_VERSION: c_int = makeVersion(VAPOURSYNTH_API_MAJOR, VAPOURSYNTH_API_MINOR);
 /// The number of audio samples in an audio frame. It is a static number to make it possible to calculate which audio frames are needed to retrieve specific samples.
@@ -305,17 +308,24 @@ pub const DataTypeHint = enum(c_int) {
 };
 
 /// Describes the upstream frame request pattern of a filter.
-pub const RequestPattern = enum(c_int) {
-    /// Anything goes. Note that filters that may be requesting beyond the end of a VSNode length in frames (repeating the last frame) should use rpGeneral and not any of the other modes.
-    General = 0,
-    /// Will only request an input frame at most once if all output frames are requested exactly one time. This includes filters such as Trim, Reverse, SelectEvery.
-    NoFrameReuse = 1,
-    /// Only requests frame N to output frame N. The main difference to rpNoFrameReuse is that the requested frame is always fixed and known ahead of time.
-    /// Filter examples Lut, Expr (conditionally, see rpGeneral note) and similar.
-    StrictSpatial = 2,
-    /// Added in API 4.1 (vapoursynth-r66), This modes is basically identical rpNoFrameReuse except that it hints the last frame may be requested multiple times
-    FrameReuseLastOnly = 3,
-};
+pub const RequestPattern = if (VAPOURSYNTH_API_MINOR >= 1)
+    enum(c_int) {
+        /// Anything goes. Note that filters that may be requesting beyond the end of a VSNode length in frames (repeating the last frame) should use rpGeneral and not any of the other modes.
+        General = 0,
+        /// Will only request an input frame at most once if all output frames are requested exactly one time. This includes filters such as Trim, Reverse, SelectEvery.
+        NoFrameReuse = 1,
+        /// Only requests frame N to output frame N. The main difference to rpNoFrameReuse is that the requested frame is always fixed and known ahead of time.
+        /// Filter examples Lut, Expr (conditionally, see rpGeneral note) and similar.
+        StrictSpatial = 2,
+        /// Added in API 4.1 (vapoursynth-r66), This modes is basically identical rpNoFrameReuse except that it hints the last frame may be requested multiple times
+        FrameReuseLastOnly = 3,
+    }
+else
+    enum(c_int) {
+        General = 0,
+        NoFrameReuse = 1,
+        StrictSpatial = 2,
+    };
 
 /// Describes how the output of a node is cached.
 pub const CacheMode = enum(c_int) {
