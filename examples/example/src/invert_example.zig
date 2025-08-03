@@ -13,7 +13,6 @@ const allocator = std.heap.c_allocator;
 const InvertData = struct {
     node: ?*vs.Node,
     enabled: bool,
-    string_bufs: [2]?[]u8,
 };
 
 fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
@@ -64,9 +63,6 @@ fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API
     _ = core;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
     vsapi.?.freeNode.?(d.node);
-    for (d.string_bufs) |buf| {
-        if (buf) |b| allocator.free(b);
-    }
     allocator.destroy(d);
 }
 
@@ -79,13 +75,15 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core:
     const vi: *const vs.VideoInfo = vsapi.?.getVideoInfo.?(d.node);
 
     if (!vsh.isConstantVideoFormat(vi) or (vi.format.sampleType != .Integer) or (vi.format.bitsPerSample != @as(c_int, 8))) {
-        vsapi.?.mapSetError.?(out, vsh.printf(
+        const msg = std.fmt.allocPrintZ(
             allocator,
-            &d.string_bufs[0],
             "Invert: only constant format 8bit integer input supported. Input clip is {}x{} {}-bits",
             .{ vi.width, vi.height, vi.format.bitsPerSample },
-        ).ptr);
+        ) catch unreachable;
+
+        vsapi.?.mapSetError.?(out, msg);
         vsapi.?.freeNode.?(d.node);
+        allocator.free(msg);
         return;
     }
 
@@ -93,13 +91,15 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core:
     const enabled = vsh.mapGetN(i32, in, "enabled", 0, vsapi) orelse 1;
 
     if ((enabled < 0) or (enabled > 1)) {
-        vsapi.?.mapSetError.?(out, vsh.printf(
+        const msg = std.fmt.allocPrintZ(
             allocator,
-            &d.string_bufs[1],
             "Invert: enabled must be 0 or 1. Passed: {}",
             .{enabled},
-        ).ptr);
+        ) catch unreachable;
+
+        vsapi.?.mapSetError.?(out, msg);
         vsapi.?.freeNode.?(d.node);
+        allocator.free(msg);
         return;
     }
 

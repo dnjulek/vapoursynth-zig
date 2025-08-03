@@ -69,8 +69,10 @@ jobs:
           pip install vapoursynth
         fi
 
-    - name: install zig
-      run: sudo snap install zig --classic --edge
+    - uses: mlugg/setup-zig@v2
+      with:
+        version: 0.14.1
+        use-cache: false
 
     - name: build example plugin
       run: |
