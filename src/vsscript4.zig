@@ -1,9 +1,11 @@
 //! https://github.com/vapoursynth/vapoursynth/blob/master/include/VSScript4.h
+const builtin = @import("builtin");
+const build_options = @import("build_options");
 
 const vs = @import("vapoursynth4.zig");
 
 pub const VSSCRIPT_API_MAJOR: c_int = 4;
-pub const VSSCRIPT_API_MINOR: c_int = 2;
+pub const VSSCRIPT_API_MINOR: c_int = @intFromEnum(build_options.vssapi4_minor);
 pub const VSSCRIPT_API_VERSION: c_int = vs.makeVersion(VSSCRIPT_API_MAJOR, VSSCRIPT_API_MINOR);
 
 pub const VSScript = opaque {};
@@ -43,9 +45,12 @@ pub const API = extern struct {
     /// Set whether or not the working directory is temporarily changed to the same
     /// location as the script file when evaluateFile is called. Off by default.
     evalSetWorkingDir: ?*const fn (handle: ?*VSScript, set_cwd: c_int) callconv(.C) void,
-    /// Write a list of set output index values to dst but at most size values.
-    /// Always returns the total number of available output index values.
-    getAvailableOutputNodes: ?*const fn (handle: ?*VSScript, size: c_int, dst: ?[*]i32) callconv(.C) c_int,
+
+    pub usingnamespace if (VSSCRIPT_API_MINOR >= 2) struct {
+        /// Write a list of set output index values to dst but at most size values.
+        /// Always returns the total number of available output index values.
+        getAvailableOutputNodes: ?*const fn (handle: ?*VSScript, size: c_int, dst: ?[*]i32) callconv(.C) c_int,
+    } else struct {};
 };
 
 pub extern fn getVSScriptAPI(version: c_int) ?*const API;
