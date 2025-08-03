@@ -1,6 +1,16 @@
 const std = @import("std");
 
-pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 14, .patch = 0, .pre = "dev.3445" };
+pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 14, .patch = 0 };
+
+pub const VSAPI4 = enum(i32) {
+    minor_0 = 0,
+    minor_1 = 1,
+};
+
+pub const VSSAPI4 = enum(i32) {
+    minor_1 = 1,
+    minor_2 = 2,
+};
 
 pub fn build(b: *std.Build) void {
     ensureZigVersion() catch return;
@@ -8,17 +18,13 @@ pub fn build(b: *std.Build) void {
     _ = b.standardTargetOptions(.{});
     _ = b.standardOptimizeOption(.{});
 
-    const vs_use_api_41 = b.option(bool, "vs_use_api_41", "Use VapourSynth API 4.1") orelse false;
-    const vs_use_latest_api = b.option(bool, "vs_use_latest_api", "Use Latest VapourSynth API") orelse false;
-    const vsscript_use_api_42 = b.option(bool, "vsscript_use_api_42", "Use VSScript API 4.2") orelse false;
-    const vsscript_use_latest_api = b.option(bool, "vsscript_use_latest_api", "Use Latest VSScript API") orelse false;
+    const vsapi4_minor: VSAPI4 = b.option(VSAPI4, "vsapi4_minor", "Set VapourSynth API4 minor") orelse .minor_1;
+    const vssapi4_minor: VSSAPI4 = b.option(VSSAPI4, "vssapi4_minor", "Set VSScript API4 minor") orelse .minor_2;
 
     // Create build options
     const options = b.addOptions();
-    options.addOption(bool, "vs_use_api_41", vs_use_api_41);
-    options.addOption(bool, "vs_use_latest_api", vs_use_latest_api);
-    options.addOption(bool, "vsscript_use_api_42", vsscript_use_api_42);
-    options.addOption(bool, "vsscript_use_latest_api", vsscript_use_latest_api);
+    options.addOption(VSAPI4, "vsapi4_minor", vsapi4_minor);
+    options.addOption(VSSAPI4, "vssapi4_minor", vssapi4_minor);
 
     // Expose this as a module that others can import
     _ = b.addModule("vapoursynth", .{

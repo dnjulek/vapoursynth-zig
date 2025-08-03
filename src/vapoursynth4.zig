@@ -11,7 +11,7 @@ pub inline fn makeVersion(major: c_int, minor: c_int) c_int {
 /// Major API version.
 pub const VAPOURSYNTH_API_MAJOR: c_int = 4;
 /// Minor API version. It is bumped when new functions are added to API or core behavior is noticeably changed.
-pub const VAPOURSYNTH_API_MINOR: c_int = if (build_options.vs_use_api_41 or build_options.vs_use_latest_api) 1 else 0;
+pub const VAPOURSYNTH_API_MINOR: c_int = @intFromEnum(build_options.vsapi4_minor);
 /// API version. The high 16 bits are VAPOURSYNTH_API_MAJOR, the low 16 bits are VAPOURSYNTH_API_MINOR.
 pub const VAPOURSYNTH_API_VERSION: c_int = makeVersion(VAPOURSYNTH_API_MAJOR, VAPOURSYNTH_API_MINOR);
 /// The number of audio samples in an audio frame. It is a static number to make it possible to calculate which audio frames are needed to retrieve specific samples.
