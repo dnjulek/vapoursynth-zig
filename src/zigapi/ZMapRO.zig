@@ -33,6 +33,14 @@ pub fn getNodeVi2(self: anytype, comptime key: [:0]const u8) ?struct { node: *vs
     return .{ .node = node.?, .vi = vi };
 }
 
+pub fn getValue(self: anytype, comptime T: type, comptime key: [:0]const u8) ?T {
+    return if (@typeInfo(T) == .int) self.getInt(T, key) else self.getFloat(T, key);
+}
+
+pub fn getValue2(self: anytype, comptime T: type, comptime key: [:0]const u8, index: usize) ?T {
+    return if (@typeInfo(T) == .int) self.getInt2(T, key, index) else self.getFloat2(T, key, index);
+}
+
 pub fn getInt(self: anytype, comptime T: type, comptime key: [:0]const u8) ?T {
     var err: vs.MapPropertyError = undefined;
     const val: T = math.lossyCast(T, self.zapi.mapGetInt(self.map, key, 0, &err));
@@ -99,6 +107,14 @@ pub fn getDataArray(self: anytype, comptime key: [:0]const u8, allocator: std.me
     }
 
     return arr;
+}
+
+/// getData with null terminator
+pub fn getDataZ(self: anytype, comptime key: [:0]const u8, index: i32) ?[:0]const u8 {
+    var err: vs.MapPropertyError = undefined;
+    const len: u32 = self.dataSize(key, index) orelse return null;
+    const ptr = self.zapi.mapGetData(self.map, key, index, &err);
+    return if (err == .Success) ptr.?[0..(len + 1)] else null;
 }
 
 pub fn numElements(self: anytype, comptime key: [:0]const u8) ?u32 {

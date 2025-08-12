@@ -98,7 +98,7 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core:
     }
 
     // https://ziglang.org/documentation/master/#Optionals
-    const enabled = map_in.getInt(i32, "enabled") orelse 1;
+    const enabled = map_in.getValue(i32, "enabled") orelse 1;
 
     if ((enabled < 0) or (enabled > 1)) {
         map_out.setError("Invert: enabled must be 0 or 1");
