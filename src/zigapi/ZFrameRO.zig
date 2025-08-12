@@ -21,6 +21,16 @@ pub fn getWidth(self: anytype, plane: usize) u32 {
     return @intCast(self.zapi.getFrameWidth(self.frame, @intCast(plane)));
 }
 
+/// Returns the height of a plane of a given video frame, in pixels. The height depends on the plane number because of the possible chroma subsampling. Returns 0 for audio frames.
+pub fn getHeightSigned(self: anytype, plane: usize) i32 {
+    return self.zapi.getFrameHeight(self.frame, @intCast(plane));
+}
+
+/// Returns the width of a plane of a given video frame, in pixels. The width depends on the plane number because of the possible chroma subsampling. Returns 0 for audio frames.
+pub fn getWidthSigned(self: anytype, plane: usize) i32 {
+    return self.zapi.getFrameWidth(self.frame, @intCast(plane));
+}
+
 /// Returns the distance in bytes between two consecutive lines of a plane of a video frame. The stride is always positive. Returns 0 if the requested plane doesn’t exist or if it isn’t a video frame.
 pub fn getStride(self: anytype, plane: usize) u32 {
     return @intCast(self.zapi.getStride(self.frame, @intCast(plane)));
