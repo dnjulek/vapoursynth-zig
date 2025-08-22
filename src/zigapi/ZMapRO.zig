@@ -114,7 +114,7 @@ pub fn getDataZ(self: anytype, comptime key: [:0]const u8, index: i32) ?[:0]cons
     var err: vs.MapPropertyError = undefined;
     const len: u32 = self.dataSize(key, index) orelse return null;
     const ptr = self.zapi.mapGetData(self.map, key, index, &err);
-    return if (err == .Success) ptr.?[0..(len + 1)] else null;
+    return if (err == .Success) ptr.?[0..len :0] else null;
 }
 
 pub fn numElements(self: anytype, comptime key: [:0]const u8) ?u32 {
