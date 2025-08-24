@@ -1,23 +1,26 @@
 const std = @import("std");
 
-pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 14, .patch = 0 };
+pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 15, .patch = 1 };
 
 pub fn build(b: *std.Build) void {
     ensureZigVersion() catch return;
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const lib = b.addSharedLibrary(.{
+    const lib = b.addLibrary(.{
         .name = "invert_example",
-        .root_source_file = b.path("src/invert_example.zig"),
-        .target = target,
-        .optimize = optimize,
+        .linkage = .dynamic,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/invert_example.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
     const vapoursynth_dep = b.dependency("vapoursynth", .{
         .target = target,
         .optimize = optimize,
-      //.vsapi4_minor = .minor_0, // if you want to use outdated vapoursynth
+        //.vsapi4_minor = .minor_0, // if you want to use outdated vapoursynth
     });
 
     lib.root_module.addImport("vapoursynth", vapoursynth_dep.module("vapoursynth"));

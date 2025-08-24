@@ -15,7 +15,7 @@ const InvertData = struct {
     enabled: bool,
 };
 
-fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
+fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.c) ?*const vs.Frame {
     _ = frame_data;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
 
@@ -59,14 +59,14 @@ fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_dat
     return null;
 }
 
-fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
+fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.c) void {
     _ = core;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
     vsapi.?.freeNode.?(d.node);
     allocator.destroy(d);
 }
 
-fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
+fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.c) void {
     _ = user_data;
     var d: InvertData = undefined;
     var err: vs.MapPropertyError = undefined;
@@ -75,10 +75,11 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core:
     const vi: *const vs.VideoInfo = vsapi.?.getVideoInfo.?(d.node);
 
     if (!vsh.isConstantVideoFormat(vi) or (vi.format.sampleType != .Integer) or (vi.format.bitsPerSample != @as(c_int, 8))) {
-        const msg = std.fmt.allocPrintZ(
+        const msg: [:0]u8 = std.fmt.allocPrintSentinel(
             allocator,
             "Invert: only constant format 8bit integer input supported. Input clip is {}x{} {}-bits",
             .{ vi.width, vi.height, vi.format.bitsPerSample },
+            0,
         ) catch unreachable;
 
         vsapi.?.mapSetError.?(out, msg);
@@ -91,10 +92,11 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core:
     const enabled = vsh.mapGetN(i32, in, "enabled", 0, vsapi) orelse 1;
 
     if ((enabled < 0) or (enabled > 1)) {
-        const msg = std.fmt.allocPrintZ(
+        const msg: [:0]u8 = std.fmt.allocPrintSentinel(
             allocator,
             "Invert: enabled must be 0 or 1. Passed: {}",
             .{enabled},
+            0,
         ) catch unreachable;
 
         vsapi.?.mapSetError.?(out, msg);
