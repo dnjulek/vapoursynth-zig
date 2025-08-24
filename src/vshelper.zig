@@ -23,36 +23,36 @@ pub const PluginID = enum {
 };
 
 /// convenience function for checking if the format never changes between frames
-pub fn isConstantVideoFormat(vi: *const vs.VideoInfo) callconv(.C) bool {
+pub fn isConstantVideoFormat(vi: *const vs.VideoInfo) bool {
     return (vi.height > 0) and (vi.width > 0) and (vi.format.colorFamily != .Undefined);
 }
 
 /// convenience function to check if two clips have the same format (unknown/changeable will be considered the same too)
-pub fn isSameVideoFormat(v1: *const vs.VideoFormat, v2: *const vs.VideoFormat) callconv(.C) bool {
+pub fn isSameVideoFormat(v1: *const vs.VideoFormat, v2: *const vs.VideoFormat) bool {
     return (v1.colorFamily == v2.colorFamily) and (v1.sampleType == v2.sampleType) and (v1.bitsPerSample == v2.bitsPerSample) and
         (v1.subSamplingW == v2.subSamplingW) and (v1.subSamplingH == v2.subSamplingH);
 }
 
 /// convenience function to check if a clip has the same format as a format id
-pub fn isSameVideoPresetFormat(presetFormat: u32, v: *const vs.VideoFormat, core: ?*vs.Core, vsapi: *const vs.API) callconv(.C) bool {
+pub fn isSameVideoPresetFormat(presetFormat: u32, v: *const vs.VideoFormat, core: ?*vs.Core, vsapi: *const vs.API) bool {
     return vsapi.queryVideoFormatID(v.colorFamily, v.sampleType, v.bitsPerSample, v.subSamplingW, v.subSamplingH, core) == presetFormat;
 }
 
 /// convenience function to check for if two clips have the same format (but not framerate)
 /// while also including width and height (unknown/changeable will be considered the same too)
-pub fn isSameVideoInfo(v1: *const vs.VideoInfo, v2: *const vs.VideoInfo) callconv(.C) bool {
+pub fn isSameVideoInfo(v1: *const vs.VideoInfo, v2: *const vs.VideoInfo) bool {
     return (v1.height == v2.height) and (v1.width == v2.width) and isSameVideoFormat(&v1.format, &v2.format);
 }
 
 /// convenience function to check for if two clips have the same format while also including samplerate
 /// (unknown/changeable will be considered the same too)
-pub fn isSameAudioFormat(a1: *const vs.AudioFormat, a2: *const vs.AudioFormat) callconv(.C) bool {
+pub fn isSameAudioFormat(a1: *const vs.AudioFormat, a2: *const vs.AudioFormat) bool {
     return (a1.bitsPerSample == a2.bitsPerSample) and (a1.sampleType == a2.sampleType) and (a1.channelLayout == a2.channelLayout);
 }
 
 /// convenience function to check for if two clips have the same format while also including samplerate
 /// (unknown/changeable will be considered the same too)
-pub fn isSameAudioInfo(a1: *const vs.AudioInfo, a2: *const vs.AudioInfo) callconv(.C) bool {
+pub fn isSameAudioInfo(a1: *const vs.AudioInfo, a2: *const vs.AudioInfo) bool {
     return (a1.sampleRate == a2.sampleRate) and isSameAudioFormat(&a1.format, &a2.format);
 }
 
@@ -76,7 +76,7 @@ pub inline fn bitblt(dstp: anytype, dst_stride: usize, srcp: anytype, src_stride
 
 /// check if the frame dimensions are valid for a given format
 /// returns non-zero for valid width and height
-pub fn areValidDimensions(fi: *const vs.VideoFormat, width: c_int, height: c_int) callconv(.C) c_int {
+pub fn areValidDimensions(fi: *const vs.VideoFormat, width: c_int, height: c_int) c_int {
     return !((width % (1 << fi.subSamplingW)) || (height % (1 << fi.subSamplingH)));
 }
 

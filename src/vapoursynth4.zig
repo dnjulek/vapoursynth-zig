@@ -339,37 +339,37 @@ pub const CacheMode = enum(c_int) {
 
 /// Returns a pointer to the global VSAPI instance.
 /// Returns NULL if the requested API version is not supported or if the system does not meet the minimum requirements to run VapourSynth. It is recommended to pass VAPOURSYNTH_API_VERSION.
-pub const GetVapourSynthAPI = ?*const fn (c_int) callconv(.C) *const API;
+pub const GetVapourSynthAPI = ?*const fn (c_int) callconv(.c) *const API;
 /// User-defined function called by the core to create an instance of the filter. This function is often named fooCreate.
 /// In this function, the filter’s input parameters should be retrieved and validated, the filter’s private instance data should be initialised,
 /// and createAudioFilter() or createVideoFilter() should be called. This is where the filter should perform any other initialisation it requires.
 /// If for some reason you cannot create the filter, you have to free any created node references using freeNode(), call mapSetError() on out, and return.
-pub const PublicFunction = ?*const fn (?*const Map, ?*Map, userData: ?*anyopaque, ?*Core, *const API) callconv(.C) void;
+pub const PublicFunction = ?*const fn (?*const Map, ?*Map, userData: ?*anyopaque, ?*Core, *const API) callconv(.c) void;
 /// Same as PublicFunction type, required to use registerFunction in separate zig file without dependency loop error.
-pub const PublicFunction2 = ?*const fn (?*const Map, ?*Map, userData: ?*anyopaque, ?*Core, *const API) callconv(.C) void;
+pub const PublicFunction2 = ?*const fn (?*const Map, ?*Map, userData: ?*anyopaque, ?*Core, *const API) callconv(.c) void;
 /// A plugin’s entry point. It must be called VapourSynthPluginInit2. This function is called after the core loads the shared library. Its purpose is to configure the plugin and to register the filters the plugin wants to export.
-pub const InitPlugin = ?*const fn (?*Plugin, *const PLUGINAPI) callconv(.C) void;
-pub const FreeFunctionData = ?*const fn (?*anyopaque) callconv(.C) void;
+pub const InitPlugin = ?*const fn (?*Plugin, *const PLUGINAPI) callconv(.c) void;
+pub const FreeFunctionData = ?*const fn (?*anyopaque) callconv(.c) void;
 /// A filter’s “getframe” function. It is called by the core when it needs the filter to generate a frame.
-pub const FilterGetFrame = ?*const fn (n: c_int, ActivationReason, instanceData: ?*anyopaque, frameData: *?*anyopaque, ?*FrameContext, ?*Core, *const API) callconv(.C) ?*const Frame;
+pub const FilterGetFrame = ?*const fn (n: c_int, ActivationReason, instanceData: ?*anyopaque, frameData: *?*anyopaque, ?*FrameContext, ?*Core, *const API) callconv(.c) ?*const Frame;
 /// This is where the filter should free everything it allocated, including its instance data.
-pub const FilterFree = ?*const fn (?*anyopaque, ?*Core, *const API) callconv(.C) void;
+pub const FilterFree = ?*const fn (?*anyopaque, ?*Core, *const API) callconv(.c) void;
 
 /// Requests the generation of a frame. When the frame is ready, a user-provided function is called. Note that the completion callback will only be called from a single thread at a time.
-pub const FrameDoneCallback = ?*const fn (user_data: ?*anyopaque, f: ?*const Frame, n: c_int, node: ?*Node, error_msg: [*:0]const u8) callconv(.C) void;
+pub const FrameDoneCallback = ?*const fn (user_data: ?*anyopaque, f: ?*const Frame, n: c_int, node: ?*Node, error_msg: [*:0]const u8) callconv(.c) void;
 /// Custom message handler.
-pub const LogHandler = ?*const fn (MessageType, [*:0]const u8, userData: ?*anyopaque) callconv(.C) void;
+pub const LogHandler = ?*const fn (MessageType, [*:0]const u8, userData: ?*anyopaque) callconv(.c) void;
 /// Called when a handler is removed.
-pub const LogHandlerFree = ?*const fn (userData: ?*anyopaque) callconv(.C) void;
+pub const LogHandlerFree = ?*const fn (userData: ?*anyopaque) callconv(.c) void;
 
 /// This struct is used to access VapourSynth’s API when a plugin is initially loaded.
 pub const PLUGINAPI = extern struct {
     /// returns VAPOURSYNTH_API_VERSION of the library
-    getAPIVersion: ?*const fn () callconv(.C) c_int,
+    getAPIVersion: ?*const fn () callconv(.c) c_int,
     /// Used to provide information about a plugin when loaded. Must be called exactly once from the VapourSynthPluginInit2 entry point. It is recommended to use the makeVersion fn when providing the pluginVersion.
-    configPlugin: ?*const fn (identifier: [*:0]const u8, pluginNamespace: [*:0]const u8, name: [*:0]const u8, pluginVersion: c_int, apiVersion: c_int, flag: c_int, ?*Plugin) callconv(.C) c_int,
+    configPlugin: ?*const fn (identifier: [*:0]const u8, pluginNamespace: [*:0]const u8, name: [*:0]const u8, pluginVersion: c_int, apiVersion: c_int, flag: c_int, ?*Plugin) callconv(.c) c_int,
     /// Function that registers a filter exported by the plugin. A plugin can export any number of filters. This function may only be called during the plugin loading phase unless the pcModifiable flag was set by configPlugin.
-    registerFunction: ?*const fn (name: [*:0]const u8, args: [*:0]const u8, returnType: [*:0]const u8, argsFunc: PublicFunction2, functionData: ?*anyopaque, ?*Plugin) callconv(.C) c_int,
+    registerFunction: ?*const fn (name: [*:0]const u8, args: [*:0]const u8, returnType: [*:0]const u8, argsFunc: PublicFunction2, functionData: ?*anyopaque, ?*Plugin) callconv(.c) c_int,
 };
 
 /// Contains information about a VSCore instance.
@@ -382,236 +382,236 @@ pub const FilterDependency = extern struct {
 /// This giant struct is the way to access VapourSynth’s public API.
 pub const API = extern struct {
     /// output nodes are appended to the clip key in the out map
-    createVideoFilter: ?*const fn (out: ?*Map, name: [*:0]const u8, vi: *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) void,
+    createVideoFilter: ?*const fn (out: ?*Map, name: [*:0]const u8, vi: *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.c) void,
     /// same as createVideoFilter but returns a pointer to the VSNode directly or NULL on failure
-    createVideoFilter2: ?*const fn (name: [*:0]const u8, vi: *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) ?*Node,
+    createVideoFilter2: ?*const fn (name: [*:0]const u8, vi: *const VideoInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.c) ?*Node,
     /// output nodes are appended to the clip key in the out map
-    createAudioFilter: ?*const fn (out: ?*Map, name: [*:0]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) void,
+    createAudioFilter: ?*const fn (out: ?*Map, name: [*:0]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.c) void,
     /// same as createAudioFilter but returns a pointer to the VSNode directly or NULL on failure
-    createAudioFilter2: ?*const fn (name: [*:0]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.C) ?*Node,
+    createAudioFilter2: ?*const fn (name: [*:0]const u8, *const AudioInfo, FilterGetFrame, FilterFree, FilterMode, ?[*]const FilterDependency, numDeps: c_int, instanceData: ?*anyopaque, ?*Core) callconv(.c) ?*Node,
     /// Use right after create*Filter*, sets the correct cache mode for using the cacheFrame API and returns the recommended upper number of additional frames to cache per request
-    setLinearFilter: ?*const fn (?*Node) callconv(.C) c_int,
+    setLinearFilter: ?*const fn (?*Node) callconv(.c) c_int,
     /// VSCacheMode, changing the cache mode also resets all options to their default
-    setCacheMode: ?*const fn (?*Node, CacheMode) callconv(.C) void,
+    setCacheMode: ?*const fn (?*Node, CacheMode) callconv(.c) void,
     /// passing -1 means no change
-    setCacheOptions: ?*const fn (?*Node, fixedSize: c_int, maxSize: c_int, maxHistorySize: c_int) callconv(.C) void,
+    setCacheOptions: ?*const fn (?*Node, fixedSize: c_int, maxSize: c_int, maxHistorySize: c_int) callconv(.c) void,
     /// Decreases the reference count of a node and destroys it once it reaches 0.
-    freeNode: ?*const fn (?*Node) callconv(.C) void,
+    freeNode: ?*const fn (?*Node) callconv(.c) void,
     /// Increment the reference count of a node. Returns the same node for convenience.
-    addNodeRef: ?*const fn (?*Node) callconv(.C) ?*Node,
+    addNodeRef: ?*const fn (?*Node) callconv(.c) ?*Node,
     /// Returns VSMediaType. Used to determine if a node is of audio or video type.
-    getNodeType: ?*const fn (?*Node) callconv(.C) MediaType,
+    getNodeType: ?*const fn (?*Node) callconv(.c) MediaType,
     /// Returns a pointer to the video info associated with a node. The pointer is valid as long as the node lives. It is undefined behavior to pass a non-video node.
-    getVideoInfo: ?*const fn (?*Node) callconv(.C) *const VideoInfo,
+    getVideoInfo: ?*const fn (?*Node) callconv(.c) *const VideoInfo,
     /// Returns a pointer to the audio info associated with a node. The pointer is valid as long as the node lives. It is undefined behavior to pass a non-audio node.
-    getAudioInfo: ?*const fn (?*Node) callconv(.C) *const AudioInfo,
+    getAudioInfo: ?*const fn (?*Node) callconv(.c) *const AudioInfo,
     /// Creates a new video frame, optionally copying the properties attached to another frame. It is a fatal error to pass invalid arguments to this function.
     /// The new frame contains uninitialised memory.
-    newVideoFrame: ?*const fn (*const VideoFormat, width: c_int, height: c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+    newVideoFrame: ?*const fn (*const VideoFormat, width: c_int, height: c_int, ?*const Frame, ?*Core) callconv(.c) ?*Frame,
     /// same as newVideoFrame but allows the specified planes to be effectively copied from the source frames
-    newVideoFrame2: ?*const fn (*const VideoFormat, width: c_int, height: c_int, [*]?*const Frame, plane: [*]const c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+    newVideoFrame2: ?*const fn (*const VideoFormat, width: c_int, height: c_int, [*]?*const Frame, plane: [*]const c_int, ?*const Frame, ?*Core) callconv(.c) ?*Frame,
     /// Creates a new audio frame, optionally copying the properties attached to another frame. It is a fatal error to pass invalid arguments to this function.
     /// The new frame contains uninitialised memory.
-    newAudioFrame: ?*const fn (*const AudioFormat, numSamples: c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+    newAudioFrame: ?*const fn (*const AudioFormat, numSamples: c_int, ?*const Frame, ?*Core) callconv(.c) ?*Frame,
     /// same as newAudioFrame but allows the specified channels to be effectively copied from the source frames
-    newAudioFrame2: ?*const fn (*const AudioFormat, numSamples: c_int, [*]?*const Frame, [*]const c_int, ?*const Frame, ?*Core) callconv(.C) ?*Frame,
+    newAudioFrame2: ?*const fn (*const AudioFormat, numSamples: c_int, [*]?*const Frame, [*]const c_int, ?*const Frame, ?*Core) callconv(.c) ?*Frame,
     /// Decrements the reference count of a frame and deletes it when it reaches 0.
-    freeFrame: ?*const fn (?*const Frame) callconv(.C) void,
+    freeFrame: ?*const fn (?*const Frame) callconv(.c) void,
     /// Increments the reference count of a frame. Returns f as a convenience.
-    addFrameRef: ?*const fn (?*const Frame) callconv(.C) ?*const Frame,
+    addFrameRef: ?*const fn (?*const Frame) callconv(.c) ?*const Frame,
     /// Duplicates the frame (not just the reference). As the frame buffer is shared in a copy-on-write fashion, the frame content is not really duplicated until a write operation occurs. This is transparent for the user.
     /// Returns a pointer to the new frame. Ownership is transferred to the caller.
-    copyFrame: ?*const fn (?*const Frame, ?*Core) callconv(.C) ?*Frame,
+    copyFrame: ?*const fn (?*const Frame, ?*Core) callconv(.c) ?*Frame,
     /// Returns a read-only pointer to a frame’s properties. The pointer is valid as long as the frame lives.
-    getFramePropertiesRO: ?*const fn (?*const Frame) callconv(.C) ?*const Map,
+    getFramePropertiesRO: ?*const fn (?*const Frame) callconv(.c) ?*const Map,
     /// Returns a read/write pointer to a frame’s properties. The pointer is valid as long as the frame lives.
-    getFramePropertiesRW: ?*const fn (?*Frame) callconv(.C) ?*Map,
+    getFramePropertiesRW: ?*const fn (?*Frame) callconv(.c) ?*Map,
     /// Returns the distance in bytes between two consecutive lines of a plane of a video frame. The stride is always positive. Returns 0 if the requested plane doesn’t exist or if it isn’t a video frame.
-    getStride: ?*const fn (?*const Frame, plane: c_int) callconv(.C) c_longlong,
+    getStride: ?*const fn (?*const Frame, plane: c_int) callconv(.c) c_longlong,
     /// Returns a read-only pointer to a plane or channel of a frame. Returns NULL if an invalid plane or channel number is passed.
     /// Don’t assume all three planes of a frame are allocated in one contiguous chunk (they’re not).
-    getReadPtr: ?*const fn (?*const Frame, plane: c_int) callconv(.C) [*]const u8,
+    getReadPtr: ?*const fn (?*const Frame, plane: c_int) callconv(.c) [*]const u8,
     /// Returns a read-write pointer to a plane or channel of a frame. Returns NULL if an invalid plane or channel number is passed.
     /// Don’t assume all three planes of a frame are allocated in one contiguous chunk (they’re not).
-    getWritePtr: ?*const fn (?*Frame, plane: c_int) callconv(.C) [*]u8,
+    getWritePtr: ?*const fn (?*Frame, plane: c_int) callconv(.c) [*]u8,
     /// Retrieves the format of a video frame.
-    getVideoFrameFormat: ?*const fn (?*const Frame) callconv(.C) *const VideoFormat,
+    getVideoFrameFormat: ?*const fn (?*const Frame) callconv(.c) *const VideoFormat,
     /// Retrieves the format of an audio frame.
-    getAudioFrameFormat: ?*const fn (?*const Frame) callconv(.C) *const AudioFormat,
+    getAudioFrameFormat: ?*const fn (?*const Frame) callconv(.c) *const AudioFormat,
     /// Returns a value from VSMediaType to distinguish audio and video frames.
-    getFrameType: ?*const fn (?*const Frame) callconv(.C) MediaType,
+    getFrameType: ?*const fn (?*const Frame) callconv(.c) MediaType,
     /// Returns the width of a plane of a given video frame, in pixels. The width depends on the plane number because of the possible chroma subsampling. Returns 0 for audio frames.
-    getFrameWidth: ?*const fn (?*const Frame, plane: c_int) callconv(.C) c_int,
+    getFrameWidth: ?*const fn (?*const Frame, plane: c_int) callconv(.c) c_int,
     /// Returns the height of a plane of a given video frame, in pixels. The height depends on the plane number because of the possible chroma subsampling. Returns 0 for audio frames.
-    getFrameHeight: ?*const fn (?*const Frame, plane: c_int) callconv(.C) c_int,
+    getFrameHeight: ?*const fn (?*const Frame, plane: c_int) callconv(.c) c_int,
     /// Returns the number of audio samples in a frame. Always returns 1 for video frames.
-    getFrameLength: ?*const fn (?*const Frame) callconv(.C) c_int,
+    getFrameLength: ?*const fn (?*const Frame) callconv(.c) c_int,
     /// Tries to output a fairly human-readable name of a video format.
     /// [*]u8: Destination buffer. At most 32 bytes including terminating NULL will be written.
-    getVideoFormatName: ?*const fn (*const VideoFormat, [*]u8) callconv(.C) c_int,
+    getVideoFormatName: ?*const fn (*const VideoFormat, [*]u8) callconv(.c) c_int,
     /// Tries to output a fairly human-readable name of an audio format.
     /// [*]u8: Destination buffer. At most 32 bytes including terminating NULL will be written.
-    getAudioFormatName: ?*const fn (*const AudioFormat, [*]u8) callconv(.C) c_int,
+    getAudioFormatName: ?*const fn (*const AudioFormat, [*]u8) callconv(.c) c_int,
     /// Fills out a VSVideoInfo struct based on the provided arguments. Validates the arguments before filling out format.
-    queryVideoFormat: ?*const fn (*VideoFormat, ColorFamily, SampleType, bitsPerSample: c_int, subSamplingW: c_int, subSamplingH: c_int, ?*Core) callconv(.C) c_int,
+    queryVideoFormat: ?*const fn (*VideoFormat, ColorFamily, SampleType, bitsPerSample: c_int, subSamplingW: c_int, subSamplingH: c_int, ?*Core) callconv(.c) c_int,
     /// Fills out a VSAudioFormat struct based on the provided arguments. Validates the arguments before filling out format.
-    queryAudioFormat: ?*const fn (*AudioFormat, SampleType, bitsPerSample: c_int, channelLayout: u64, ?*Core) callconv(.C) c_int,
+    queryAudioFormat: ?*const fn (*AudioFormat, SampleType, bitsPerSample: c_int, channelLayout: u64, ?*Core) callconv(.c) c_int,
     /// Get the id associated with a video format. Similar to queryVideoFormat() except that it returns a format id instead of filling out a VSVideoInfo struct.
-    queryVideoFormatID: ?*const fn (ColorFamily, SampleType, bitsPerSample: c_int, subSamplingW: c_int, subSamplingH: c_int, ?*Core) callconv(.C) PresetVideoFormat,
+    queryVideoFormatID: ?*const fn (ColorFamily, SampleType, bitsPerSample: c_int, subSamplingW: c_int, subSamplingH: c_int, ?*Core) callconv(.c) PresetVideoFormat,
     /// Fills out the VSVideoFormat struct passed to format based
-    getVideoFormatByID: ?*const fn (*VideoFormat, id: PresetVideoFormat, ?*Core) callconv(.C) c_int,
+    getVideoFormatByID: ?*const fn (*VideoFormat, id: PresetVideoFormat, ?*Core) callconv(.c) c_int,
     /// Fetches a frame synchronously. The frame is available when the function returns.
     /// This function is meant for external applications using the core as a library, or if frame requests are necessary during a filter’s initialization.
-    getFrame: ?*const fn (n: c_int, ?*Node, errorMsg: ?[*:0]const u8, bufSize: c_int) callconv(.C) ?*const Frame,
+    getFrame: ?*const fn (n: c_int, ?*Node, errorMsg: ?[*:0]const u8, bufSize: c_int) callconv(.c) ?*const Frame,
     /// Requests the generation of a frame. When the frame is ready, a user-provided function is called. Note that the completion callback will only be called from a single thread at a time.
     /// This function is meant for applications using VapourSynth as a library.
-    getFrameAsync: ?*const fn (n: c_int, ?*Node, FrameDoneCallback, userData: ?*anyopaque) callconv(.C) void,
+    getFrameAsync: ?*const fn (n: c_int, ?*Node, FrameDoneCallback, userData: ?*anyopaque) callconv(.c) void,
     /// Retrieves a frame that was previously requested with requestFrameFilter(). Only use inside a filter's getframe function
-    getFrameFilter: ?*const fn (n: c_int, ?*Node, ?*FrameContext) callconv(.C) ?*const Frame,
+    getFrameFilter: ?*const fn (n: c_int, ?*Node, ?*FrameContext) callconv(.c) ?*const Frame,
     /// Requests a frame from a node and returns immediately. Only use inside a filter's getframe function
-    requestFrameFilter: ?*const fn (n: c_int, ?*Node, ?*FrameContext) callconv(.C) void,
+    requestFrameFilter: ?*const fn (n: c_int, ?*Node, ?*FrameContext) callconv(.c) void,
     /// By default all requested frames are referenced until a filter’s frame request is done. In extreme cases where a filter needs to reduce 20+ frames
     /// into a single output frame it may be beneficial to request these in batches and incrementally process the data instead.
-    releaseFrameEarly: ?*const fn (?*Node, n: c_int, ?*FrameContext) callconv(.C) void,
+    releaseFrameEarly: ?*const fn (?*Node, n: c_int, ?*FrameContext) callconv(.c) void,
     /// Pushes a not requested frame into the cache. This is useful for (source) filters that greatly benefit from completely linear access and producing all output in linear order.
     /// This function may only be used in filters that were created with setLinearFilter.
-    cacheFrame: ?*const fn (?*const Frame, n: c_int, ?*FrameContext) callconv(.C) void,
+    cacheFrame: ?*const fn (?*const Frame, n: c_int, ?*FrameContext) callconv(.c) void,
     /// Adds an error message to a frame context, replacing the existing message, if any.
     /// This is the way to report errors in a filter’s “getframe” function. Such errors are not necessarily fatal, i.e. the caller can try to request the same frame again.
-    setFilterError: ?*const fn (errorMessage: [*:0]const u8, ?*FrameContext) callconv(.C) void,
+    setFilterError: ?*const fn (errorMessage: [*:0]const u8, ?*FrameContext) callconv(.c) void,
     // External functions
-    createFunction: ?*const fn (PublicFunction, userData: ?*anyopaque, FreeFunctionData, ?*Core) callconv(.C) ?*Function,
+    createFunction: ?*const fn (PublicFunction, userData: ?*anyopaque, FreeFunctionData, ?*Core) callconv(.c) ?*Function,
     /// Decrements the reference count of a function and deletes it when it reaches 0.
-    freeFunction: ?*const fn (?*Function) callconv(.C) void,
-    addFunctionRef: ?*const fn (?*Function) callconv(.C) ?*Function,
-    callFunction: ?*const fn (?*Function, ?*const Map, ?*Map) callconv(.C) void,
+    freeFunction: ?*const fn (?*Function) callconv(.c) void,
+    addFunctionRef: ?*const fn (?*Function) callconv(.c) ?*Function,
+    callFunction: ?*const fn (?*Function, ?*const Map, ?*Map) callconv(.c) void,
     /// Creates a new property map. It must be deallocated later with freeMap().
-    createMap: ?*const fn () callconv(.C) ?*Map,
+    createMap: ?*const fn () callconv(.c) ?*Map,
     /// Frees a map and all the objects it contains.
-    freeMap: ?*const fn (?*Map) callconv(.C) void,
+    freeMap: ?*const fn (?*Map) callconv(.c) void,
     /// Deletes all the keys and their associated values from the map, leaving it empty.
-    clearMap: ?*const fn (?*Map) callconv(.C) void,
+    clearMap: ?*const fn (?*Map) callconv(.c) void,
     /// copies all values in src to dst, if a key already exists in dst it's replaced
-    copyMap: ?*const fn (?*const Map, ?*Map) callconv(.C) void,
+    copyMap: ?*const fn (?*const Map, ?*Map) callconv(.c) void,
     /// Adds an error message to a map. The map is cleared first. The error message is copied. In this state the map may only be freed, cleared or queried for the error message.
     /// For errors encountered in a filter’s “getframe” function, use setFilterError.
-    mapSetError: ?*const fn (?*Map, errorMessage: [*:0]const u8) callconv(.C) void,
+    mapSetError: ?*const fn (?*Map, errorMessage: [*:0]const u8) callconv(.c) void,
     /// Returns a pointer to the error message contained in the map, or NULL if there is no error set. The pointer is valid until the next modifying operation on the map.
-    mapGetError: ?*const fn (?*const Map) callconv(.C) ?[*:0]const u8,
+    mapGetError: ?*const fn (?*const Map) callconv(.c) ?[*:0]const u8,
     /// Returns the number of keys contained in a property map.
-    mapNumKeys: ?*const fn (?*const Map) callconv(.C) c_int,
+    mapNumKeys: ?*const fn (?*const Map) callconv(.c) c_int,
     /// Returns the nth key from a property map. Passing an invalid index will cause a fatal error. The pointer is valid as long as the key exists in the map.
-    mapGetKey: ?*const fn (?*const Map, index: c_int) callconv(.C) ?[*:0]const u8,
+    mapGetKey: ?*const fn (?*const Map, index: c_int) callconv(.c) ?[*:0]const u8,
     /// Removes the property with the given key. All values associated with the key are lost. Returns 0 if the key isn’t in the map. Otherwise it returns 1.
-    mapDeleteKey: ?*const fn (?*Map, key: [*:0]const u8) callconv(.C) c_int,
+    mapDeleteKey: ?*const fn (?*Map, key: [*:0]const u8) callconv(.c) c_int,
     /// Returns the number of elements associated with a key in a property map. Returns -1 if there is no such key in the map.
-    mapNumElements: ?*const fn (?*const Map, key: [*:0]const u8) callconv(.C) c_int,
+    mapNumElements: ?*const fn (?*const Map, key: [*:0]const u8) callconv(.c) c_int,
     /// Returns a value from VSPropertyType representing type of elements in the given key. If there is no such key in the map, the returned value is ptUnset. Note that also empty arrays created with mapSetEmpty are typed.
-    mapGetType: ?*const fn (?*const Map, key: [*:0]const u8) callconv(.C) PropertyType,
+    mapGetType: ?*const fn (?*const Map, key: [*:0]const u8) callconv(.c) PropertyType,
     /// Creates an empty array of type in key. Returns non-zero value on failure due to key already existing or having an invalid name.
-    mapSetEmpty: ?*const fn (?*Map, key: [*:0]const u8, PropertyType) callconv(.C) c_int,
+    mapSetEmpty: ?*const fn (?*Map, key: [*:0]const u8, PropertyType) callconv(.c) c_int,
     /// Retrieves an integer from a specified key in a map. Returns the number on success, or 0 in case of error. If the map has an error set (i.e. if mapGetError() returns non-NULL), VapourSynth will die with a fatal error.
-    mapGetInt: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) i64,
+    mapGetInt: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) i64,
     /// Works just like mapGetInt() except that the value returned is also converted to an integer using saturation.
-    mapGetIntSaturated: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) c_int,
+    mapGetIntSaturated: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) c_int,
     /// Retrieves an array of integers from a map. Use this function if there are a lot of numbers associated with a key, because it is faster than calling mapGetInt() in a loop.
     /// Returns a pointer to the first element of the array on success, or NULL in case of error. Use mapNumElements() to know the total number of elements associated with a key.
-    mapGetIntArray: ?*const fn (?*const Map, key: [*:0]const u8, ?*MapPropertyError) callconv(.C) ?[*]const i64,
+    mapGetIntArray: ?*const fn (?*const Map, key: [*:0]const u8, ?*MapPropertyError) callconv(.c) ?[*]const i64,
     /// Sets an integer to the specified key in a map. Multiple values can be associated with one key, but they must all be the same type.
-    mapSetInt: ?*const fn (?*Map, key: [*:0]const u8, i64, MapAppendMode) callconv(.C) c_int,
+    mapSetInt: ?*const fn (?*Map, key: [*:0]const u8, i64, MapAppendMode) callconv(.c) c_int,
     /// Adds an array of integers to a map. Use this function if there are a lot of numbers to add, because it is faster than calling mapSetInt() in a loop.
     /// If map already contains a property with this key, that property will be overwritten and all old values will be lost.
-    mapSetIntArray: ?*const fn (?*Map, key: [*:0]const u8, arr: [*]const i64, size: c_int) callconv(.C) c_int,
+    mapSetIntArray: ?*const fn (?*Map, key: [*:0]const u8, arr: [*]const i64, size: c_int) callconv(.c) c_int,
     ///Retrieves a floating point number from a map. Returns the number on success, or 0 in case of error.
-    mapGetFloat: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) f64,
+    mapGetFloat: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) f64,
     /// Works just like mapGetFloat() except that the value returned is also converted to a f32.
-    mapGetFloatSaturated: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) f32,
+    mapGetFloatSaturated: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) f32,
     /// Retrieves an array of floating point numbers from a map. Use this function if there are a lot of numbers associated with a key, because it is faster than calling mapGetFloat() in a loop.
     /// Returns a pointer to the first element of the array on success, or NULL in case of error. Use mapNumElements() to know the total number of elements associated with a key.
-    mapGetFloatArray: ?*const fn (?*const Map, key: [*:0]const u8, ?*MapPropertyError) callconv(.C) ?[*]const f64,
+    mapGetFloatArray: ?*const fn (?*const Map, key: [*:0]const u8, ?*MapPropertyError) callconv(.c) ?[*]const f64,
     /// Sets a float to the specified key in a map.
-    mapSetFloat: ?*const fn (?*Map, key: [*:0]const u8, n: f64, MapAppendMode) callconv(.C) c_int,
+    mapSetFloat: ?*const fn (?*Map, key: [*:0]const u8, n: f64, MapAppendMode) callconv(.c) c_int,
     /// Adds an array of floating point numbers to a map. Use this function if there are a lot of numbers to add, because it is faster than calling mapSetFloat() in a loop.
-    mapSetFloatArray: ?*const fn (?*Map, key: [*:0]const u8, arr: [*]const f64, size: c_int) callconv(.C) c_int,
+    mapSetFloatArray: ?*const fn (?*Map, key: [*:0]const u8, arr: [*]const f64, size: c_int) callconv(.c) c_int,
     /// Retrieves arbitrary binary data from a map. Checking mapGetDataTypeHint() may provide a hint about whether or not the data is human readable.
-    mapGetData: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) ?[*]const u8,
+    mapGetData: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) ?[*]const u8,
     /// Returns the size in bytes of a property of type ptData (see VSPropertyType), or 0 in case of error. The terminating NULL byte added by mapSetData() is not counted.
-    mapGetDataSize: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) c_int,
+    mapGetDataSize: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) c_int,
     /// Returns the size in bytes of a property of type ptData (see VSPropertyType), or 0 in case of error. The terminating NULL byte added by mapSetData() is not counted.
-    mapGetDataTypeHint: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) DataTypeHint,
+    mapGetDataTypeHint: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) DataTypeHint,
     /// Sets binary data to the specified key in a map. Multiple values can be associated with one key, but they must all be the same type.
-    mapSetData: ?*const fn (?*Map, key: [*:0]const u8, data: [*:0]const u8, size: c_int, DataTypeHint, MapAppendMode) callconv(.C) c_int,
+    mapSetData: ?*const fn (?*Map, key: [*:0]const u8, data: [*:0]const u8, size: c_int, DataTypeHint, MapAppendMode) callconv(.c) c_int,
     /// Retrieves a node from a map. Returns a pointer to the node on success, or NULL in case of error.
     /// This function increases the node’s reference count, so freeNode() must be used when the node is no longer needed.
-    mapGetNode: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) ?*Node,
+    mapGetNode: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) ?*Node,
     /// Sets a node to the specified key in a map.
-    mapSetNode: ?*const fn (?*Map, key: [*:0]const u8, ?*Node, MapAppendMode) callconv(.C) c_int,
+    mapSetNode: ?*const fn (?*Map, key: [*:0]const u8, ?*Node, MapAppendMode) callconv(.c) c_int,
     /// Sets a node to the specified key in a map and decreases the reference count.
-    mapConsumeNode: ?*const fn (?*Map, key: [*:0]const u8, ?*Node, MapAppendMode) callconv(.C) c_int,
+    mapConsumeNode: ?*const fn (?*Map, key: [*:0]const u8, ?*Node, MapAppendMode) callconv(.c) c_int,
     /// Retrieves a frame from a map. Returns a pointer to the frame on success, or NULL in case of error.
     /// This function increases the frame’s reference count, so freeFrame() must be used when the frame is no longer needed.
-    mapGetFrame: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) ?*const Frame,
+    mapGetFrame: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) ?*const Frame,
     /// Sets a frame to the specified key in a map.
-    mapSetFrame: ?*const fn (?*Map, key: [*:0]const u8, ?*const Frame, MapAppendMode) callconv(.C) c_int,
+    mapSetFrame: ?*const fn (?*Map, key: [*:0]const u8, ?*const Frame, MapAppendMode) callconv(.c) c_int,
     /// Sets a frame to the specified key in a map and decreases the reference count.
-    mapConsumeFrame: ?*const fn (?*Map, key: [*:0]const u8, ?*const Frame, MapAppendMode) callconv(.C) c_int,
+    mapConsumeFrame: ?*const fn (?*Map, key: [*:0]const u8, ?*const Frame, MapAppendMode) callconv(.c) c_int,
     /// Retrieves a function from a map. Returns a pointer to the function on success, or NULL in case of error.
     /// This function increases the function’s reference count, so freeFunction() must be used when the function is no longer needed.
-    mapGetFunction: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.C) ?*Function,
+    mapGetFunction: ?*const fn (?*const Map, key: [*:0]const u8, index: c_int, ?*MapPropertyError) callconv(.c) ?*Function,
     /// Sets a function object to the specified key in a map.
-    mapSetFunction: ?*const fn (?*Map, key: [*:0]const u8, ?*Function, MapAppendMode) callconv(.C) c_int,
+    mapSetFunction: ?*const fn (?*Map, key: [*:0]const u8, ?*Function, MapAppendMode) callconv(.c) c_int,
     /// Sets a function object to the specified key in a map and decreases the reference count.
-    mapConsumeFunction: ?*const fn (?*Map, key: [*:0]const u8, ?*Function, MapAppendMode) callconv(.C) c_int,
+    mapConsumeFunction: ?*const fn (?*Map, key: [*:0]const u8, ?*Function, MapAppendMode) callconv(.c) c_int,
     /// Function that registers a filter exported by the plugin. A plugin can export any number of filters.
     /// This function may only be called during the plugin loading phase unless the pcModifiable flag was set by configPlugin.
-    registerFunction: ?*const fn (name: [*:0]const u8, args: [*:0]const u8, returnType: [*:0]const u8, argsFunc: PublicFunction, functionData: ?*anyopaque, ?*Plugin) callconv(.C) c_int,
+    registerFunction: ?*const fn (name: [*:0]const u8, args: [*:0]const u8, returnType: [*:0]const u8, argsFunc: PublicFunction, functionData: ?*anyopaque, ?*Plugin) callconv(.c) c_int,
     /// Returns a pointer to the plugin with the given identifier, or NULL if not found.
-    getPluginByID: ?*const fn (identifier: [*:0]const u8, ?*Core) callconv(.C) ?*Plugin,
+    getPluginByID: ?*const fn (identifier: [*:0]const u8, ?*Core) callconv(.c) ?*Plugin,
     /// Returns a pointer to the plugin with the given namespace, or NULL if not found.
-    getPluginByNamespace: ?*const fn (ns: [*:0]const u8, ?*Core) callconv(.C) ?*Plugin,
+    getPluginByNamespace: ?*const fn (ns: [*:0]const u8, ?*Core) callconv(.c) ?*Plugin,
     /// Used to enumerate over all currently loaded plugins. The order is fixed but provides no other guarantees.
-    getNextPlugin: ?*const fn (?*Plugin, ?*Core) callconv(.C) ?*Plugin,
+    getNextPlugin: ?*const fn (?*Plugin, ?*Core) callconv(.c) ?*Plugin,
     /// Returns the name of the plugin that was passed to configPlugin.
-    getPluginName: ?*const fn (?*Plugin) callconv(.C) ?[*:0]const u8,
+    getPluginName: ?*const fn (?*Plugin) callconv(.c) ?[*:0]const u8,
     /// Returns the identifier of the plugin that was passed to configPlugin.
-    getPluginID: ?*const fn (?*Plugin) callconv(.C) ?[*:0]const u8,
+    getPluginID: ?*const fn (?*Plugin) callconv(.c) ?[*:0]const u8,
     /// Returns the namespace the plugin currently is loaded in.
-    getPluginNamespace: ?*const fn (?*Plugin) callconv(.C) ?[*:0]const u8,
+    getPluginNamespace: ?*const fn (?*Plugin) callconv(.c) ?[*:0]const u8,
     /// Used to enumerate over all functions in a plugin. The order is fixed but provides no other guarantees.
-    getNextPluginFunction: ?*const fn (?*PluginFunction, ?*Plugin) callconv(.C) ?*PluginFunction,
+    getNextPluginFunction: ?*const fn (?*PluginFunction, ?*Plugin) callconv(.c) ?*PluginFunction,
     /// Get a function belonging to a plugin by its name.
-    getPluginFunctionByName: ?*const fn (name: [*:0]const u8, ?*Plugin) callconv(.C) ?*PluginFunction,
+    getPluginFunctionByName: ?*const fn (name: [*:0]const u8, ?*Plugin) callconv(.c) ?*PluginFunction,
     /// Returns the name of the function that was passed to registerFunction.
-    getPluginFunctionName: ?*const fn (?*PluginFunction) callconv(.C) ?[*:0]const u8,
+    getPluginFunctionName: ?*const fn (?*PluginFunction) callconv(.c) ?[*:0]const u8,
     /// Returns the argument string of the function that was passed to registerFunction.
-    getPluginFunctionArguments: ?*const fn (?*PluginFunction) callconv(.C) ?[*:0]const u8,
+    getPluginFunctionArguments: ?*const fn (?*PluginFunction) callconv(.c) ?[*:0]const u8,
     /// Returns the return type string of the function that was passed to registerFunction.
-    getPluginFunctionReturnType: ?*const fn (?*PluginFunction) callconv(.C) ?[*:0]const u8,
+    getPluginFunctionReturnType: ?*const fn (?*PluginFunction) callconv(.c) ?[*:0]const u8,
     /// Returns the absolute path to the plugin, including the plugin’s file name. This is the real location of the plugin, i.e. there are no symbolic links in the path.
-    getPluginPath: ?*const fn (?*const Plugin) callconv(.C) ?[*:0]const u8,
+    getPluginPath: ?*const fn (?*const Plugin) callconv(.c) ?[*:0]const u8,
     /// Returns the version of the plugin. This is the same as the version number passed to configPlugin.
-    getPluginVersion: ?*const fn (?*const Plugin) callconv(.C) c_int,
+    getPluginVersion: ?*const fn (?*const Plugin) callconv(.c) c_int,
     /// Checks that the args passed to the filter are consistent with the argument list registered by the plugin that contains the filter, calls the filter’s
     /// “create” function, and checks that the filter returns the declared types. If everything goes smoothly, the filter will be ready to generate frames after invoke() returns.
-    invoke: ?*const fn (?*Plugin, [*:0]const u8, ?*const Map) callconv(.C) ?*Map,
+    invoke: ?*const fn (?*Plugin, [*:0]const u8, ?*const Map) callconv(.c) ?*Map,
     /// Creates the VapourSynth processing core and returns a pointer to it. It is possible to create multiple cores but in most cases it shouldn’t be needed.
-    createCore: ?*const fn (CoreCreationFlags) callconv(.C) ?*Core,
+    createCore: ?*const fn (CoreCreationFlags) callconv(.c) ?*Core,
     /// Frees a core. Should only be done after all frame requests have completed and all objects belonging to the core have been released.
-    freeCore: ?*const fn (?*Core) callconv(.C) void,
+    freeCore: ?*const fn (?*Core) callconv(.c) void,
     /// Sets the maximum size of the framebuffer cache. Returns the new maximum size.
-    setMaxCacheSize: ?*const fn (bytes: i64, ?*Core) callconv(.C) i64,
+    setMaxCacheSize: ?*const fn (bytes: i64, ?*Core) callconv(.c) i64,
     /// Sets the number of threads used for processing. Pass 0 to automatically detect. Returns the number of threads that will be used for processing.
-    setThreadCount: ?*const fn (threads: c_int, ?*Core) callconv(.C) c_int,
+    setThreadCount: ?*const fn (threads: c_int, ?*Core) callconv(.c) c_int,
     /// Returns information about the VapourSynth core.
-    getCoreInfo: ?*const fn (?*Core, *CoreInfo) callconv(.C) void,
+    getCoreInfo: ?*const fn (?*Core, *CoreInfo) callconv(.c) void,
     /// Returns the highest VAPOURSYNTH_API_VERSION the library support.
-    getAPIVersion: ?*const fn () callconv(.C) c_int,
+    getAPIVersion: ?*const fn () callconv(.c) c_int,
     /// Send a message through VapourSynth’s logging framework. See addLogHandler.
-    logMessage: ?*const fn (MessageType, msg: [*:0]const u8, ?*Core) callconv(.C) void,
+    logMessage: ?*const fn (MessageType, msg: [*:0]const u8, ?*Core) callconv(.c) void,
     /// Installs a custom handler for the various error messages VapourSynth emits. The message handler is per VSCore instance. Returns a unique handle.
-    addLogHandler: ?*const fn (LogHandler, LogHandlerFree, userData: ?*anyopaque, ?*Core) callconv(.C) ?*LogHandle,
+    addLogHandler: ?*const fn (LogHandler, LogHandlerFree, userData: ?*anyopaque, ?*Core) callconv(.c) ?*LogHandle,
     /// Removes a custom handler. Return non-zero on success and zero if the handle is invalid.
-    removeLogHandler: ?*const fn (?*LogHandle, ?*Core) callconv(.C) c_int,
+    removeLogHandler: ?*const fn (?*LogHandle, ?*Core) callconv(.c) c_int,
 };
 
 pub extern fn getVapourSynthAPI(version: c_int) *const API;

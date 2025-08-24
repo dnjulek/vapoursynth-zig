@@ -19,19 +19,19 @@ const InvertData = struct {
     path: [][]const u8 = undefined,
 };
 
-fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) ?*const vs.Frame {
+fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_data: ?*anyopaque, frame_data: ?*?*anyopaque, frame_ctx: ?*vs.FrameContext, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.c) ?*const vs.Frame {
     _ = frame_data;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
-    const zapi = ZAPI.init(vsapi, core);
+    const zapi = ZAPI.init(vsapi, core, frame_ctx);
 
     if (activation_reason == .Initial) {
-        zapi.requestFrameFilter(n, d.node, frame_ctx);
+        zapi.requestFrameFilter(n, d.node);
     } else if (activation_reason == .AllFramesReady) {
-        const src = zapi.initZFrame(d.node, n, frame_ctx);
+        const src = zapi.initZFrame(d.node, n);
         defer src.deinit();
         const dst = src.newVideoFrame();
 
-        const src2 = zapi.initZFrameFromVi(d.vi, frame_ctx, null, .{ .cf = .Gray });
+        const src2 = zapi.initZFrameFromVi(d.vi, null);
 
         const src_prop = src.getPropertiesRO();
         const dst_prop = dst.getPropertiesRW();
@@ -70,7 +70,7 @@ fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_dat
     return null;
 }
 
-fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
+fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.c) void {
     _ = core;
     const d: *InvertData = @ptrCast(@alignCast(instance_data));
     vsapi.?.freeNode.?(d.node);
@@ -79,11 +79,11 @@ fn invertFree(instance_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API
     allocator.destroy(d);
 }
 
-fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.C) void {
+fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.c) void {
     _ = user_data;
     var d: InvertData = undefined;
 
-    const zapi = ZAPI.init(vsapi, core);
+    const zapi = ZAPI.init(vsapi, core, null);
     const map_in = zapi.initZMap(in);
     const map_out = zapi.initZMap(out);
 
