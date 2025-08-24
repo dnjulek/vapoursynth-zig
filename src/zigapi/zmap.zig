@@ -16,6 +16,10 @@ pub fn ZMap(comptime MT: type) type {
             return Self{ .map = map, .zapi = zapi };
         }
 
+        pub fn free(self: *const Self) void {
+            self.zapi.freeMap(self.map);
+        }
+
         pub fn getNode(self: *const Self, comptime key: [:0]const u8) ?*vs.Node {
             return self.zapi.mapGetNode(self.map, key, 0, null);
         }
