@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 14, .patch = 0 };
+pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 15, .patch = 1 };
 
 pub const VSAPI4 = enum(i32) {
     minor_0 = 0,
