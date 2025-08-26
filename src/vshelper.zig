@@ -106,24 +106,3 @@ pub inline fn muldivRational(num: *i64, den: *i64, mul: i64, div: i64) void {
 pub inline fn ceilN(x: usize, n: usize) usize {
     return (x + (n - 1)) & ~(n - 1);
 }
-
-/// Helper to use Zig Optionals and saturate to return type
-/// https://ziglang.org/documentation/master/#Optionals
-pub fn mapGetN(comptime T: type, in: ?*const vs.Map, key: [*:0]const u8, index: u32, vsapi: ?*const vs.API) ?T {
-    var err: vs.MapPropertyError = undefined;
-    const val: T = switch (@typeInfo(T)) {
-        .int => math.lossyCast(T, vsapi.?.mapGetInt.?(in, key, @intCast(index), &err)),
-        .float => math.lossyCast(T, vsapi.?.mapGetFloat.?(in, key, @intCast(index), &err)),
-        .bool => vsapi.?.mapGetInt.?(in, key, @intCast(index), &err) != 0,
-        else => @compileError("mapGetN only works with Int, Float and Bool types"),
-    };
-
-    return if (err == .Success) val else null;
-}
-
-/// Format the string with a null-terminator to work properly with C API, you need to free the buf manually.
-pub fn printf(allocator: std.mem.Allocator, buf: *?[]u8, comptime fmt: []const u8, args: anytype) []const u8 {
-    const err_msg = "Out of memory occurred while writing string.";
-    buf.* = allocator.alloc(u8, std.fmt.count(fmt, args) + 1) catch null; // +1 for "\x00" in bufPrintZ
-    return if (buf.*) |b| std.fmt.bufPrintZ(b, fmt, args) catch err_msg else err_msg;
-}
