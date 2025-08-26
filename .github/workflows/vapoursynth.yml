@@ -76,7 +76,7 @@ jobs:
 
     - name: build example plugin
       run: |
-        cd examples/example-zigapi
+        cd examples
         zig build
 
     - name: build test plugin
