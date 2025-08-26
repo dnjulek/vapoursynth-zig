@@ -1,12 +1,10 @@
 const std = @import("std");
 const zon = @import("build.zig.zon");
 
-pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 15, .patch = 1 };
-
 //NOTE: read https://github.com/ziglang/zig/blob/master/lib/init/build.zig
 
 pub fn build(b: *std.Build) !void {
-    ensureZigVersion() catch return;
+    ensureZigVersion(try .parse(zon.minimum_zig_version)) catch return;
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
@@ -43,7 +41,7 @@ pub fn build(b: *std.Build) !void {
     b.installArtifact(lib);
 }
 
-fn ensureZigVersion() !void {
+fn ensureZigVersion(min_zig_version: std.SemanticVersion) !void {
     var installed_ver = @import("builtin").zig_version;
     installed_ver.build = null;
 
