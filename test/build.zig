@@ -1,20 +1,29 @@
 const std = @import("std");
+const zon = @import("build.zig.zon");
 
 pub const min_zig_version = std.SemanticVersion{ .major = 0, .minor = 15, .patch = 1 };
 
-pub fn build(b: *std.Build) void {
+//NOTE: read https://github.com/ziglang/zig/blob/master/lib/init/build.zig
+pub fn build(b: *std.Build) !void {
     ensureZigVersion() catch return;
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const mod = b.createModule(.{
+        .root_source_file = b.path("src/invert_example.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const options = b.addOptions();
+    const version = try std.SemanticVersion.parse(zon.version);
+    options.addOption(std.SemanticVersion, "version", version);
+    mod.addOptions("zon", options);
+
     const lib = b.addLibrary(.{
         .name = "invert_example",
         .linkage = .dynamic,
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("src/invert_example.zig"),
-            .target = target,
-            .optimize = optimize,
-        }),
+        .root_module = mod,
     });
 
     const vapoursynth_dep = b.dependency("vapoursynth", .{

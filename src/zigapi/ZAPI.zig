@@ -33,8 +33,8 @@ const MapPropertyError = vs.MapPropertyError;
 const MediaType = vs.MediaType;
 const MessageType = vs.MessageType;
 const Node = vs.Node;
-const Plugin = vs.Plugin;
 const PluginFunction = vs.PluginFunction;
+const PLUGINAPI = vs.PLUGINAPI;
 const PresetVideoFormat = vs.PresetVideoFormat;
 const PropertyType = vs.PropertyType;
 const PublicFunction = vs.PublicFunction;
@@ -433,44 +433,44 @@ pub fn mapConsumeFunction(self: *const ZAPI, map: ?*Map, key: [:0]const u8, func
 }
 /// Function that registers a filter exported by the plugin. A plugin can export any number of filters.
 /// This function may only be called during the plugin loading phase unless the pcModifiable flag was set by configPlugin.
-pub fn registerFunction(self: *const ZAPI, name: [:0]const u8, args: [:0]const u8, return_type: [:0]const u8, func: PublicFunction, data: ?*anyopaque, plugin: ?*Plugin) i32 {
+pub fn registerFunction(self: *const ZAPI, name: [:0]const u8, args: [:0]const u8, return_type: [:0]const u8, func: PublicFunction, data: ?*anyopaque, plugin: ?*vs.Plugin) i32 {
     return self.vsapi.registerFunction.?(name.ptr, args.ptr, return_type.ptr, func, data, plugin);
 }
 /// Returns a pointer to the plugin with the given identifier, or NULL if not found.
-pub fn getPluginByID(self: *const ZAPI, identifier: [:0]const u8) ?*Plugin {
+pub fn getPluginByID(self: *const ZAPI, identifier: [:0]const u8) ?*vs.Plugin {
     return self.vsapi.getPluginByID.?(identifier.ptr, self.core);
 }
 /// Returns a pointer to the plugin with the given identifier, or NULL if not found.
 /// Wrapper around getPluginByID() that takes a PluginID instead of a string.
-pub fn getPluginByID2(self: *const ZAPI, id: vsh.PluginID) ?*Plugin {
+pub fn getPluginByID2(self: *const ZAPI, id: vsh.PluginID) ?*vs.Plugin {
     return self.vsapi.getPluginByID.?(id.toString().ptr, self.core);
 }
 /// Returns a pointer to the plugin with the given namespace, or NULL if not found.
-pub fn getPluginByNamespace(self: *const ZAPI, ns: [:0]const u8) ?*Plugin {
+pub fn getPluginByNamespace(self: *const ZAPI, ns: [:0]const u8) ?*vs.Plugin {
     return self.vsapi.getPluginByNamespace.?(ns.ptr, self.core);
 }
 /// Used to enumerate over all currently loaded plugins. The order is fixed but provides no other guarantees.
-pub fn getNextPlugin(self: *const ZAPI, plugin: ?*Plugin) ?*Plugin {
+pub fn getNextPlugin(self: *const ZAPI, plugin: ?*vs.Plugin) ?*vs.Plugin {
     return self.vsapi.getNextPlugin.?(plugin, self.core);
 }
 /// Returns the name of the plugin that was passed to configPlugin.
-pub fn getPluginName(self: *const ZAPI, plugin: ?*Plugin) ?[*:0]const u8 {
+pub fn getPluginName(self: *const ZAPI, plugin: ?*vs.Plugin) ?[*:0]const u8 {
     return self.vsapi.getPluginName.?(plugin);
 }
 /// Returns the identifier of the plugin that was passed to configPlugin.
-pub fn getPluginID(self: *const ZAPI, plugin: ?*Plugin) ?[*:0]const u8 {
+pub fn getPluginID(self: *const ZAPI, plugin: ?*vs.Plugin) ?[*:0]const u8 {
     return self.vsapi.getPluginID.?(plugin);
 }
 /// Returns the namespace the plugin currently is loaded in.
-pub fn getPluginNamespace(self: *const ZAPI, plugin: ?*Plugin) ?[*:0]const u8 {
+pub fn getPluginNamespace(self: *const ZAPI, plugin: ?*vs.Plugin) ?[*:0]const u8 {
     return self.vsapi.getPluginNamespace.?(plugin);
 }
 /// Used to enumerate over all functions in a plugin. The order is fixed but provides no other guarantees.
-pub fn getNextPluginFunction(self: *const ZAPI, func: ?*PluginFunction, plugin: ?*Plugin) ?*PluginFunction {
+pub fn getNextPluginFunction(self: *const ZAPI, func: ?*PluginFunction, plugin: ?*vs.Plugin) ?*PluginFunction {
     return self.vsapi.getNextPluginFunction.?(func, plugin);
 }
 /// Get a function belonging to a plugin by its name.
-pub fn getPluginFunctionByName(self: *const ZAPI, name: [:0]const u8, plugin: ?*Plugin) ?*PluginFunction {
+pub fn getPluginFunctionByName(self: *const ZAPI, name: [:0]const u8, plugin: ?*vs.Plugin) ?*PluginFunction {
     return self.vsapi.getPluginFunctionByName.?(name.ptr, plugin);
 }
 /// Returns the name of the function that was passed to registerFunction.
@@ -486,16 +486,16 @@ pub fn getPluginFunctionReturnType(self: *const ZAPI, func: ?*PluginFunction) ?[
     return self.vsapi.getPluginFunctionReturnType.?(func);
 }
 /// Returns the absolute path to the plugin, including the plugin’s file name. This is the real location of the plugin, i.e. there are no symbolic links in the path.
-pub fn getPluginPath(self: *const ZAPI, plugin: ?*const Plugin) ?[*:0]const u8 {
+pub fn getPluginPath(self: *const ZAPI, plugin: ?*const vs.Plugin) ?[*:0]const u8 {
     return self.vsapi.getPluginPath.?(plugin);
 }
 /// Returns the version of the plugin. This is the same as the version number passed to configPlugin.
-pub fn getPluginVersion(self: *const ZAPI, plugin: ?*const Plugin) i32 {
+pub fn getPluginVersion(self: *const ZAPI, plugin: ?*const vs.Plugin) i32 {
     return self.vsapi.getPluginVersion.?(plugin);
 }
 /// Checks that the args passed to the filter are consistent with the argument list registered by the plugin that contains the filter, calls the filter’s
 /// “create” function, and checks that the filter returns the declared types. If everything goes smoothly, the filter will be ready to generate frames after invoke() returns.
-pub fn invoke(self: *const ZAPI, plugin: ?*Plugin, name: [:0]const u8, args: ?*const Map) ?*Map {
+pub fn invoke(self: *const ZAPI, plugin: ?*vs.Plugin, name: [:0]const u8, args: ?*const Map) ?*Map {
     return self.vsapi.invoke.?(plugin, name.ptr, args);
 }
 /// Creates the VapourSynth processing core and returns a pointer to it. It is possible to create multiple cores but in most cases it shouldn’t be needed.
@@ -534,3 +534,13 @@ pub fn addLogHandler(self: *const ZAPI, handler: LogHandler, free: LogHandlerFre
 pub fn removeLogHandler(self: *const ZAPI, handle: ?*LogHandle) i32 {
     return self.vsapi.removeLogHandler.?(handle, self.core);
 }
+
+pub const Plugin = struct {
+    pub fn config(id: [*:0]const u8, namespace: [:0]const u8, name: [:0]const u8, comptime version: std.SemanticVersion, plugin: *vs.Plugin, vspapi: *const PLUGINAPI) void {
+        _ = vspapi.configPlugin.?(id, namespace, name, vs.makeVersion(version.major, version.minor), vs.VAPOURSYNTH_API_VERSION, 0, plugin);
+    }
+
+    pub fn function(name: [:0]const u8, args: [:0]const u8, return_type: [:0]const u8, create: vs.PublicFunction2, plugin: *vs.Plugin, vspapi: *const PLUGINAPI) void {
+        _ = vspapi.registerFunction.?(name, args, return_type, create, null, plugin);
+    }
+};

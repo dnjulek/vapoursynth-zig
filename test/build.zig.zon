@@ -1,4 +1,5 @@
 .{
+    //NOTE: read https://github.com/ziglang/zig/blob/master/lib/init/build.zig.zon
     .name = .invert_example,
     .version = "1.0.0",
     .paths = .{""},
