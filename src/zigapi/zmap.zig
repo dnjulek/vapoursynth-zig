@@ -49,25 +49,25 @@ pub fn ZMap(comptime MT: type) type {
 
         pub fn getInt(self: *const Self, comptime T: type, comptime key: [:0]const u8) ?T {
             var err: vs.MapPropertyError = undefined;
-            const val: T = math.lossyCast(T, self.zapi.mapGetInt(self.map, key, 0, &err));
+            const val: T = lossyCastInt(T, self.zapi.mapGetInt(self.map, key, 0, &err));
             return if (err == .Success) val else null;
         }
 
         pub fn getInt2(self: *const Self, comptime T: type, comptime key: [:0]const u8, index: usize) ?T {
             var err: vs.MapPropertyError = undefined;
-            const val: T = math.lossyCast(T, self.zapi.mapGetInt(self.map, key, @intCast(index), &err));
+            const val: T = lossyCastInt(T, self.zapi.mapGetInt(self.map, key, @intCast(index), &err));
             return if (err == .Success) val else null;
         }
 
         pub fn getFloat(self: *const Self, comptime T: type, comptime key: [:0]const u8) ?T {
             var err: vs.MapPropertyError = undefined;
-            const val: T = math.lossyCast(T, self.zapi.mapGetFloat(self.map, key, 0, &err));
+            const val: T = @floatCast(self.zapi.mapGetFloat(self.map, key, 0, &err));
             return if (err == .Success) val else null;
         }
 
         pub fn getFloat2(self: *const Self, comptime T: type, comptime key: [:0]const u8, index: usize) ?T {
             var err: vs.MapPropertyError = undefined;
-            const val: T = math.lossyCast(T, self.zapi.mapGetFloat(self.map, key, @intCast(index), &err));
+            const val: T = @floatCast(self.zapi.mapGetFloat(self.map, key, @intCast(index), &err));
             return if (err == .Success) val else null;
         }
 
@@ -369,4 +369,14 @@ pub fn ZMap(comptime MT: type) type {
             return self.setInt("_SceneChangePrev", @intFromBool(n), .Replace);
         }
     };
+}
+
+fn lossyCastInt(comptime T: type, value: anytype) T {
+    if (value >= math.maxInt(T)) {
+        return math.maxInt(T);
+    } else if (value <= math.minInt(T)) {
+        return math.minInt(T);
+    } else {
+        return @intCast(value);
+    }
 }
