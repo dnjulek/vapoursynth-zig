@@ -536,7 +536,7 @@ pub fn removeLogHandler(self: *const ZAPI, handle: ?*LogHandle) i32 {
 }
 
 pub const Plugin = struct {
-    pub fn config(id: [*:0]const u8, namespace: [:0]const u8, name: [:0]const u8, comptime version: std.SemanticVersion, plugin: *vs.Plugin, vspapi: *const PLUGINAPI) void {
+    pub fn config(id: [:0]const u8, namespace: [:0]const u8, name: [:0]const u8, comptime version: std.SemanticVersion, plugin: *vs.Plugin, vspapi: *const PLUGINAPI) void {
         _ = vspapi.configPlugin.?(id, namespace, name, vs.makeVersion(version.major, version.minor), vs.VAPOURSYNTH_API_VERSION, 0, plugin);
     }
 
