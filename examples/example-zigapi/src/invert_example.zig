@@ -8,6 +8,7 @@ const vs = vapoursynth.vapoursynth4;
 const vsh = vapoursynth.vshelper;
 const vsc = vapoursynth.vsconstants;
 const ZAPI = vapoursynth.ZAPI;
+const zon = @import("zon");
 
 // https://ziglang.org/documentation/master/#Choosing-an-Allocator
 const allocator = std.heap.c_allocator;
@@ -112,6 +113,6 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, user_data: ?*anyopaque, core:
 }
 
 export fn VapourSynthPluginInit2(plugin: *vs.Plugin, vspapi: *const vs.PLUGINAPI) void {
-    _ = vspapi.configPlugin.?("com.example.zinvert", "zinvert", "VapourSynth Invert Example", vs.makeVersion(1, 0), vs.VAPOURSYNTH_API_VERSION, 0, plugin);
-    _ = vspapi.registerFunction.?("Filter", "clip:vnode;enabled:int:opt;", "clip:vnode;", invertCreate, null, plugin);
+    ZAPI.Plugin.config("com.example.zinvert", "zinvert", "VapourSynth Invert Example", zon.version, plugin, vspapi);
+    ZAPI.Plugin.function("Filter", "clip:vnode;enabled:int:opt;prop:data:opt;path:data[]:opt;", "clip:vnode;", invertCreate, plugin, vspapi);
 }
