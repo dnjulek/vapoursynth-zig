@@ -5,7 +5,7 @@
     .version = "1.0.0",
     .paths = .{""},
     .fingerprint = 0xcda4a3d9dd3345d8,
-    .minimum_zig_version = "0.15.1",
+    .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .vapoursynth = .{
             // zig fetch --save git+https://github.com/dnjulek/vapoursynth-zig.git

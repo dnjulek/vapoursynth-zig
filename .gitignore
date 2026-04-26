@@ -1,6 +1,7 @@
 
 .zig-cache/
 zig-out/
+zig-pkg/
 example/.zig-cache/
 example/zig-out/
 .vsjet/
