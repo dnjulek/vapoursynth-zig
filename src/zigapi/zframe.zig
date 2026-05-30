@@ -70,9 +70,9 @@ pub fn ZFrame(comptime FT: type) type {
         /// Same as newVideoFrame but with custom format, width and height.
         /// Use this if you want to create a frame with a different format or size than the source frame.
         pub fn newVideoFrame3(self: *const Self, options: FrameOptions) ZFrame(*Frame) {
-            const format = if (options.format != null) options.format.? else self.zapi.getVideoFrameFormat(self.frame);
-            const width = if (options.width != null) options.width.? else self.zapi.getFrameWidth(self.frame, 0);
-            const height = if (options.height != null) options.height.? else self.zapi.getFrameHeight(self.frame, 0);
+            const format = options.format orelse self.zapi.getVideoFrameFormat(self.frame);
+            const width = options.width orelse self.zapi.getFrameWidth(self.frame, 0);
+            const height = options.height orelse self.zapi.getFrameHeight(self.frame, 0);
 
             const frame = self.zapi.newVideoFrame(
                 format,
@@ -172,7 +172,7 @@ pub fn ZFrame(comptime FT: type) type {
 
         /// Same as getStride but returns the stride for type T.
         pub fn getStride2(self: *const Self, comptime T: type, plane: usize) u32 {
-            return @intCast(self.zapi.getStride(self.frame, @intCast(plane)) >> (@sizeOf(T) >> 1));
+            return @intCast(@divExact(self.zapi.getStride(self.frame, @intCast(plane)), @sizeOf(T)));
         }
 
         /// Same as getDimensions but returns the dimensions for type T.

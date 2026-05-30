@@ -1,5 +1,4 @@
 //! https://github.com/vapoursynth/vapoursynth/blob/master/include/VSScript4.h
-const builtin = @import("builtin");
 const build_options = @import("build_options");
 
 const vs = @import("vapoursynth4.zig");

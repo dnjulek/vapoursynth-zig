@@ -1,6 +1,5 @@
 //! https://github.com/vapoursynth/vapoursynth/blob/master/include/VapourSynth4.h
 
-const builtin = @import("builtin");
 const build_options = @import("build_options");
 
 /// Used to create version numbers.
@@ -100,6 +99,10 @@ pub const PresetVideoFormat = enum(u32) {
     YUV422P16 = makeVideoID(.YUV, .Integer, 16, 1, 0),
     YUV444P16 = makeVideoID(.YUV, .Integer, 16, 0, 0),
 
+    YUV420PH = makeVideoID(.YUV, .Float, 16, 1, 1),
+    YUV420PS = makeVideoID(.YUV, .Float, 32, 1, 1),
+    YUV422PH = makeVideoID(.YUV, .Float, 16, 1, 0),
+    YUV422PS = makeVideoID(.YUV, .Float, 32, 1, 0),
     YUV444PH = makeVideoID(.YUV, .Float, 16, 0, 0),
     YUV444PS = makeVideoID(.YUV, .Float, 32, 0, 0),
 
@@ -290,6 +293,7 @@ pub const CoreCreationFlags = enum(c_int) {
     /// Don’t unload plugin libraries when the core is destroyed. Due to a small amount of memory leaking every load and unload
     /// (windows feature, not my fault) of a library this may help in applications with extreme amount of script reloading.
     DisableLibraryUnloading = 4,
+    EnableFrameRefDebug = 8,
 };
 
 /// Options when loading a plugin.
@@ -427,7 +431,7 @@ pub const API = extern struct {
     /// Returns a read/write pointer to a frame’s properties. The pointer is valid as long as the frame lives.
     getFramePropertiesRW: ?*const fn (?*Frame) callconv(.c) ?*Map,
     /// Returns the distance in bytes between two consecutive lines of a plane of a video frame. The stride is always positive. Returns 0 if the requested plane doesn’t exist or if it isn’t a video frame.
-    getStride: ?*const fn (?*const Frame, plane: c_int) callconv(.c) c_longlong,
+    getStride: ?*const fn (?*const Frame, plane: c_int) callconv(.c) isize,
     /// Returns a read-only pointer to a plane or channel of a frame. Returns NULL if an invalid plane or channel number is passed.
     /// Don’t assume all three planes of a frame are allocated in one contiguous chunk (they’re not).
     getReadPtr: ?*const fn (?*const Frame, plane: c_int) callconv(.c) [*]const u8,
@@ -612,6 +616,19 @@ pub const API = extern struct {
     addLogHandler: ?*const fn (LogHandler, LogHandlerFree, userData: ?*anyopaque, ?*Core) callconv(.c) ?*LogHandle,
     /// Removes a custom handler. Return non-zero on success and zero if the handle is invalid.
     removeLogHandler: ?*const fn (?*LogHandle, ?*Core) callconv(.c) c_int,
+
+    // Added in API 4.1, mostly graph and node inspection, PLEASE DON'T USE INSIDE FILTERS
+
+    clearNodeCache: ?*const fn (?*Node) callconv(.c) void,
+    clearCoreCaches: ?*const fn (?*Core) callconv(.c) void,
+    getNodeName: ?*const fn (?*Node) callconv(.c) ?[*:0]const u8,
+    getNodeFilterMode: ?*const fn (?*Node) callconv(.c) FilterMode,
+    getNumNodeDependencies: ?*const fn (?*Node) callconv(.c) c_int,
+    getNodeDependency: ?*const fn (?*Node, index: c_int) callconv(.c) ?*const FilterDependency,
+    getCoreNodeTiming: ?*const fn (?*Core) callconv(.c) c_int,
+    setCoreNodeTiming: ?*const fn (?*Core, enable: c_int) callconv(.c) void,
+    getNodeProcessingTime: ?*const fn (?*Node, reset: c_int) callconv(.c) i64,
+    getFreedNodeProcessingTime: ?*const fn (?*Core, reset: c_int) callconv(.c) i64,
 };
 
 pub extern fn getVapourSynthAPI(version: c_int) *const API;

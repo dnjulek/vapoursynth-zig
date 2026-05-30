@@ -174,41 +174,32 @@ pub fn ZMap(comptime MT: type) type {
 
         pub fn getChromaLocation(self: *const Self) ?vsc.ChromaLocation {
             const value: i32 = self.getInt(i32, "_ChromaLocation") orelse return null;
-            return if (value < 0 or value > 5) null else @enumFromInt(value);
+            return std.enums.fromInt(vsc.ChromaLocation, value);
         }
 
         pub fn getColorRange(self: *const Self) ?vsc.ColorRange {
             const value: i32 = self.getInt(i32, "_ColorRange") orelse return null;
-            return if (value < 0 or value > 1) null else @enumFromInt(value);
+            return std.enums.fromInt(vsc.ColorRange, value);
         }
 
         pub fn getFieldBased(self: *const Self) ?vsc.FieldBased {
             const value: i32 = self.getInt(i32, "_FieldBased") orelse return null;
-            return if (value < 0 or value > 2) null else @enumFromInt(value);
+            return std.enums.fromInt(vsc.FieldBased, value);
         }
 
         pub fn getMatrix(self: *const Self) vsc.MatrixCoefficient {
             const value: i32 = self.getInt(i32, "_Matrix") orelse return .UNSPECIFIED;
-            for (std.enums.values(vsc.MatrixCoefficient)) |v| {
-                if (@as(i32, @intFromEnum(v)) == value) return v;
-            }
-            return .UNSPECIFIED;
+            return std.enums.fromInt(vsc.MatrixCoefficient, value) orelse .UNSPECIFIED;
         }
 
         pub fn getPrimaries(self: *const Self) vsc.ColorPrimaries {
             const value: i32 = self.getInt(i32, "_Primaries") orelse return .UNSPECIFIED;
-            for (std.enums.values(vsc.ColorPrimaries)) |v| {
-                if (@as(i32, @intFromEnum(v)) == value) return v;
-            }
-            return .UNSPECIFIED;
+            return std.enums.fromInt(vsc.ColorPrimaries, value) orelse .UNSPECIFIED;
         }
 
         pub fn getTransfer(self: *const Self) vsc.TransferCharacteristics {
             const value: i32 = self.getInt(i32, "_Transfer") orelse return .UNSPECIFIED;
-            for (std.enums.values(vsc.TransferCharacteristics)) |v| {
-                if (@as(i32, @intFromEnum(v)) == value) return v;
-            }
-            return .UNSPECIFIED;
+            return std.enums.fromInt(vsc.TransferCharacteristics, value) orelse .UNSPECIFIED;
         }
 
         pub fn getDurationNum(self: *const Self) ?i64 {
@@ -228,7 +219,7 @@ pub fn ZMap(comptime MT: type) type {
         }
 
         pub fn getPictType(self: *const Self) ?[:0]const u8 {
-            return self.getData("_PictType", 0);
+            return self.getDataZ("_PictType", 0);
         }
 
         pub fn getSARNum(self: *const Self) ?i64 {
@@ -284,7 +275,7 @@ pub fn ZMap(comptime MT: type) type {
                     @panic("ZMap.setError2: print_buf is too small for the formatted message.");
                 }
 
-                const msg = std.fmt.bufPrintZ(buf, fmt, args) catch fmt;
+                const msg = std.fmt.bufPrintSentinel(buf, fmt, args, 0) catch fmt;
                 self.zapi.mapSetError(self.map, msg);
             } else {
                 @panic("ZMap.setError2: print_buf is null, use zapi.initZMap2 to initialize ZMap with a buffer.");

@@ -75,9 +75,11 @@ pub inline fn bitblt(dstp: anytype, dst_stride: usize, srcp: anytype, src_stride
 }
 
 /// check if the frame dimensions are valid for a given format
-/// returns non-zero for valid width and height
-pub fn areValidDimensions(fi: *const vs.VideoFormat, width: c_int, height: c_int) c_int {
-    return !((width % (1 << fi.subSamplingW)) || (height % (1 << fi.subSamplingH)));
+/// returns true for valid width and height
+pub fn areValidDimensions(fi: *const vs.VideoFormat, width: c_int, height: c_int) bool {
+    const sw = @as(c_int, 1) << @intCast(fi.subSamplingW);
+    const sh = @as(c_int, 1) << @intCast(fi.subSamplingH);
+    return @mod(width, sw) == 0 and @mod(height, sh) == 0;
 }
 
 /// multiplies and divides a rational number, such as a frame duration, in place and reduces the result

@@ -56,6 +56,7 @@ pub const TransferCharacteristics = enum(c_int) {
     /// Equivalent to 1
     BT2020_12 = 15,
     ST2084 = 16,
+    ST428 = 17,
     ARIB_B67 = 18,
 };
 

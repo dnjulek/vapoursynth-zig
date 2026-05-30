@@ -36,11 +36,53 @@ fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_dat
 
         const src_prop = src.getPropertiesRO();
         const dst_prop = dst.getPropertiesRW();
+
         const prop_example: vsc.MatrixCoefficient = src_prop.getMatrix();
         dst_prop.setInt("prop_example", @intFromEnum(prop_example), .Replace);
+
+        std.debug.assert(src_prop.getCombed() == null);
+        std.debug.assert(src_prop.getPictType() == null);
+
+        dst_prop.setMatrix(.BT709);
+        dst_prop.setPrimaries(.BT709);
         dst_prop.setChromaLocation(.TOP_LEFT);
+        dst_prop.setColorRange(.LIMITED);
+        dst_prop.setFieldBased(.PROGRESSIVE);
         dst_prop.setCombed(false);
+        dst_prop.setField(1);
+        dst_prop.setSARNum(1);
+        dst_prop.setSARDen(1);
+        dst_prop.setDurationNum(1);
+        dst_prop.setDurationDen(1);
+        dst_prop.setSceneChangeNext(true);
+        dst_prop.setSceneChangePrev(false);
+        dst_prop.setPictType("I");
         dst_prop.setTransfer(.LOG_316);
+
+        std.debug.assert(dst_prop.getMatrix() == .BT709);
+        std.debug.assert(dst_prop.getPrimaries() == .BT709);
+        std.debug.assert(dst_prop.getTransfer() == .LOG_316);
+        std.debug.assert(dst_prop.getChromaLocation().? == .TOP_LEFT);
+        std.debug.assert(dst_prop.getColorRange().? == .LIMITED);
+        std.debug.assert(dst_prop.getFieldBased().? == .PROGRESSIVE);
+        std.debug.assert(dst_prop.getCombed().? == false);
+        std.debug.assert(dst_prop.getField().? == 1);
+        std.debug.assert(dst_prop.getSARNum().? == 1);
+        std.debug.assert(dst_prop.getSARDen().? == 1);
+        std.debug.assert(dst_prop.getDurationNum().? == 1);
+        std.debug.assert(dst_prop.getDurationDen().? == 1);
+        std.debug.assert(dst_prop.getSceneChangeNext().? == true);
+        std.debug.assert(dst_prop.getSceneChangePrev().? == false);
+        std.debug.assert(std.mem.eql(u8, dst_prop.getPictType().?, "I"));
+
+        src.newVideoFrame2(.{ true, true, true }).deinit();
+        src.newVideoFrame3(.{}).deinit();
+
+        std.debug.assert(src.getStride2(u8, 0) == src.getStride(0));
+        const dim2 = src.getDimensions2(u8, 0);
+        std.debug.assert(src.getReadSlice2(u8, 0).len == dim2[1] * dim2[2]);
+        const dim3 = src.getDimensions3(0);
+        std.debug.assert(dim3.width == src.getWidth(0) and dim3.height == src.getHeight(0) and dim3.stride == src.getStride(0));
 
         var plane: u32 = 0;
         while (plane < d.vi.format.numPlanes) : (plane += 1) {
@@ -100,6 +142,12 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, _: ?*anyopaque, core: ?*vs.Co
         return;
     }
 
+    if (!vsh.areValidDimensions(&d.vi.format, d.vi.width, d.vi.height)) {
+        map_out.setError("Invert: dimensions not valid for the subsampling");
+        zapi.freeNode(d.node);
+        return;
+    }
+
     // https://ziglang.org/documentation/master/#Optionals
     const enabled = map_in.getValue(i32, "enabled") orelse 1;
 
@@ -119,6 +167,22 @@ fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, _: ?*anyopaque, core: ?*vs.Co
 
     const prop = map_in.getData("prop", 0) orelse "empty";
     std.debug.print("prop in: {s}\n", .{prop});
+
+    {
+        const scratch = zapi.createZMap();
+        defer scratch.free();
+        scratch.setIntArray("ints", &.{ 1, 2, 3 });
+        scratch.setFloatArray("floats", &.{ 1.5, 2.5 });
+        std.debug.assert(scratch.numKeys() == 2);
+        std.debug.assert(scratch.getType("ints") == .Int);
+        const ints = scratch.getIntArray("ints").?;
+        std.debug.assert(ints.len == 3 and ints[2] == 3);
+        const floats = scratch.getFloatArray("floats").?;
+        std.debug.assert(floats.len == 2 and floats[1] == 2.5);
+        std.debug.assert(scratch.getValue(i64, "ints").? == 1);
+        std.debug.assert(scratch.getValue(f64, "floats").? == 1.5);
+        std.debug.assert(scratch.getBool("ints").? == true);
+    }
 
     const data: *InvertData = allocator.create(InvertData) catch unreachable;
     data.* = d;
