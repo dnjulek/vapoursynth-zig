@@ -97,7 +97,7 @@ pub fn ZFrame(comptime FT: type) type {
         }
 
         /// Increments the reference count of a frame. Returns said frame for convenience.
-        pub fn addFrameRef(self: *const Self) ZFrame(*Frame) {
+        pub fn addFrameRef(self: *const Self) ZFrame(*const Frame) {
             return .{
                 .zapi = self.zapi,
                 .frame = self.zapi.addFrameRef(self.frame).?,
