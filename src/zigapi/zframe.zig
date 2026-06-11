@@ -96,6 +96,14 @@ pub fn ZFrame(comptime FT: type) type {
             };
         }
 
+        /// Increments the reference count of a frame. Returns said frame for convenience.
+        pub fn addFrameRef(self: *const Self) ZFrame(*Frame) {
+            return .{
+                .zapi = self.zapi,
+                .frame = self.zapi.addFrameRef(self.frame).?,
+            };
+        }
+
         /// Returns a read/write Map to a frame’s properties. The Map is valid as long as the frame lives.
         pub fn getPropertiesRW(self: *const Self) ZAPI.ZMap(*vs.Map) {
             const map = self.zapi.getFramePropertiesRW(self.frame).?;
