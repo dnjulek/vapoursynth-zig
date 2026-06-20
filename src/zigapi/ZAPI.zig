@@ -314,16 +314,16 @@ pub fn mapSetError(self: *const ZAPI, out: ?*Map, error_message: [:0]const u8) v
     self.vsapi.mapSetError.?(out, error_message.ptr);
 }
 /// Returns a pointer to the error message contained in the map, or NULL if there is no error set. The pointer is valid until the next modifying operation on the map.
-pub fn mapGetError(self: *const ZAPI, in: ?*const Map) ?[*:0]const u8 {
-    return self.vsapi.mapGetError.?(in);
+pub fn mapGetError(self: *const ZAPI, in: ?*const Map) ?[:0]const u8 {
+    return std.mem.span(self.vsapi.mapGetError.?(in));
 }
 /// Returns the number of keys contained in a property map.
 pub fn mapNumKeys(self: *const ZAPI, in: ?*const Map) i32 {
     return self.vsapi.mapNumKeys.?(in);
 }
 /// Returns the nth key from a property map. Passing an invalid index will cause a fatal error. The pointer is valid as long as the key exists in the map.
-pub fn mapGetKey(self: *const ZAPI, in: ?*const Map, index: i32) ?[*:0]const u8 {
-    return self.vsapi.mapGetKey.?(in, index);
+pub fn mapGetKey(self: *const ZAPI, in: ?*const Map, index: i32) ?[:0]const u8 {
+    return std.mem.span(self.vsapi.mapGetKey.?(in, index));
 }
 /// Removes the property with the given key. All values associated with the key are lost. Returns 0 if the key isn’t in the map. Otherwise it returns 1.
 pub fn mapDeleteKey(self: *const ZAPI, map: ?*Map, key: [:0]const u8) i32 {
@@ -462,16 +462,16 @@ pub fn getNextPlugin(self: *const ZAPI, plugin: ?*vs.Plugin) ?*vs.Plugin {
     return self.vsapi.getNextPlugin.?(plugin, self.core);
 }
 /// Returns the name of the plugin that was passed to configPlugin.
-pub fn getPluginName(self: *const ZAPI, plugin: ?*vs.Plugin) ?[*:0]const u8 {
-    return self.vsapi.getPluginName.?(plugin);
+pub fn getPluginName(self: *const ZAPI, plugin: ?*vs.Plugin) ?[:0]const u8 {
+    return std.mem.span(self.vsapi.getPluginName.?(plugin));
 }
 /// Returns the identifier of the plugin that was passed to configPlugin.
-pub fn getPluginID(self: *const ZAPI, plugin: ?*vs.Plugin) ?[*:0]const u8 {
-    return self.vsapi.getPluginID.?(plugin);
+pub fn getPluginID(self: *const ZAPI, plugin: ?*vs.Plugin) ?[:0]const u8 {
+    return std.mem.span(self.vsapi.getPluginID.?(plugin));
 }
 /// Returns the namespace the plugin currently is loaded in.
-pub fn getPluginNamespace(self: *const ZAPI, plugin: ?*vs.Plugin) ?[*:0]const u8 {
-    return self.vsapi.getPluginNamespace.?(plugin);
+pub fn getPluginNamespace(self: *const ZAPI, plugin: ?*vs.Plugin) ?[:0]const u8 {
+    return std.mem.span(self.vsapi.getPluginNamespace.?(plugin));
 }
 /// Used to enumerate over all functions in a plugin. The order is fixed but provides no other guarantees.
 pub fn getNextPluginFunction(self: *const ZAPI, func: ?*PluginFunction, plugin: ?*vs.Plugin) ?*PluginFunction {
@@ -482,20 +482,20 @@ pub fn getPluginFunctionByName(self: *const ZAPI, name: [:0]const u8, plugin: ?*
     return self.vsapi.getPluginFunctionByName.?(name.ptr, plugin);
 }
 /// Returns the name of the function that was passed to registerFunction.
-pub fn getPluginFunctionName(self: *const ZAPI, func: ?*PluginFunction) ?[*:0]const u8 {
-    return self.vsapi.getPluginFunctionName.?(func);
+pub fn getPluginFunctionName(self: *const ZAPI, func: ?*PluginFunction) ?[:0]const u8 {
+    return std.mem.span(self.vsapi.getPluginFunctionName.?(func));
 }
 /// Returns the argument string of the function that was passed to registerFunction.
-pub fn getPluginFunctionArguments(self: *const ZAPI, func: ?*PluginFunction) ?[*:0]const u8 {
-    return self.vsapi.getPluginFunctionArguments.?(func);
+pub fn getPluginFunctionArguments(self: *const ZAPI, func: ?*PluginFunction) ?[:0]const u8 {
+    return std.mem.span(self.vsapi.getPluginFunctionArguments.?(func));
 }
 /// Returns the return type string of the function that was passed to registerFunction.
-pub fn getPluginFunctionReturnType(self: *const ZAPI, func: ?*PluginFunction) ?[*:0]const u8 {
-    return self.vsapi.getPluginFunctionReturnType.?(func);
+pub fn getPluginFunctionReturnType(self: *const ZAPI, func: ?*PluginFunction) ?[:0]const u8 {
+    return std.mem.span(self.vsapi.getPluginFunctionReturnType.?(func));
 }
 /// Returns the absolute path to the plugin, including the plugin’s file name. This is the real location of the plugin, i.e. there are no symbolic links in the path.
-pub fn getPluginPath(self: *const ZAPI, plugin: ?*const vs.Plugin) ?[*:0]const u8 {
-    return self.vsapi.getPluginPath.?(plugin);
+pub fn getPluginPath(self: *const ZAPI, plugin: ?*const vs.Plugin) ?[:0]const u8 {
+    return std.mem.span(self.vsapi.getPluginPath.?(plugin));
 }
 /// Returns the version of the plugin. This is the same as the version number passed to configPlugin.
 pub fn getPluginVersion(self: *const ZAPI, plugin: ?*const vs.Plugin) i32 {

@@ -146,7 +146,7 @@ pub fn ZMap(comptime MT: type) type {
             return self.zapi.mapNumKeys(self.map);
         }
 
-        pub fn getError(self: *const Self) ?[*:0]const u8 {
+        pub fn getError(self: *const Self) ?[:0]const u8 {
             return self.zapi.mapGetError(self.map);
         }
 
