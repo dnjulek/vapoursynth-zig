@@ -158,7 +158,7 @@ pub fn ZMap(comptime MT: type) type {
             return self.zapi.mapGetDataTypeHint(self.map, key, index, err);
         }
 
-        pub fn getFrame(self: *const Self, key: [:0]const u8, index: i32, err: ?*vs.MapPropertyError) ?*vs.Frame {
+        pub fn getFrame(self: *const Self, key: [:0]const u8, index: i32, err: ?*vs.MapPropertyError) ?*const vs.Frame {
             return self.zapi.mapGetFrame(self.map, key, index, err);
         }
 

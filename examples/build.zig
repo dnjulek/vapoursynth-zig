@@ -1,7 +1,7 @@
 const std = @import("std");
 const zon = @import("build.zig.zon");
 
-//NOTE: read https://github.com/ziglang/zig/blob/master/lib/init/build.zig
+//NOTE: read https://codeberg.org/ziglang/zig/src/branch/master/lib/init/build.zig
 
 pub fn build(b: *std.Build) !void {
     ensureZigVersion(try .parse(zon.minimum_zig_version)) catch return;

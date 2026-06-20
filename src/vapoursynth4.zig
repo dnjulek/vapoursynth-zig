@@ -115,6 +115,10 @@ pub const PresetVideoFormat = enum(u32) {
 
     RGBH = makeVideoID(.RGB, .Float, 16, 0, 0),
     RGBS = makeVideoID(.RGB, .Float, 32, 0, 0),
+
+    /// `queryVideoFormatID`/`getVideoFormatByID` accept and return arbitrary valid format
+    /// ids (e.g. 11-bit Gray), not just the presets above, so this enum is non-exhaustive.
+    _,
 };
 
 /// Controls how a filter will be multithreaded, if at all.
@@ -284,16 +288,19 @@ pub const MessageType = enum(c_int) {
     Fatal = 4,
 };
 
-/// Options when creating a core.
-pub const CoreCreationFlags = enum(c_int) {
+/// Options when creating a core. These are bit flags in the C API (`int`), so they are
+/// modeled as a `packed struct(c_int)`: the default `.{}` is `0` (no flags) and several
+/// flags can be combined by setting more than one field.
+pub const CoreCreationFlags = packed struct(c_int) {
     /// Required to use the graph inspection api functions. Increases memory usage due to the extra information stored.
-    EnableGraphInspection = 1,
+    enable_graph_inspection: bool = false,
     /// Don’t autoload any user plugins. Core plugins are always loaded.
-    DisableAutoLoading = 2,
+    disable_auto_loading: bool = false,
     /// Don’t unload plugin libraries when the core is destroyed. Due to a small amount of memory leaking every load and unload
     /// (windows feature, not my fault) of a library this may help in applications with extreme amount of script reloading.
-    DisableLibraryUnloading = 4,
-    EnableFrameRefDebug = 8,
+    disable_library_unloading: bool = false,
+    enable_frame_ref_debug: bool = false,
+    _padding: u28 = 0,
 };
 
 /// Options when loading a plugin.
@@ -343,7 +350,7 @@ pub const CacheMode = enum(c_int) {
 
 /// Returns a pointer to the global VSAPI instance.
 /// Returns NULL if the requested API version is not supported or if the system does not meet the minimum requirements to run VapourSynth. It is recommended to pass VAPOURSYNTH_API_VERSION.
-pub const GetVapourSynthAPI = ?*const fn (c_int) callconv(.c) *const API;
+pub const GetVapourSynthAPI = ?*const fn (c_int) callconv(.c) ?*const API;
 /// User-defined function called by the core to create an instance of the filter. This function is often named fooCreate.
 /// In this function, the filter’s input parameters should be retrieved and validated, the filter’s private instance data should be initialised,
 /// and createAudioFilter() or createVideoFilter() should be called. This is where the filter should perform any other initialisation it requires.
@@ -360,7 +367,7 @@ pub const FilterGetFrame = ?*const fn (n: c_int, ActivationReason, instanceData:
 pub const FilterFree = ?*const fn (?*anyopaque, ?*Core, *const API) callconv(.c) void;
 
 /// Requests the generation of a frame. When the frame is ready, a user-provided function is called. Note that the completion callback will only be called from a single thread at a time.
-pub const FrameDoneCallback = ?*const fn (user_data: ?*anyopaque, f: ?*const Frame, n: c_int, node: ?*Node, error_msg: [*:0]const u8) callconv(.c) void;
+pub const FrameDoneCallback = ?*const fn (user_data: ?*anyopaque, f: ?*const Frame, n: c_int, node: ?*Node, error_msg: ?[*:0]const u8) callconv(.c) void;
 /// Custom message handler.
 pub const LogHandler = ?*const fn (MessageType, [*:0]const u8, userData: ?*anyopaque) callconv(.c) void;
 /// Called when a handler is removed.
@@ -434,10 +441,10 @@ pub const API = extern struct {
     getStride: ?*const fn (?*const Frame, plane: c_int) callconv(.c) isize,
     /// Returns a read-only pointer to a plane or channel of a frame. Returns NULL if an invalid plane or channel number is passed.
     /// Don’t assume all three planes of a frame are allocated in one contiguous chunk (they’re not).
-    getReadPtr: ?*const fn (?*const Frame, plane: c_int) callconv(.c) [*]const u8,
+    getReadPtr: ?*const fn (?*const Frame, plane: c_int) callconv(.c) ?[*]const u8,
     /// Returns a read-write pointer to a plane or channel of a frame. Returns NULL if an invalid plane or channel number is passed.
     /// Don’t assume all three planes of a frame are allocated in one contiguous chunk (they’re not).
-    getWritePtr: ?*const fn (?*Frame, plane: c_int) callconv(.c) [*]u8,
+    getWritePtr: ?*const fn (?*Frame, plane: c_int) callconv(.c) ?[*]u8,
     /// Retrieves the format of a video frame.
     getVideoFrameFormat: ?*const fn (?*const Frame) callconv(.c) *const VideoFormat,
     /// Retrieves the format of an audio frame.
@@ -466,7 +473,7 @@ pub const API = extern struct {
     getVideoFormatByID: ?*const fn (*VideoFormat, id: PresetVideoFormat, ?*Core) callconv(.c) c_int,
     /// Fetches a frame synchronously. The frame is available when the function returns.
     /// This function is meant for external applications using the core as a library, or if frame requests are necessary during a filter’s initialization.
-    getFrame: ?*const fn (n: c_int, ?*Node, errorMsg: ?[*:0]const u8, bufSize: c_int) callconv(.c) ?*const Frame,
+    getFrame: ?*const fn (n: c_int, ?*Node, errorMsg: ?[*]u8, bufSize: c_int) callconv(.c) ?*const Frame,
     /// Requests the generation of a frame. When the frame is ready, a user-provided function is called. Note that the completion callback will only be called from a single thread at a time.
     /// This function is meant for applications using VapourSynth as a library.
     getFrameAsync: ?*const fn (n: c_int, ?*Node, FrameDoneCallback, userData: ?*anyopaque) callconv(.c) void,
@@ -631,4 +638,4 @@ pub const API = extern struct {
     getFreedNodeProcessingTime: ?*const fn (?*Core, reset: c_int) callconv(.c) i64,
 };
 
-pub extern fn getVapourSynthAPI(version: c_int) *const API;
+pub extern fn getVapourSynthAPI(version: c_int) ?*const API;

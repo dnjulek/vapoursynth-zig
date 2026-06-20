@@ -180,12 +180,12 @@ pub fn getStride(self: *const ZAPI, frame: ?*const Frame, plane: i32) isize {
 /// Returns a read-only pointer to a plane or channel of a frame. Returns NULL if an invalid plane or channel number is passed.
 /// Don’t assume all three planes of a frame are allocated in one contiguous chunk (they’re not).
 pub fn getReadPtr(self: *const ZAPI, frame: ?*const Frame, plane: i32) [*]const u8 {
-    return self.vsapi.getReadPtr.?(frame, plane);
+    return self.vsapi.getReadPtr.?(frame, plane).?;
 }
 /// Returns a read-write pointer to a plane or channel of a frame. Returns NULL if an invalid plane or channel number is passed.
 /// Don’t assume all three planes of a frame are allocated in one contiguous chunk (they’re not).
 pub fn getWritePtr(self: *const ZAPI, frame: ?*Frame, plane: i32) [*]u8 {
-    return self.vsapi.getWritePtr.?(frame, plane);
+    return self.vsapi.getWritePtr.?(frame, plane).?;
 }
 /// Retrieves the format of a video frame.
 pub fn getVideoFrameFormat(self: *const ZAPI, frame: ?*const Frame) *const VideoFormat {
@@ -242,8 +242,11 @@ pub fn getVideoFormatID(self: *const ZAPI, vi: *const VideoInfo) PresetVideoForm
 }
 /// Fetches a frame synchronously. The frame is available when the function returns.
 /// This function is meant for external applications using the core as a library, or if frame requests are necessary during a filter’s initialization.
-pub fn getFrame(self: *const ZAPI, n: i32, node: ?*Node, error_msg: ?[*:0]const u8, buf_size: i32) ?*const Frame {
-    return self.vsapi.getFrame.?(n, node, error_msg, buf_size);
+/// `err_buf`, if provided, is a writable buffer the core fills with an error message on failure.
+pub fn getFrame(self: *const ZAPI, n: i32, node: ?*Node, err_buf: ?[]u8) ?*const Frame {
+    const ptr: ?[*]u8 = if (err_buf) |b| b.ptr else null;
+    const size: i32 = if (err_buf) |b| @intCast(b.len) else 0;
+    return self.vsapi.getFrame.?(n, node, ptr, size);
 }
 /// Requests the generation of a frame. When the frame is ready, a user-provided function is called. Note that the completion callback will only be called from a single thread at a time.
 /// This function is meant for applications using VapourSynth as a library.
@@ -412,7 +415,7 @@ pub fn mapConsumeNode(self: *const ZAPI, map: ?*Map, key: [:0]const u8, node: ?*
 }
 /// Retrieves a frame from a map. Returns a pointer to the frame on success, or NULL in case of error.
 /// This function increases the frame’s reference count, so freeFrame() must be used when the frame is no longer needed.
-pub fn mapGetFrame(self: *const ZAPI, map: ?*const Map, key: [:0]const u8, index: i32, err: ?*MapPropertyError) ?*Frame {
+pub fn mapGetFrame(self: *const ZAPI, map: ?*const Map, key: [:0]const u8, index: i32, err: ?*MapPropertyError) ?*const Frame {
     return self.vsapi.mapGetFrame.?(map, key.ptr, index, err);
 }
 /// Sets a frame to the specified key in a map.
