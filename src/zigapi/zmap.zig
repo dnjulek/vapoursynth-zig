@@ -381,6 +381,10 @@ pub fn ZMap(comptime MT: type) type {
         pub fn setSceneChangePrev(self: *const Self, n: bool) void {
             return self.setInt("_SceneChangePrev", @intFromBool(n), .Replace);
         }
+
+        pub fn setVideoFormat(self: *const Self, key: [:0]const u8, n: vs.PresetVideoFormat, mode: vs.MapAppendMode) void {
+            _ = self.zapi.mapSetInt(self.map, key, @intFromEnum(n), mode);
+        }
     };
 }
 

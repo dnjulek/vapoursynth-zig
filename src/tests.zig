@@ -186,6 +186,7 @@ fn touchZMapWrites(z: anytype) void {
     z.setSARDen(1);
     z.setSceneChangeNext(true);
     z.setSceneChangePrev(false);
+    z.setVideoFormat("k", .GrayS, .Replace);
 }
 
 fn touchZFrameReads(z: anytype) void {
