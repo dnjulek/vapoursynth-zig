@@ -8,9 +8,7 @@
     .minimum_zig_version = "0.17.0",
     .dependencies = .{
         .vapoursynth = .{
-            // zig fetch --save git+https://github.com/dnjulek/vapoursynth-zig.git
-            .url = "git+https://github.com/dnjulek/vapoursynth-zig.git#a8a78bcbc136d2c7c7b5736e11c12f41c1250ba1",
-            .hash = "vapoursynth-4.0.0-jLYMQ9DlAgB0dMWXD6HQ3eksaWv-2UXF5riUCIsI9-hZ",
+            .path = "../",
         },
     },
 }
