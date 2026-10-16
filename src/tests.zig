@@ -133,6 +133,7 @@ fn touchZMapReads(z: anytype) void {
     // reserved frame-property getters (non-generic, but only covered here for
     // the const-map instantiation)
     _ = z.getChromaLocation();
+    _ = z.getRange();
     _ = z.getColorRange();
     _ = z.getFieldBased();
     _ = z.getMatrix();
@@ -172,6 +173,7 @@ fn touchZMapWrites(z: anytype) void {
     z.setAlpha(frame);
     z.consumeAlpha(frame);
     z.setChromaLocation(.LEFT);
+    z.setRange(.LIMITED);
     z.setColorRange(.LIMITED);
     z.setFieldBased(.PROGRESSIVE);
     z.setMatrix(.BT709);
@@ -332,7 +334,9 @@ test "abi: extern struct layout matches the C ABI (64-bit)" {
 
 test "abi: vsconstants reserved-property values (<= API 4.1 range semantics)" {
     // NOTE: VSConstants4.h flips ColorRange under API 4.2 (FULL=1, LIMITED=0).
-    // The default build targets API 4.1, where FULL=0 / LIMITED=1.
+    // Here the two semantics are separate types: Range (_Range) and ColorRange (_ColorRange).
+    try testing.expectEqual(@as(c_int, 1), @backingInt(vsc.Range.FULL));
+    try testing.expectEqual(@as(c_int, 0), @backingInt(vsc.Range.LIMITED));
     try testing.expectEqual(@as(c_int, 0), @backingInt(vsc.ColorRange.FULL));
     try testing.expectEqual(@as(c_int, 1), @backingInt(vsc.ColorRange.LIMITED));
     try testing.expectEqual(@as(c_int, 2), @backingInt(vsc.ChromaLocation.TOP_LEFT));

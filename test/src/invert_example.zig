@@ -46,7 +46,7 @@ fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_dat
         dst_prop.setMatrix(.BT709);
         dst_prop.setPrimaries(.BT709);
         dst_prop.setChromaLocation(.TOP_LEFT);
-        dst_prop.setColorRange(.LIMITED);
+        dst_prop.setRange(.LIMITED);
         dst_prop.setFieldBased(.PROGRESSIVE);
         dst_prop.setCombed(false);
         dst_prop.setField(1);
@@ -63,6 +63,8 @@ fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_dat
         std.debug.assert(dst_prop.getPrimaries() == .BT709);
         std.debug.assert(dst_prop.getTransfer() == .LOG_316);
         std.debug.assert(dst_prop.getChromaLocation().? == .TOP_LEFT);
+        std.debug.assert(dst_prop.getRange().? == .LIMITED);
+        // R4.2+ cores link _ColorRange to _Range (with inverted values)
         std.debug.assert(dst_prop.getColorRange().? == .LIMITED);
         std.debug.assert(dst_prop.getFieldBased().? == .PROGRESSIVE);
         std.debug.assert(dst_prop.getCombed().? == false);

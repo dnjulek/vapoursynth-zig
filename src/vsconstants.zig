@@ -1,6 +1,11 @@
 //! https://github.com/vapoursynth/vapoursynth/blob/master/include/VSConstants4.h
 //!
 
+pub const Range = enum(c_int) {
+    FULL = 1,
+    LIMITED = 0,
+};
+
 pub const ColorRange = enum(c_int) {
     FULL = 0,
     LIMITED = 1,

@@ -177,6 +177,12 @@ pub fn ZMap(comptime MT: type) type {
             return std.enums.fromInt(vsc.ChromaLocation, value);
         }
 
+        pub fn getRange(self: *const Self) ?vsc.Range {
+            const value: i32 = self.getInt(i32, "_Range") orelse return null;
+            return std.enums.fromInt(vsc.Range, value);
+        }
+
+        /// Deprecated, use `getRange` instead.
         pub fn getColorRange(self: *const Self) ?vsc.ColorRange {
             const value: i32 = self.getInt(i32, "_ColorRange") orelse return null;
             return std.enums.fromInt(vsc.ColorRange, value);
@@ -326,6 +332,11 @@ pub fn ZMap(comptime MT: type) type {
             self.setInt("_ChromaLocation", @backingInt(n), .Replace);
         }
 
+        pub fn setRange(self: *const Self, n: vsc.Range) void {
+            self.setInt("_Range", @backingInt(n), .Replace);
+        }
+
+        /// Deprecated, use `setRange` instead.
         pub fn setColorRange(self: *const Self, n: vsc.ColorRange) void {
             self.setInt("_ColorRange", @backingInt(n), .Replace);
         }
