@@ -38,7 +38,7 @@ fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_dat
         const dst_prop = dst.getPropertiesRW();
 
         const prop_example: vsc.MatrixCoefficient = src_prop.getMatrix();
-        dst_prop.setInt("prop_example", @intFromEnum(prop_example), .Replace);
+        dst_prop.setInt("prop_example", @backingInt(prop_example), .Replace);
 
         std.debug.assert(src_prop.getCombed() == null);
         std.debug.assert(src_prop.getPictType() == null);
@@ -127,7 +127,7 @@ const name = "Invert";
 fn invertCreate(in: ?*const vs.Map, out: ?*vs.Map, _: ?*anyopaque, core: ?*vs.Core, vsapi: ?*const vs.API) callconv(.c) void {
     var d: InvertData = undefined;
 
-    var print_buf = [_]u8{0} ** 512; // buffer for setError2
+    var print_buf: [512]u8 = @splat(0); // buffer for setError2
     const zapi = ZAPI.init(vsapi, core, null);
     const map_in = zapi.initZMap(in);
     const map_out = zapi.initZMap2(out, &print_buf);

@@ -275,7 +275,7 @@ pub fn ZMap(comptime MT: type) type {
                     @panic("ZMap.setError2: print_buf is too small for the formatted message.");
                 }
 
-                const msg = std.fmt.bufPrintSentinel(buf, fmt, args, 0) catch fmt;
+                const msg = std.mem.printSentinel(buf, fmt, args, 0) catch fmt;
                 self.zapi.mapSetError(self.map, msg);
             } else {
                 @panic("ZMap.setError2: print_buf is null, use zapi.initZMap2 to initialize ZMap with a buffer.");
@@ -323,27 +323,27 @@ pub fn ZMap(comptime MT: type) type {
         }
 
         pub fn setChromaLocation(self: *const Self, n: vsc.ChromaLocation) void {
-            self.setInt("_ChromaLocation", @intFromEnum(n), .Replace);
+            self.setInt("_ChromaLocation", @backingInt(n), .Replace);
         }
 
         pub fn setColorRange(self: *const Self, n: vsc.ColorRange) void {
-            self.setInt("_ColorRange", @intFromEnum(n), .Replace);
+            self.setInt("_ColorRange", @backingInt(n), .Replace);
         }
 
         pub fn setFieldBased(self: *const Self, n: vsc.FieldBased) void {
-            self.setInt("_FieldBased", @intFromEnum(n), .Replace);
+            self.setInt("_FieldBased", @backingInt(n), .Replace);
         }
 
         pub fn setMatrix(self: *const Self, n: vsc.MatrixCoefficient) void {
-            self.setInt("_Matrix", @intFromEnum(n), .Replace);
+            self.setInt("_Matrix", @backingInt(n), .Replace);
         }
 
         pub fn setPrimaries(self: *const Self, n: vsc.ColorPrimaries) void {
-            self.setInt("_Primaries", @intFromEnum(n), .Replace);
+            self.setInt("_Primaries", @backingInt(n), .Replace);
         }
 
         pub fn setTransfer(self: *const Self, n: vsc.TransferCharacteristics) void {
-            self.setInt("_Transfer", @intFromEnum(n), .Replace);
+            self.setInt("_Transfer", @backingInt(n), .Replace);
         }
 
         pub fn setDurationNum(self: *const Self, n: i64) void {
@@ -383,7 +383,7 @@ pub fn ZMap(comptime MT: type) type {
         }
 
         pub fn setVideoFormat(self: *const Self, key: [:0]const u8, n: vs.PresetVideoFormat, mode: vs.MapAppendMode) void {
-            _ = self.zapi.mapSetInt(self.map, key, @intFromEnum(n), mode);
+            _ = self.zapi.mapSetInt(self.map, key, @backingInt(n), mode);
         }
     };
 }

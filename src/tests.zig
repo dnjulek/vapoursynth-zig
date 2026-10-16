@@ -40,12 +40,12 @@ const ZAPI = vapoursynth.ZAPI;
 /// by `touchGenerics` / the `helper:` tests respectively.
 fn refFns(comptime T: type) usize {
     var sum: usize = 0;
-    inline for (@typeInfo(T).@"struct".decls) |decl| {
-        const f = @field(T, decl.name);
+    inline for (@typeInfo(T).@"struct".decl_names) |decl_name| {
+        const f = @field(T, decl_name);
         const FT = @TypeOf(f);
         if (@typeInfo(FT) == .@"fn") {
             const fi = @typeInfo(FT).@"fn";
-            if (!fi.is_generic and !std.mem.eql(u8, @tagName(fi.calling_convention), "inline")) {
+            if (!fi.is_generic and fi.attrs.@"callconv" != .@"inline") {
                 sum +%= @intFromPtr(&f);
             }
         }
@@ -230,74 +230,74 @@ fn touchZFrameWrites(z: anytype) void {
 // ---------------------------------------------------------------------------
 
 test "abi: VSAPI has exactly 116 function pointers, all nullable" {
-    try testing.expectEqual(@as(usize, 116), @typeInfo(vs.API).@"struct".fields.len);
-    inline for (@typeInfo(vs.API).@"struct".fields) |field| {
-        try testing.expect(@typeInfo(field.type) == .optional);
+    try testing.expectEqual(@as(usize, 116), @typeInfo(vs.API).@"struct".field_types.len);
+    inline for (@typeInfo(vs.API).@"struct".field_types) |field_type| {
+        try testing.expect(@typeInfo(field_type) == .optional);
     }
 }
 
 test "abi: VSSCRIPTAPI and VSPLUGINAPI shapes" {
-    inline for (@typeInfo(vss.API).@"struct".fields) |field| {
-        try testing.expect(@typeInfo(field.type) == .optional);
+    inline for (@typeInfo(vss.API).@"struct".field_types) |field_type| {
+        try testing.expect(@typeInfo(field_type) == .optional);
     }
     // getAPIVersion, configPlugin, registerFunction
-    try testing.expectEqual(@as(usize, 3), @typeInfo(vs.PLUGINAPI).@"struct".fields.len);
+    try testing.expectEqual(@as(usize, 3), @typeInfo(vs.PLUGINAPI).@"struct".field_types.len);
     try testing.expectEqual(@as(c_int, 4), vss.VSSCRIPT_API_MAJOR);
     try testing.expectEqual(@as(c_int, 4), vs.VAPOURSYNTH_API_MAJOR);
 }
 
 test "abi: MapPropertyError keeps the swapped Index/Error values" {
-    try testing.expectEqual(@as(c_int, 0), @intFromEnum(vs.MapPropertyError.Success));
-    try testing.expectEqual(@as(c_int, 1), @intFromEnum(vs.MapPropertyError.Unset));
-    try testing.expectEqual(@as(c_int, 2), @intFromEnum(vs.MapPropertyError.Type));
+    try testing.expectEqual(@as(c_int, 0), @backingInt(vs.MapPropertyError.Success));
+    try testing.expectEqual(@as(c_int, 1), @backingInt(vs.MapPropertyError.Unset));
+    try testing.expectEqual(@as(c_int, 2), @backingInt(vs.MapPropertyError.Type));
     // the gotcha: index is 4 and error is 3 (not sequential)
-    try testing.expectEqual(@as(c_int, 4), @intFromEnum(vs.MapPropertyError.Index));
-    try testing.expectEqual(@as(c_int, 3), @intFromEnum(vs.MapPropertyError.Error));
+    try testing.expectEqual(@as(c_int, 4), @backingInt(vs.MapPropertyError.Index));
+    try testing.expectEqual(@as(c_int, 3), @backingInt(vs.MapPropertyError.Error));
 }
 
 test "abi: PropertyType values 0..8" {
-    try testing.expectEqual(@as(c_int, 0), @intFromEnum(vs.PropertyType.Unset));
-    try testing.expectEqual(@as(c_int, 1), @intFromEnum(vs.PropertyType.Int));
-    try testing.expectEqual(@as(c_int, 2), @intFromEnum(vs.PropertyType.Float));
-    try testing.expectEqual(@as(c_int, 3), @intFromEnum(vs.PropertyType.Data));
-    try testing.expectEqual(@as(c_int, 4), @intFromEnum(vs.PropertyType.Function));
-    try testing.expectEqual(@as(c_int, 5), @intFromEnum(vs.PropertyType.VideoNode));
-    try testing.expectEqual(@as(c_int, 6), @intFromEnum(vs.PropertyType.AudioNode));
-    try testing.expectEqual(@as(c_int, 7), @intFromEnum(vs.PropertyType.VideoFrame));
-    try testing.expectEqual(@as(c_int, 8), @intFromEnum(vs.PropertyType.AudioFrame));
+    try testing.expectEqual(@as(c_int, 0), @backingInt(vs.PropertyType.Unset));
+    try testing.expectEqual(@as(c_int, 1), @backingInt(vs.PropertyType.Int));
+    try testing.expectEqual(@as(c_int, 2), @backingInt(vs.PropertyType.Float));
+    try testing.expectEqual(@as(c_int, 3), @backingInt(vs.PropertyType.Data));
+    try testing.expectEqual(@as(c_int, 4), @backingInt(vs.PropertyType.Function));
+    try testing.expectEqual(@as(c_int, 5), @backingInt(vs.PropertyType.VideoNode));
+    try testing.expectEqual(@as(c_int, 6), @backingInt(vs.PropertyType.AudioNode));
+    try testing.expectEqual(@as(c_int, 7), @backingInt(vs.PropertyType.VideoFrame));
+    try testing.expectEqual(@as(c_int, 8), @backingInt(vs.PropertyType.AudioFrame));
 }
 
 test "abi: AudioChannels keeps the FFmpeg numbering gaps" {
     // gap between TopBackRight (17) and StereoLeft (29)
-    try testing.expectEqual(@as(c_int, 17), @intFromEnum(vs.AudioChannels.TopBackRight));
-    try testing.expectEqual(@as(c_int, 29), @intFromEnum(vs.AudioChannels.StereoLeft));
-    try testing.expectEqual(@as(c_int, 30), @intFromEnum(vs.AudioChannels.StereoRight));
-    try testing.expectEqual(@as(c_int, 33), @intFromEnum(vs.AudioChannels.SurroundDirectLeft));
-    try testing.expectEqual(@as(c_int, 35), @intFromEnum(vs.AudioChannels.LowFrequency2));
+    try testing.expectEqual(@as(c_int, 17), @backingInt(vs.AudioChannels.TopBackRight));
+    try testing.expectEqual(@as(c_int, 29), @backingInt(vs.AudioChannels.StereoLeft));
+    try testing.expectEqual(@as(c_int, 30), @backingInt(vs.AudioChannels.StereoRight));
+    try testing.expectEqual(@as(c_int, 33), @backingInt(vs.AudioChannels.SurroundDirectLeft));
+    try testing.expectEqual(@as(c_int, 35), @backingInt(vs.AudioChannels.LowFrequency2));
 }
 
 test "abi: ColorFamily / SampleType / MediaType / ActivationReason" {
-    try testing.expectEqual(@as(c_int, 0), @intFromEnum(vs.ColorFamily.Undefined));
-    try testing.expectEqual(@as(c_int, 1), @intFromEnum(vs.ColorFamily.Gray));
-    try testing.expectEqual(@as(c_int, 2), @intFromEnum(vs.ColorFamily.RGB));
-    try testing.expectEqual(@as(c_int, 3), @intFromEnum(vs.ColorFamily.YUV));
-    try testing.expectEqual(@as(c_int, 0), @intFromEnum(vs.SampleType.Integer));
-    try testing.expectEqual(@as(c_int, 1), @intFromEnum(vs.SampleType.Float));
-    try testing.expectEqual(@as(c_int, 1), @intFromEnum(vs.MediaType.Video));
-    try testing.expectEqual(@as(c_int, 2), @intFromEnum(vs.MediaType.Audio));
-    try testing.expectEqual(@as(c_int, -1), @intFromEnum(vs.ActivationReason.Error));
+    try testing.expectEqual(@as(c_int, 0), @backingInt(vs.ColorFamily.Undefined));
+    try testing.expectEqual(@as(c_int, 1), @backingInt(vs.ColorFamily.Gray));
+    try testing.expectEqual(@as(c_int, 2), @backingInt(vs.ColorFamily.RGB));
+    try testing.expectEqual(@as(c_int, 3), @backingInt(vs.ColorFamily.YUV));
+    try testing.expectEqual(@as(c_int, 0), @backingInt(vs.SampleType.Integer));
+    try testing.expectEqual(@as(c_int, 1), @backingInt(vs.SampleType.Float));
+    try testing.expectEqual(@as(c_int, 1), @backingInt(vs.MediaType.Video));
+    try testing.expectEqual(@as(c_int, 2), @backingInt(vs.MediaType.Audio));
+    try testing.expectEqual(@as(c_int, -1), @backingInt(vs.ActivationReason.Error));
 }
 
 test "abi: preset format ids follow VS_MAKE_VIDEO_ID" {
     // formula: (cf << 28) | (st << 24) | (bps << 16) | (ssw << 8) | ssh
-    try testing.expectEqual(vs.makeVideoID(.Gray, .Integer, 8, 0, 0), @intFromEnum(vs.PresetVideoFormat.Gray8));
-    try testing.expectEqual(vs.makeVideoID(.YUV, .Integer, 8, 1, 1), @intFromEnum(vs.PresetVideoFormat.YUV420P8));
-    try testing.expectEqual(vs.makeVideoID(.YUV, .Float, 32, 0, 0), @intFromEnum(vs.PresetVideoFormat.YUV444PS));
-    try testing.expectEqual(vs.makeVideoID(.RGB, .Integer, 8, 0, 0), @intFromEnum(vs.PresetVideoFormat.RGB24));
+    try testing.expectEqual(vs.makeVideoID(.Gray, .Integer, 8, 0, 0), @backingInt(vs.PresetVideoFormat.Gray8));
+    try testing.expectEqual(vs.makeVideoID(.YUV, .Integer, 8, 1, 1), @backingInt(vs.PresetVideoFormat.YUV420P8));
+    try testing.expectEqual(vs.makeVideoID(.YUV, .Float, 32, 0, 0), @backingInt(vs.PresetVideoFormat.YUV444PS));
+    try testing.expectEqual(vs.makeVideoID(.RGB, .Integer, 8, 0, 0), @backingInt(vs.PresetVideoFormat.RGB24));
     // concrete bit patterns
-    try testing.expectEqual(@as(u32, 0x10080000), @intFromEnum(vs.PresetVideoFormat.Gray8));
-    try testing.expectEqual(@as(u32, 0x20080000), @intFromEnum(vs.PresetVideoFormat.RGB24));
-    try testing.expectEqual(@as(u32, 0), @intFromEnum(vs.PresetVideoFormat.None));
+    try testing.expectEqual(@as(u32, 0x10080000), @backingInt(vs.PresetVideoFormat.Gray8));
+    try testing.expectEqual(@as(u32, 0x20080000), @backingInt(vs.PresetVideoFormat.RGB24));
+    try testing.expectEqual(@as(u32, 0), @backingInt(vs.PresetVideoFormat.None));
 }
 
 test "abi: makeVersion packs major into the high 16 bits" {
@@ -333,13 +333,13 @@ test "abi: extern struct layout matches the C ABI (64-bit)" {
 test "abi: vsconstants reserved-property values (<= API 4.1 range semantics)" {
     // NOTE: VSConstants4.h flips ColorRange under API 4.2 (FULL=1, LIMITED=0).
     // The default build targets API 4.1, where FULL=0 / LIMITED=1.
-    try testing.expectEqual(@as(c_int, 0), @intFromEnum(vsc.ColorRange.FULL));
-    try testing.expectEqual(@as(c_int, 1), @intFromEnum(vsc.ColorRange.LIMITED));
-    try testing.expectEqual(@as(c_int, 2), @intFromEnum(vsc.ChromaLocation.TOP_LEFT));
-    try testing.expectEqual(@as(c_int, 1), @intFromEnum(vsc.MatrixCoefficient.BT709));
-    try testing.expectEqual(@as(c_int, 9), @intFromEnum(vsc.MatrixCoefficient.BT2020_NCL));
-    try testing.expectEqual(@as(c_int, 16), @intFromEnum(vsc.TransferCharacteristics.ST2084));
-    try testing.expectEqual(@as(c_int, 22), @intFromEnum(vsc.ColorPrimaries.EBU3213_E));
+    try testing.expectEqual(@as(c_int, 0), @backingInt(vsc.ColorRange.FULL));
+    try testing.expectEqual(@as(c_int, 1), @backingInt(vsc.ColorRange.LIMITED));
+    try testing.expectEqual(@as(c_int, 2), @backingInt(vsc.ChromaLocation.TOP_LEFT));
+    try testing.expectEqual(@as(c_int, 1), @backingInt(vsc.MatrixCoefficient.BT709));
+    try testing.expectEqual(@as(c_int, 9), @backingInt(vsc.MatrixCoefficient.BT2020_NCL));
+    try testing.expectEqual(@as(c_int, 16), @backingInt(vsc.TransferCharacteristics.ST2084));
+    try testing.expectEqual(@as(c_int, 22), @backingInt(vsc.ColorPrimaries.EBU3213_E));
 }
 
 // ---------------------------------------------------------------------------
@@ -363,8 +363,8 @@ test "ffi-signature: getReadPtr / getWritePtr are nullable (C returns NULL on a 
 }
 
 test "ffi-signature: getFrame's errorMsg is a writable buffer" {
-    const params = @typeInfo(FieldFn(vs.API, "getFrame")).@"fn".params;
-    try testing.expect(params[2].type.? == ?[*]u8);
+    const param_types = @typeInfo(FieldFn(vs.API, "getFrame")).@"fn".param_types;
+    try testing.expect(param_types[2].? == ?[*]u8);
 }
 
 test "ffi-signature: GetVapourSynthAPI typedef may return NULL" {
@@ -378,12 +378,12 @@ test "ffi-signature: GetVapourSynthAPI typedef may return NULL" {
 
 test "ffi-signature: FrameDoneCallback's error_msg is optional (NULL on success)" {
     const CbFn = @typeInfo(@typeInfo(vs.FrameDoneCallback).optional.child).pointer.child;
-    const params = @typeInfo(CbFn).@"fn".params;
-    try testing.expect(params[4].type.? == ?[*:0]const u8);
+    const param_types = @typeInfo(CbFn).@"fn".param_types;
+    try testing.expect(param_types[4].? == ?[*:0]const u8);
 }
 
 test "ffi-signature: PresetVideoFormat is non-exhaustive (arbitrary valid ids)" {
-    try testing.expect(!@typeInfo(vs.PresetVideoFormat).@"enum".is_exhaustive);
+    try testing.expect(@typeInfo(vs.PresetVideoFormat).@"enum".mode == .nonexhaustive);
 }
 
 test "ffi-signature: CoreCreationFlags is a c_int bit-field" {
@@ -451,18 +451,18 @@ test "helper: muldivRational scales and reduces in place" {
 test "helper: bitblt copies row-by-row honouring strides" {
     // padded source (stride 4) into a tightly-packed destination (stride 3)
     const src = [_]u8{ 1, 2, 3, 99, 4, 5, 6, 99 };
-    var dst = [_]u8{0} ** 6;
+    var dst: [6]u8 = @splat(0);
     vsh.bitblt(&dst, 3, &src, 4, 3, 2);
     try testing.expectEqualSlices(u8, &.{ 1, 2, 3, 4, 5, 6 }, &dst);
 
     // fast path: stride == row_size on both sides -> single memcpy
     const src2 = [_]u8{ 7, 8, 9, 10 };
-    var dst2 = [_]u8{0} ** 4;
+    var dst2: [4]u8 = @splat(0);
     vsh.bitblt(&dst2, 2, &src2, 2, 2, 2);
     try testing.expectEqualSlices(u8, &src2, &dst2);
 
     // height 0 -> no-op
-    var dst3 = [_]u8{42} ** 2;
+    var dst3: [2]u8 = @splat(42);
     vsh.bitblt(&dst3, 1, &src2, 1, 1, 0);
     try testing.expectEqual(@as(u8, 42), dst3[0]);
 }

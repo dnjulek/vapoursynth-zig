@@ -4,7 +4,7 @@ const build_options = @import("build_options");
 const vs = @import("vapoursynth4.zig");
 
 pub const VSSCRIPT_API_MAJOR: c_int = 4;
-pub const VSSCRIPT_API_MINOR: c_int = @intFromEnum(build_options.vssapi4_minor);
+pub const VSSCRIPT_API_MINOR: c_int = @backingInt(build_options.vssapi4_minor);
 pub const VSSCRIPT_API_VERSION: c_int = vs.makeVersion(VSSCRIPT_API_MAJOR, VSSCRIPT_API_MINOR);
 
 pub const VSScript = opaque {};

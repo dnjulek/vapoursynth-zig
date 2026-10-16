@@ -34,7 +34,7 @@ fn invertGetFrame(n: c_int, activation_reason: vs.ActivationReason, instance_dat
         const src_prop = src.getPropertiesRO();
         const dst_prop = dst.getPropertiesRW();
         const prop_example: vsc.MatrixCoefficient = src_prop.getMatrix();
-        dst_prop.setInt("prop_example", @intFromEnum(prop_example), .Replace);
+        dst_prop.setInt("prop_example", @backingInt(prop_example), .Replace);
         dst_prop.setChromaLocation(.TOP_LEFT);
         dst_prop.setCombed(false);
         dst_prop.setTransfer(.LOG_316);

@@ -35,7 +35,7 @@ pub fn isSameVideoFormat(v1: *const vs.VideoFormat, v2: *const vs.VideoFormat) b
 
 /// convenience function to check if a clip has the same format as a format id
 pub fn isSameVideoPresetFormat(presetFormat: u32, v: *const vs.VideoFormat, core: ?*vs.Core, vsapi: *const vs.API) bool {
-    return @intFromEnum(vsapi.queryVideoFormatID.?(v.colorFamily, v.sampleType, v.bitsPerSample, v.subSamplingW, v.subSamplingH, core)) == presetFormat;
+    return @backingInt(vsapi.queryVideoFormatID.?(v.colorFamily, v.sampleType, v.bitsPerSample, v.subSamplingW, v.subSamplingH, core)) == presetFormat;
 }
 
 /// convenience function to check for if two clips have the same format (but not framerate)
